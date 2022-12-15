@@ -380,8 +380,255 @@ def videoD():
                         mimetype='multipart/x-mixed-replace; boundary=frame')
 ###################################################################################
 
+#####################fr candidate addon####################
+from flask import Flask, Response, json, render_template
+from werkzeug.utils import secure_filename
+from flask import request
+from os import path, getcwd
+import time
+import os
+import cv2
+from mtcnn import MTCNN
+import numpy as np
 
 
+##############################
+roi_x = 0
+roi_y = 0
+roi_w = 0
+rou_h = 0
+gTracker = None
+gLabel = ''
+gPath = os.getcwd()
+
+
+
+class FR_candidate_addon(object):
+    def __init__(self, url):
+        self.video = cv2.VideoCapture(url)
+        self.url = url
+        self.error_count = 0
+
+    def __del__(self):
+        self.video.release()
+
+    
+    def get_frame(self):
+        
+
+        fn_haar = 'haarcascade_frontalface_default.xml'
+        haar_cascade = cv2.CascadeClassifier(fn_haar)
+        success, frame = self.video.read()
+        print("hello")
+
+        if success:
+            count = 0
+            size = 4
+            # fn_haar = 'haarcascade_frontalface_default.xml'
+            fn_dir = str(os.getcwd())+'/database/'
+            fn_name = gLabel
+            print(fn_name )
+            path = os.path.join(fn_dir, fn_name)
+            # if not os.path.isdir(path):
+            #     os.mkdir(path)
+            (im_width, im_height) = (112, 112)
+            # haar_cascade = cv2.CascadeClassifier(fn_haar)
+            
+            frame= cv2.flip(frame, 1, 0)
+            gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+            mini = cv2.resize(gray,(gray.shape[1]//size, gray.shape[0]//size))
+            faces = haar_cascade.detectMultiScale(mini)
+            faces = sorted(faces, key=lambda x: x[3])
+            if faces:
+                face_i = faces[0]
+                (x, y, w, h) = [v * size for v in face_i]
+                face = gray[y:y + h, x:x + w]
+                face_resize = cv2.resize(face, (im_width, im_height))
+                pin=sorted([int(n[:n.find('.')]) for n in os.listdir(path)
+                    if n[0]!='.' ]+[0])[-1] + 1
+                cv2.imwrite('%s/%s.png' % (path, pin), face_resize)
+                cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 3)
+                cv2.putText(frame, fn_name, (x - 10, y - 10), cv2.FONT_HERSHEY_PLAIN,
+                    1,(0, 255, 0))
+                time.sleep(0.38)
+                count += 1
+            
+            print(str(count) + " images taken and saved to " + fn_name +" folder in database ")
+
+                    
+               
+               
+            #ret, jpeg = cv2.imencode('.jpg', cv2.resize(image, (160, 90)))
+            ret, jpeg = cv2.imencode('.jpg', frame)
+            return jpeg.tobytes(), True
+        else:
+            return None, False
+
+
+def gen_frca(camera):
+    while True:
+        frame, suc = camera.get_frame()
+        yield (b'--frame\r\n'
+                b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
+
+
+
+@app.route('/video_feed_frca')
+def frc_video_feed():
+    url = request.args.get('url')
+    return Response(gen_frca(FR_candidate_addon(url)), mimetype='multipart/x-mixed-replace; boundary=frame')
+
+
+
+
+
+@app.route('/api/addLabelfrca', methods=['POST'])
+def api_addLabelfrca():
+    print("---Add label---")
+    
+    label = request.form.get('label')
+    global gTracker
+    gTracker = DlibTracker()
+   
+    global gLabel, gPath
+    gLabel = label
+    gPath = str(os.getcwd())+"/database/" + gLabel
+    print(gPath)
+    Path(gPath).mkdir(parents=True, exist_ok=True)
+    Path(gPath + "/Images")
+ 
+
+
+    return json.dumps({
+        'status': 200,
+        'msg': 'ok'
+    })
+
+###################frca model training##################
+
+from FR.generate_face_embeddings import GenerateFaceEmbedding
+from FR.facial_recognition_model_training import TrainFaceRecogModel
+
+
+
+@app.route('/frca_modeltrain')
+def frca_modeltrain():
+    gfe = GenerateFaceEmbedding()
+    gfe.genFaceEmbedding(gPath)
+    frmt = TrainFaceRecogModel()
+    frmt.trainKerasModelForFaceRecognition()
+
+    return None
+
+################## Face recognition ####################
+from mtcnn import MTCNN
+import warnings
+import sys
+import dlib
+
+from keras.models import load_model
+import numpy as np
+import pickle
+import cv2
+from imutils.video import FPS
+import os
+from FR import face_model
+##################
+class FacePredictor():
+    def __init__(self,url):
+       
+
+      
+
+        self.video = cv2.VideoCapture(url)
+        self.url = url
+        self.error_count = 0
+        
+        self.frame_width = int(self.video.get(3))
+        self.frame_height = int(self.video.get(4))
+        print(str(self.frame_width) + " : " + str(self.frame_height))
+        self.save_width = 800
+        self.save_height = int(800 / self.frame_width * self.frame_height)
+
+    
+
+
+    def detectFace(self):
+         
+        
+                
+        size = 4
+        haar_file = 'haarcascade_frontalface_default.xml'
+        (width, height) = (128, 128)
+        face_cascade = cv2.CascadeClassifier(haar_file)
+      
+        embeddings = os.path.sep.join(
+            [str(os.getcwd()), "FR/faceEmbeddingModels/embeddings.pickle"])
+        le = os.path.sep.join(
+            [str(os.getcwd()),  "FR/faceEmbeddingModels/le.pickle"])
+
+        # Load embeddings and labels
+        data = pickle.loads(open(embeddings, "rb").read())
+        le = pickle.loads(open(le, "rb").read())
+
+        embeddings = np.array(data['embeddings'])
+        labels = le.fit_transform(data['names'])
+
+        # Load the classifier model
+        model = load_model(os.path.sep.join(
+            [str(os.getcwd()), "FR/faceEmbeddingModels/my_model.h5"]))
+        success ,im = self.video.read()
+        
+        if success:
+            im = cv2.resize(im, (self.save_width, self.save_height))
+            gray = cv2.cvtColor(im, cv2.COLOR_BGR2GRAY)
+            faces = face_cascade.detectMultiScale(gray, 1.3, 5)
+            for (x, y, w, h) in faces:
+                cv2.rectangle(im, (x, y), (x + w, y + h), (255, 0, 0), 2)
+                face = gray[y:y + h, x:x + w]
+                face_resize = cv2.resize(face, (width, height))
+                # Try to recognize the face
+                
+                prediction = model.predict(face_resize)
+                j = np.argmax(prediction)
+                cv2.rectangle(im, (x, y), (x + w, y + h), (0, 255, 0), 3)
+
+                if prediction[1] < 500:
+                    name =  le.classes_[j]
+                    text = "{}".format(name)
+                    cv2.putText(im,text, (x - 10, y - 10), cv2.FONT_HERSHEY_PLAIN, 1, (0, 255, 0))
+
+                else:
+                    cv2.putText(im, 'not recognized', (x - 10, y - 10), cv2.FONT_HERSHEY_PLAIN, 1, (0, 255, 0))
+
+            ret, jpeg = cv2.imencode('.jpg', im)
+            return jpeg.tobytes(), True
+        else:
+            return None, False
+
+           
+            
+            
+
+
+def gen_fr(camera):
+    while True:
+        frame, suc = camera.detectFace()
+        yield (b'--frame\r\n'
+                b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
+
+
+
+@app.route('/video_feed_fr')
+def fr_video_feed():
+    url = request.args.get('url')
+    return Response(gen_fr(FacePredictor(url)), mimetype='multipart/x-mixed-replace; boundary=frame')
+
+
+
+
+
+#################################################################################
 
 
 

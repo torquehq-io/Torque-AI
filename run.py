@@ -324,27 +324,98 @@ import io
 import os
 from PIL import Image
 import numpy as np
-loadModel = (str(os.getcwd()))
+# loadModel = (str(os.getcwd()))
+
+
+# from io import BytesIO
+# @app.route('/detectModel')
+# def genDetect():
+#     path_model = loadModel + "/yolov5/train/" + gLabel + "/" + "weights" + "/" + "best.pt"
+#     print("model pARTHHH", path_model)
+
+#     #model = torch.hub.load("ultralytics/yolov5", "custom", path = path_model ,force_reload=True)
+#     model = torch.hub.load('yolov5', 'custom', path=loadModel + "/yolov5/runs/" + "/" + "train" + "/" + gLabel + "/" + "weights" + "/" + "best.pt", source='local', force_reload=True)
+#     # Set Model Settings
+#     model.eval()
+#     model.conf = 0.6  # confidence threshold (0-1)
+#     model.iou = 0.45  # NMS IoU threshold (0-1) 
+#     cap=cv2.VideoCapture('rtmp://media5.ambicam.com:1938/live/81f911d4-84b2-43a9-98bd-bdba4dc4538f')
+#     # Read until video is completed
+#     while(cap.isOpened()):
+        
+#         # Capture frame-by-fram ## read the camera frame
+#         success, frame = cap.read()
+#         if success == True:
+
+#             ret,buffer=cv2.imencode('.jpg',frame)
+#             frame=buffer.tobytes()
+            
+#             #print(type(frame))
+
+#             img = Image.open(io.BytesIO(frame))
+#             results = model(img, size=640)
+           
+#             results.print()  # print results to screen
+            
+            
+#             #convert remove single-dimensional entries from the shape of an array
+#             img = np.squeeze(results.render()) #RGB
+#             # read image as BGR
+#             img_BGR = cv2.cvtColor(img, cv2.COLOR_RGB2BGR) #BGR
+
+#         else:
+#             break
+
+#         # Encode BGR image to bytes so that cv2 will convert to RGB
+#         frame = cv2.imencode('.jpg', img_BGR)[1].tobytes()
+#         #print(frame)
+        
+#         yield(b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+
+# @app.route('/videoDetect')
+# def videoD():
+#     """Video streaming route. Put this in the src attribute of an img tag."""
+
+#     return Response(genDetect(),
+#                         mimetype='multipart/x-mixed-replace; boundary=frame')
+
+oadModel = (str(os.getcwd()))
 
 
 from io import BytesIO
-@app.route('/detectModel')
-def genDetect():
-    path_model = loadModel + "/yolov5/train/" + gLabel + "/" + "weights" + "/" + "best.pt"
-    print("model pARTHHH", path_model)
 
-    #model = torch.hub.load("ultralytics/yolov5", "custom", path = path_model ,force_reload=True)
-    model = torch.hub.load('yolov5', 'custom', path=loadModel + "/yolov5/runs/" + "/" + "train" + "/" + gLabel + "/" + "weights" + "/" + "best.pt", source='local', force_reload=True)
-    # Set Model Settings
-    model.eval()
-    model.conf = 0.6  # confidence threshold (0-1)
-    model.iou = 0.45  # NMS IoU threshold (0-1) 
-    cap=cv2.VideoCapture('rtmp://media5.ambicam.com:1938/live/81f911d4-84b2-43a9-98bd-bdba4dc4538f')
-    # Read until video is completed
-    while(cap.isOpened()):
+
+
+class Objdetection():
+    def __init__(self, url):
+        self.video = cv2.VideoCapture(url)
+        self.url = url
+        self.error_count = 0
+
+        # self.model = torch.hub.load('yolov5', 'custom', path=loadModel + "/yolov5/runs/" + "/" + "train" + "/" + gLabel + "/" + "weights" + "/" + gLabel+".pt", source='local', force_reload=True)
+        self.model = torch.hub.load('yolov5', 'custom', path=loadModel + '/yolov5/runs/train/'+gLabel+'/weights/'+gLabel+'.pt', source='local', force_reload=True)
+    def __del__(self):
+        self.video.release()
+    
+    def get_frame(self):
+        path_model = loadModel + "/yolov5/train/" + gLabel + "/" + "weights" + "/" + gLabel+'.pt'
+        print("model pARTHHH", path_model)
+
+        # model = torch.hub.load("ultralytics/yolov5", "custom", path = "/home/torque/Desktop/Torque-AI/Rampage/Intact-core/Rampage_AI/yolov5/runs/train/2/weights/best.pt",force_reload=True)
         
-        # Capture frame-by-fram ## read the camera frame
-        success, frame = cap.read()
+        # model = torch.hub.load('yolov5', 'custom', path=loadModel + "/yolov5/runs/" + "/" + "train" + "/" + gLabel + "/" + "weights" + "/" + "best.pt", source='local', force_reload=True)
+        
+        
+        # model = torch.hub.load('yolov5', 'custom', path='/home/torque/Desktop/Torque-AI/Rampage/Intact-core/Rampage_AI/yolov5/runs/train/a12/weights/a12.pt', source='local', force_reload=True)
+        # Set Model Settings
+        self.model.eval()
+        self.model.conf = 0.6  # confidence threshold (0-1)
+        self.model.iou = 0.45  # NMS IoU threshold (0-1) 
+      
+    
+        
+            # Capture frame-by-fram ## read the camera frame
+        success, frame = self.video.read()
         if success == True:
 
             ret,buffer=cv2.imencode('.jpg',frame)
@@ -353,8 +424,8 @@ def genDetect():
             #print(type(frame))
 
             img = Image.open(io.BytesIO(frame))
-            results = model(img, size=640)
-           
+            results =self.model(img, size=640)
+        
             results.print()  # print results to screen
             
             
@@ -362,22 +433,25 @@ def genDetect():
             img = np.squeeze(results.render()) #RGB
             # read image as BGR
             img_BGR = cv2.cvtColor(img, cv2.COLOR_RGB2BGR) #BGR
+            frame = cv2.imencode('.jpg', img_BGR)[1].tobytes()
+            return frame
+       
 
-        else:
-            break
+def gen_det(camera):
+    while True:
+        frame = camera.get_frame()
+        yield (b'--frame\r\n'
+                b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
 
-        # Encode BGR image to bytes so that cv2 will convert to RGB
-        frame = cv2.imencode('.jpg', img_BGR)[1].tobytes()
-        #print(frame)
-        
-        yield(b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
 
-@app.route('/videoDetect')
-def videoD():
-    """Video streaming route. Put this in the src attribute of an img tag."""
+@app.route('/video_feed_det')
+def det_video_feed():
+    url = request.args.get('url')
+    return Response(gen_det(Objdetection(url)), mimetype='multipart/x-mixed-replace; boundary=frame')
 
-    return Response(genDetect(),
-                        mimetype='multipart/x-mixed-replace; boundary=frame')
+
+
+
 ###################################################################################
 
 #####################fr candidate addon####################
@@ -690,7 +764,8 @@ class CentroidTracker:
 
     def deregister(self, objectID):
         # to deregister an object ID we delete the object ID from
-        # both of our respective dictionaries
+        # both of our respective dictionaries          <li class="nav-item"><a class="nav-link" href="autoannotation.html">
+             
         del self.objects[objectID]
         del self.disappeared[objectID]
         del self.bbox[objectID]  # CHANGE

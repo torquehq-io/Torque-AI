@@ -966,6 +966,73 @@ def pc_video_feed():
 
 
 
+########################## Fire detection ##########################
+
+class Fire_detection():
+    def __init__(self, url):
+        self.video = cv2.VideoCapture(url)
+        self.url = url
+        self.error_count = 0
+        self.model = torch.hub.load('yolov5', 'custom', path='/home/torquehq/Documents/Github/Torque-AI/Fire_detection/fire.pt', source='local', force_reload=True)
+
+       
+
+    def __del__(self):
+        self.video.release()
+    
+    def get_frame(self):
+       
+
+        
+        # Set Model Settings Dynamic
+        self.model.eval()
+        self.model.conf = 0.6  # confidence threshold (0-1)
+        self.model.iou = 0.45  # NMS IoU threshold (0-1) 
+      
+        # Set Model Settings Static
+        # model.eval()
+        # model.conf = 0.6  # confidence threshold (0-1)
+        # model.iou = 0.45  # NMS IoU threshold (0-1) 
+        
+            # Capture frame-by-fram ## read the camera frame
+        
+        success, frame = self.video.read()
+        if success == True:
+
+            ret,buffer=cv2.imencode('.jpg',frame)
+            frame=buffer.tobytes()
+            
+            #print(type(frame))
+
+            img = Image.open(io.BytesIO(frame))
+            results = self.model(img, size=640)
+        
+            results.print()  # print results to screen
+            
+            
+            #convert remove single-dimensional entries from the shape of an array
+            img = np.squeeze(results.render()) #RGB
+            # read image as BGR
+            img_BGR = cv2.cvtColor(img, cv2.COLOR_RGB2BGR) #BGR
+            frame = cv2.imencode('.jpg', img_BGR)[1].tobytes()
+            return frame
+       
+
+def gen_fire_det(camera):
+    while True:
+        frame = camera.get_frame()
+        yield (b'--frame\r\n'
+                b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
+
+
+@app.route('/video_feed_fire_det')
+def fire_det_video_feed():
+    url = request.args.get('url')
+    return Response(gen_fire_det(Fire_detection(url)), mimetype='multipart/x-mixed-replace; boundary=frame')
+
+
+
+
 
 #################################################################################
 

@@ -13,7 +13,7 @@ from PIL import Image
 app = Flask(__name__)
 models = {}
 
-DETECTION_URL = "/v1/object-detection/<model>"
+DETECTION_URL = "/home/torquehq/Documents/Github/Torque-AI/Fire_detection/fire.pt"
 
 
 @app.route(DETECTION_URL, methods=["POST"])

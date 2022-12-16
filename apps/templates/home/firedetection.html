@@ -12,7 +12,7 @@
 
 <head>
 
-	<head>
+
 
 		<meta name="apple-mobile-web-app-capable" content="yes">
 		<meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -103,12 +103,12 @@
 	<div>
 		<section>
 			<div class="row mt-4">
-				<div class="col-lg-7 mb-lg-0 mb-4">
+				<!-- <div class="col-lg-7 mb-lg-0 mb-4">
 					<div class="card">
 					</div>
-				</div>
-				<center>
-					<div class="col-lg-4">
+				</div> -->
+				
+					<div class="col-lg-6" style="display: none;">
 						<div class="card h-100 p-3">
 							<form id="urlForm" ,action="/training">
 								<label>RTMP URL:</label>
@@ -122,37 +122,70 @@
 						</div>
 					</div>
 
+					<div class="col-lg-6" style="display: none;">
+						<div class="card h-100 p-4">
+							<form id="urlForm1" ,action="/training">
+								<label>RTMP URL-1:</label>
+								<input id="rtmpUrl1" style="width: 50%" type="text" name="rtmpUrl1" value="" />
+								<br>
+							
+								<button id="btnPlay1">Play</button>
+								<button id="btnStop1">Stop</button>
+								
+							</form>
+						</div>
+					</div>
 
-				</center>
+
+				
 			</div>
 			<br>
-			<center>
-				<div class="demo-container">
-					<img id='videoImage' src="" style="display:visible;" />
+
+
+			<div class="row mt-4">
+				<!-- <div class="col-lg-7 mb-lg-0 mb-4">
+					<div class="card">
+					</div>
+				</div> -->
+				
+				<div class="col-lg-6">
+					<div class="card h-100 p-4">
+						<img id='videoImage' src="" style="display:visible;" />
+					</div>
+				</div>
+					
+
+				<div class="col-lg-6">
+					<div class="card h-100 p-4">
+						<img id='videoImage1' src="" style="display:visible;" />
+					</div>
 				</div>
 				
-			</center>
+			
+			
+				
+			</div>
+			
+				
+			
+			
 		</section>
 	</div>
 	<script>
+		$("#videoImage").attr("src", "/video_feed_fire_det?url=" + rtmpUrl);
 		
-		
-		
-		
+		// $("#btnPlay").on("click", function (event) {
+		// 	event.preventDefault();
 
-
-		$("#btnPlay").on("click", function (event) {
-			event.preventDefault();
-
-			console.log("Playing stream ...");
-			var spinner = '<div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div>'
-			var rtmpUrl = $("#rtmpUrl").val();
-			$("#btnPlay").html(spinner);
-			// play in image
-			$("#videoImage").attr("src", "/video_feed_fire_det?url=" + rtmpUrl);
+		// 	console.log("Playing stream ...");
+		// 	var spinner = '<div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div>'
+		// 	var rtmpUrl = $("#rtmpUrl").val();
+		// 	$("#btnPlay").html(spinner);
+		// 	// play in image
+		// 	$("#videoImage").attr("src", "/video_feed_fire_det?url=" + rtmpUrl);
         
 			
-		});
+		// });
 		$("#btnStop").on("click", function (event) {
 			$("#btnPlay").text("Play");
 			event.preventDefault();
@@ -162,16 +195,77 @@
 		
 			$("#btnStop").text("Stop");
 		});
-		
 	
-
-
-
 	</script>
-	</script>
-
-
+	
 	<script async src="static/assets/js/annotation/opencv3.4.16.js" type="text/javascript"></script>
+
+
+
+	<!-- ##################################################### -->
+	<div>
+		<section>
+			<div class="row mt-4">
+				<div class="col-lg-7 mb-lg-0 mb-4">
+					<div class="card">
+					</div>
+				</div>
+				
+					<!-- <div class="col-lg-4">
+						<div class="card h-100 p-3">
+							<form id="urlForm1" ,action="/training">
+								<label>RTMP URL:</label>
+								<input id="rtmpUrl1" style="width: 50%" type="text" name="rtmpUrl1" value="" />
+								<br>
+							
+								<button id="btnPlay1">Play</button>
+								<button id="btnStop1">Stop</button>
+								
+							</form>
+						</div>
+					</div> -->
+
+
+				
+			</div>
+			<br>
+			<center>
+				<div class="demo-container">
+					<img id='videoImage1' src="" style="display:visible;" />
+				</div>
+			</center>
+			
+		</section>
+	</div>
+	<script>
+		$("#videoImage1").attr("src", "/video_feed_fire_det1?url1=" + rtmpUrl1);
+		// $("#btnPlay1").on("click", function (event) {
+		// 	event.preventDefault();
+
+		// 	console.log("Playing stream ...");
+		// 	var spinner = '<div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div>'
+		// 	var rtmpUrl1 = $("#rtmpUrl1").val();
+		// 	$("#btnPlay1").html(spinner);
+		// 	// play in image
+		// 	$("#videoImage1").attr("src", "/video_feed_fire_det1?url1=" + rtmpUrl1);
+        
+			
+		// });
+		$("#btnStop1").on("click", function (event) {
+			$("#btnPlay1").text("Play");
+			event.preventDefault();
+			console.log("Stop Stream ...");
+			
+			$("#videoImage1").attr("src", "/");
+		
+			$("#btnStop1").text("Stop");
+		});
+	
+	</script>
+	
+	<script async src="static/assets/js/annotation/opencv3.4.16.js" type="text/javascript"></script>
+
+
 </body>
 
 </html>

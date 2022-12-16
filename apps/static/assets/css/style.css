@@ -639,7 +639,12 @@ progress {
 
 .col-7 {
   flex: 0 0 auto;
-  width: 58.33333%; }
+  width: 0% !important ; 
+}
+
+.col-lg-7{
+  width: 0% !important ; 
+}
 
 .col-8 {
   flex: 0 0 auto;

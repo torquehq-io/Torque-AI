@@ -7,12 +7,12 @@
 
 {% block content %}
 
-    <div class="bg-light min-vh-100 d-flex flex-row align-items-center">
+    <div id="hahaha" class="bg-light min-vh-100 d-flex flex-row align-items-center">
       <div class="container">
         <div class="row justify-content-center">
           <div class="col-lg-8">
             <div class="card-group d-block d-md-flex row">
-              <div class="card col-md-7 p-4 mb-0">
+              <div class=" col-md-7 col-lg-6 p-4 mb-0" >
                 <div class="card-body">
                   <h1>Login</h1>
                   <p class="text-medium-emphasis">
@@ -41,10 +41,10 @@
                         </div>
                         <div class="row">
                           <div class="col-6">
-                            <button class="btn btn-primary px-4" type="submit" name="login">Login</button>
+                            <button class="btn btn-dark px-4" type="submit" name="login">Login</button>
                           </div>
                           <div class="col-6 text-end">
-                            <a href="{{ url_for('authentication_blueprint.register') }}" class="btn btn-link px-0" type="button">Register</a>
+                            <a href="{{ url_for('authentication_blueprint.register') }}" class="btn btn-link px-0" style="color:rgb(16, 41, 73);" type="button">Register</a>
                           </div>
                         </div>
 
@@ -52,26 +52,25 @@
 
                 </div>
               </div>
-              <div class="card col-md-5 text-white bg-primary py-5">
-                <div class="card-body text-center">
+              <div class="col-lg-6  text-white" style="padding:0%; margin:0%;">
+                <div class=" text-center">
                   <div>
                     <h2>
-                      Flask CoreUI
+                      
                     </h2>
-                    <p>
-                      MIT licensed admin dashboard for CoreUI Dashboard (Free Version)
-                    </p>
-                    <p>
-                      <a href="https://appseed.us/product/coreui/flask/" target="_blank"  
-                        class="btn btn-lg btn-outline-light mt-3">See Product</a>
-                    </p>
-
-                    <br />
-                    <p>
-                      &copy; <a class="text-white" target="_blank" href="https://bit.ly/2VTDaxg">CoreUI</a> 
-                      - coded by <a class="text-white" target="_blank" href="https://appseed.us">AppSeed</a>.
-                    </p>
+                    <!-- <img src="{{ config.ASSETS_ROOT }}/img/torque.PNG" style="width:70%;" class="navbar-brand-img h-100" alt="main_logo"> -->
+                    <video width="400" height="400" autoplay muted loop>
+                      <source src="{{ config.ASSETS_ROOT }}/img/torqueai.mp4" type="video/mp4">
+                      <source src="movie.ogg" type="video/ogg">
+                    
+                    </video>
         
+
+
+
+
+
+
                   </div>
                 </div>
               </div>
@@ -81,6 +80,7 @@
       </div>
     </div>
 
+  
 {% endblock content %}
 
 <!-- Specific Page JS goes HERE  -->

@@ -40,7 +40,7 @@ if DEBUG:
 ################################################################################
 ############# Auto Annotation tool ##################
 
-from flask import Flask, render_template, request, json, session, Response, url_for
+from flask import Flask, render_template, request, json, session, Response, url_for, send_file
 import os, base64, random
 from datetime import timedelta, datetime
 from os.path import join, dirname, realpath
@@ -301,22 +301,30 @@ def split():
                 f"cp {dataset_path}/{title}.txt {gLabel}/data/labels/valid")
 
 
+def rename_modelfile():
+    source_filepath = (str(os.getcwd())+"/yolov5/runs/train/"+gLabel+"/weights/best.pt")
+    rename_filepath =(str(os.getcwd())+"/yolov5/runs/train/"+gLabel+"/weights/"+gLabel+".pt")
+    renamed_file=os.rename(source_filepath,rename_filepath)
+    
+    
+    print("Successfully rename the model file name")
+    print("model genrated on  ")
+    return None
 
 @app.route('/trainingModel')
 def training():
     split()
 
     data1 = dataset_path + "/data/" +'data.yaml'
-    subprocess.run(['python3', 'yolov5/train.py', '--data', data1, '--name', gLabel])
-     
-    
-    
+    subprocess.run(['python3','-m','torch.distributed.run', '--nproc_per_node', '2','yolov5/train.py','--data', data1, '--name', gLabel])
+    rename_modelfile()
+       
     return "None"  
 
 model_path = (str(os.getcwd()))    
 @app.route('/downloadModel')
 def download():
-    Path = (model_path + "/yolov5/runs/train" + '/' + gLabel + '/weights/best.pt')
+    Path = (model_path + "/yolov5/runs/train" + '/' + gLabel + '/weights/'+gLabel+'.pt')
     print(Path)
     return send_file(Path, as_attachment=True) 
 
@@ -379,7 +387,7 @@ import numpy as np
 #     return Response(genDetect(),
 #                         mimetype='multipart/x-mixed-replace; boundary=frame')
 
-oadModel = (str(os.getcwd()))
+loadModel = (str(os.getcwd()))
 
 
 from io import BytesIO
@@ -1045,10 +1053,10 @@ def pc_video_feed():
 
 class Fire_detection():
     def __init__(self, url):
-        self.video = cv2.VideoCapture(url)
+        self.video = cv2.VideoCapture('rtmp://media1.ambicam.com:1938/dvr7/fd9b67cc-6c2e-46c6-99c4-0e13ac403e32')
         self.url = url
         self.error_count = 0
-        self.model = torch.hub.load('yolov5', 'custom', path='/home/torquehq/Documents/Github/Torque-AI/Fire_detection/fire.pt', source='local', force_reload=True)
+        self.model = torch.hub.load('yolov5', 'custom', path='Fire_detection/fire.pt', source='local', force_reload=True)
 
        
 
@@ -1103,15 +1111,79 @@ def gen_fire_det(camera):
 @app.route('/video_feed_fire_det')
 def fire_det_video_feed():
     url = request.args.get('url')
+    
     return Response(gen_fire_det(Fire_detection(url)), mimetype='multipart/x-mixed-replace; boundary=frame')
 
 
 
 
 
+
 #################################################################################
+class Fire_detection1():
+    def __init__(self, url1):
+        self.video = cv2.VideoCapture('rtmp://media1.ambicam.com:1938/dvr7/3803ff24-f7cc-48bb-bc25-bbc5486ef728')
+        self.url1 = url1
+        self.error_count = 0
+        self.model = torch.hub.load('yolov5', 'custom', path='Fire_detection/fire.pt', source='local', force_reload=True)
+
+       
+
+    def __del__(self):
+        self.video.release()
+    
+    def get_frame1(self):
+       
+
+        
+        # Set Model Settings Dynamic
+        self.model.eval()
+        self.model.conf = 0.6  # confidence threshold (0-1)
+        self.model.iou = 0.45  # NMS IoU threshold (0-1) 
+      
+        # Set Model Settings Static
+        # model.eval()
+        # model.conf = 0.6  # confidence threshold (0-1)
+        # model.iou = 0.45  # NMS IoU threshold (0-1) 
+        
+            # Capture frame-by-fram ## read the camera frame
+        
+        success, frame = self.video.read()
+        if success == True:
+
+            ret,buffer=cv2.imencode('.jpg',frame)
+            frame=buffer.tobytes()
+            
+            #print(type(frame))
+
+            img = Image.open(io.BytesIO(frame))
+            results = self.model(img, size=640)
+        
+            results.print()  # print results to screen
+            
+            
+            #convert remove single-dimensional entries from the shape of an array
+            img = np.squeeze(results.render()) #RGB
+            # read image as BGR
+            img_BGR = cv2.cvtColor(img, cv2.COLOR_RGB2BGR) #BGR
+            frame = cv2.imencode('.jpg', img_BGR)[1].tobytes()
+            return frame
+       
+
+def gen_fire_det1(camera1):
+    while True:
+        frame = camera1.get_frame1()
+        yield (b'--frame\r\n'
+                b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
 
 
+@app.route('/video_feed_fire_det1')
+def fire_det_video_feed1():
+    url1 = request.args.get('url1')
+    
+    return Response(gen_fire_det1(Fire_detection1(url1)), mimetype='multipart/x-mixed-replace; boundary=frame')
+
+#################################################################################
 
 if __name__ == "__main__":
     app.run()

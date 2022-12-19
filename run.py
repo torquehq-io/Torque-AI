@@ -314,16 +314,20 @@ def move_modelfile():
         current_loggin_user = current_user.username
         print(current_loggin_userid)
         print(current_loggin_user )
+    custom_models = os.path.join(str(getcwd()+"/Users_slab/"+current_loggin_user+"/Models/"),gLabel)
 
-    source_dir = str(getcwd()+"/yolov5/runs/train/"+gLabel+"/weights/"+gLabel+".pt")
-    target_dir = str(getcwd()+"/Users_slab/"+current_loggin_user+"/Models/")
-
-    shutil.move(os.path.join(source_dir), target_dir)
+    os.makedirs(custom_models)
+    source_dir = str(getcwd()+"/yolov5/runs/train/"+gLabel+"/")
+    target_dir = str(getcwd()+"/Users_slab/"+current_loggin_user+"/Models/"+gLabel)
+    file_names = os.listdir(source_dir)
+    #shutil.move(os.path.join(source_dir), target_dir)
+    for file_name in file_names:
+        shutil.move(os.path.join(source_dir, file_name), target_dir)
     print("Model file is successfully move at user folder")
 
-    filenames=os.listdir(target_dir)
-    for filename in filenames:
-        print(filename)
+    # filenames=os.listdir(target_dir)
+    # for filename in filenames:
+    #     print(filename)
 
 def rename_modelfile():
     source_filepath = (str(os.getcwd())+"/yolov5/runs/train/"+gLabel+"/weights/best.pt")

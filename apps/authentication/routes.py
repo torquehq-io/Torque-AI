@@ -16,7 +16,7 @@ from apps.authentication.forms import LoginForm, CreateAccountForm
 from apps.authentication.models import Users
 
 from apps.authentication.util import verify_pass
-
+import os
 
 @blueprint.route('/')
 def route_default():
@@ -64,6 +64,10 @@ def register():
 
         # Check usename exists
         user = Users.query.filter_by(username=username).first()
+        user_folder = os.path.join(str(os.getcwd()+"/Users_slab/"), username)
+        
+        os.mkdir(user_folder)
+        os.makedirs(user_folder+"/Models")
         if user:
             return render_template('accounts/register.html',
                                    msg='Username already registered',

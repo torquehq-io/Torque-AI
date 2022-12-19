@@ -62,6 +62,7 @@ import subprocess
 import torch
 import glob
 import cv2
+import shutil
 #####################################################
 roi_x = 0
 roi_y = 0
@@ -70,6 +71,11 @@ rou_h = 0
 gTracker = None
 gLabel = ''
 gPath = os.getcwd()
+from flask_login import (
+    current_user,
+    login_user,
+    logout_user
+)
 
 class VideoCamera():
     def __init__(self, url):
@@ -300,6 +306,24 @@ def split():
             os.system(
                 f"cp {dataset_path}/{title}.txt {gLabel}/data/labels/valid")
 
+def move_modelfile():
+    global current_loggin_user,target_dir
+    # user = Users.query.filter_by(username=LoginForm.username).first()
+    if current_user.is_authenticated:
+        current_loggin_userid = current_user.get_id() # return username in get_id()
+        current_loggin_user = current_user.username
+        print(current_loggin_userid)
+        print(current_loggin_user )
+
+    source_dir = str(getcwd()+"/yolov5/runs/train/"+gLabel+"/weights/"+gLabel+".pt")
+    target_dir = str(getcwd()+"/Users_slab/"+current_loggin_user+"/Models/")
+
+    shutil.move(os.path.join(source_dir), target_dir)
+    print("Model file is successfully move at user folder")
+
+    filenames=os.listdir(target_dir)
+    for filename in filenames:
+        print(filename)
 
 def rename_modelfile():
     source_filepath = (str(os.getcwd())+"/yolov5/runs/train/"+gLabel+"/weights/best.pt")
@@ -309,6 +333,7 @@ def rename_modelfile():
     
     print("Successfully rename the model file name")
     print("model genrated on  ")
+    move_modelfile()
     return None
 
 @app.route('/trainingModel')
@@ -324,7 +349,7 @@ def training():
 model_path = (str(os.getcwd()))    
 @app.route('/downloadModel')
 def download():
-    Path = (model_path + "/yolov5/runs/train" + '/' + gLabel + '/weights/'+gLabel+'.pt')
+    Path = (model_path+"/Users_slab/"+current_loggin_user+"/Models/"+gLabel+'.pt')
     print(Path)
     return send_file(Path, as_attachment=True) 
 
@@ -332,60 +357,7 @@ import io
 import os
 from PIL import Image
 import numpy as np
-# loadModel = (str(os.getcwd()))
 
-
-# from io import BytesIO
-# @app.route('/detectModel')
-# def genDetect():
-#     path_model = loadModel + "/yolov5/train/" + gLabel + "/" + "weights" + "/" + "best.pt"
-#     print("model pARTHHH", path_model)
-
-#     #model = torch.hub.load("ultralytics/yolov5", "custom", path = path_model ,force_reload=True)
-#     model = torch.hub.load('yolov5', 'custom', path=loadModel + "/yolov5/runs/" + "/" + "train" + "/" + gLabel + "/" + "weights" + "/" + "best.pt", source='local', force_reload=True)
-#     # Set Model Settings
-#     model.eval()
-#     model.conf = 0.6  # confidence threshold (0-1)
-#     model.iou = 0.45  # NMS IoU threshold (0-1) 
-#     cap=cv2.VideoCapture('rtmp://media5.ambicam.com:1938/live/81f911d4-84b2-43a9-98bd-bdba4dc4538f')
-#     # Read until video is completed
-#     while(cap.isOpened()):
-        
-#         # Capture frame-by-fram ## read the camera frame
-#         success, frame = cap.read()
-#         if success == True:
-
-#             ret,buffer=cv2.imencode('.jpg',frame)
-#             frame=buffer.tobytes()
-            
-#             #print(type(frame))
-
-#             img = Image.open(io.BytesIO(frame))
-#             results = model(img, size=640)
-           
-#             results.print()  # print results to screen
-            
-            
-#             #convert remove single-dimensional entries from the shape of an array
-#             img = np.squeeze(results.render()) #RGB
-#             # read image as BGR
-#             img_BGR = cv2.cvtColor(img, cv2.COLOR_RGB2BGR) #BGR
-
-#         else:
-#             break
-
-#         # Encode BGR image to bytes so that cv2 will convert to RGB
-#         frame = cv2.imencode('.jpg', img_BGR)[1].tobytes()
-#         #print(frame)
-        
-#         yield(b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
-
-# @app.route('/videoDetect')
-# def videoD():
-#     """Video streaming route. Put this in the src attribute of an img tag."""
-
-#     return Response(genDetect(),
-#                         mimetype='multipart/x-mixed-replace; boundary=frame')
 
 loadModel = (str(os.getcwd()))
 

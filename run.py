@@ -76,6 +76,7 @@ from flask_login import (
     login_user,
     logout_user
 )
+global current_loggin_user
 
 class VideoCamera():
     def __init__(self, url):
@@ -175,6 +176,7 @@ def fr_video_feed2():
 
 @app.route('/api/addLabel', methods=['POST'])
 def api_addLabel():
+    current_loggin_user = current_user.username
     print("---Add label---")
     x = request.form.get('x', type=int)
     y = request.form.get('y', type=int)
@@ -186,7 +188,7 @@ def api_addLabel():
     gTracker.reset(x, y, w, h)
     global gLabel, gPath
     gLabel = label
-    gPath = str(os.getcwd())+"/" + gLabel
+    gPath = str(os.getcwd())+"/Users_slab/"+current_loggin_user+"/"+gLabel
     print(gPath)
     Path(gPath).mkdir(parents=True, exist_ok=True)
     Path(gPath + "/Images")
@@ -195,18 +197,18 @@ def api_addLabel():
     global dataset_path
     dataset_path = (str(os.getcwd()) +'/'+ gLabel)
 
-    print("Spliting", dataset_path)
-    Path(dataset_path).mkdir(parents=True, exist_ok=True)
-    Path(dataset_path + "/data").mkdir(parents=True, exist_ok=True)
-    Path(dataset_path + "/data/images").mkdir(parents=True, exist_ok=True)
-    Path(dataset_path + "/data/labels").mkdir(parents=True, exist_ok=True)
-    Path(dataset_path + "/data/images/train").mkdir(parents=True, exist_ok=True)
-    Path(dataset_path + "/data/images/valid").mkdir(parents=True, exist_ok=True)
-    Path(dataset_path + "/data/labels/train").mkdir(parents=True, exist_ok=True)
-    Path(dataset_path + "/data/labels/valid").mkdir(parents=True, exist_ok=True)
-    with open(dataset_path + "/data/" + 'data.yaml', 'w') as data:
-        data.write('train:'+' '+dataset_path + "/data/images/train" + '\n')
-        data.write('val:'+' '+dataset_path + "/data/images/valid" + '\n')
+    print("Spliting", gPath)
+    Path(gPath).mkdir(parents=True, exist_ok=True)
+    Path(gPath + "/data").mkdir(parents=True, exist_ok=True)
+    Path(gPath + "/data/images").mkdir(parents=True, exist_ok=True)
+    Path(gPath + "/data/labels").mkdir(parents=True, exist_ok=True)
+    Path(gPath + "/data/images/train").mkdir(parents=True, exist_ok=True)
+    Path(gPath + "/data/images/valid").mkdir(parents=True, exist_ok=True)
+    Path(gPath + "/data/labels/train").mkdir(parents=True, exist_ok=True)
+    Path(gPath + "/data/labels/valid").mkdir(parents=True, exist_ok=True)
+    with open(gPath + "/data/" + 'data.yaml', 'w') as data:
+        data.write('train:'+' '+gPath + "/data/images/train" + '\n')
+        data.write('val:'+' '+gPath + "/data/images/valid" + '\n')
         data.write('\n')
         data.write('nc: 1')
         data.write('\n')
@@ -219,7 +221,7 @@ def api_addLabel():
 
 
 
-    with open(gLabel + '/' + 'classes.txt', 'w') as data1:
+    with open(gPath + '/' + 'classes.txt', 'w') as data1:
         data1.write(gLabel)
 
     return json.dumps({
@@ -229,15 +231,17 @@ def api_addLabel():
 
 
 print(gPath)
-imgFolderPath = (str(os.getcwd()))
+
 
 
 @app.route('/convert')
 def convertYolo():
+    current_loggin_user = current_user.username
+    imgFolderPath = str(os.getcwd())+"/Users_slab/"+current_loggin_user
     print("---Convert---")
     print(gLabel)
     print(imgFolderPath)
-    for file in os.listdir(gLabel):
+    for file in os.listdir(imgFolderPath+"/"+gLabel):
 
         print(gLabel)
         if file.endswith(".xml"):
@@ -287,24 +291,27 @@ def convertYolo():
     return "Nothing"
 
 
-dataset_path = (str(os.getcwd()))
+
 percentage_test = 20
 p = percentage_test/100
 def split():
+    current_loggin_user = current_user.username
+
+    dataset_path = str(os.getcwd())+"/Users_slab/"+current_loggin_user+"/"+gLabel
     for pathAndFilename in glob.iglob(os.path.join(dataset_path, "*.jpg")):
         title, ext = os.path.splitext(os.path.basename(pathAndFilename))
         #print("for", gLabel)
         if random.random() <= p:
             print("for", gPath)
             os.system(
-                f"cp {dataset_path}/{title}.jpg {gLabel}/data/images/train")
+                f"cp {dataset_path}/{title}.jpg {dataset_path}/data/images/train")
             os.system(
-                f"cp {dataset_path}/{title}.txt {gLabel}/data/labels/train")
+                f"cp {dataset_path}/{title}.txt {dataset_path}/data/labels/train")
         else:
             os.system(
-                f"cp {dataset_path}/{title}.jpg {gLabel}/data/images/valid")
+                f"cp {dataset_path}/{title}.jpg {dataset_path}/data/images/valid")
             os.system(
-                f"cp {dataset_path}/{title}.txt {gLabel}/data/labels/valid")
+                f"cp {dataset_path}/{title}.txt {dataset_path}/data/labels/valid")
 
 def move_modelfile():
     global current_loggin_user,target_dir
@@ -343,7 +350,9 @@ def rename_modelfile():
 @app.route('/trainingModel')
 def training():
     split()
+    current_loggin_user = current_user.username
 
+    dataset_path = str(os.getcwd())+"/Users_slab/"+current_loggin_user+"/"+gLabel
     data1 = dataset_path + "/data/" +'data.yaml'
     subprocess.run(['python3','-m','torch.distributed.run', '--nproc_per_node', '2','yolov5/train.py','--data', data1, '--name', gLabel])
     rename_modelfile()
@@ -353,7 +362,7 @@ def training():
 model_path = (str(os.getcwd()))    
 @app.route('/downloadModel')
 def download():
-    Path = (model_path+"/Users_slab/"+current_loggin_user+"/Models/"+gLabel+'.pt')
+    Path = (model_path+"/Users_slab/"+current_loggin_user+"/Models/"+gLabel+"/weights/"+gLabel+'.pt')
     print(Path)
     return send_file(Path, as_attachment=True) 
 

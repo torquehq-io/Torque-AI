@@ -43,7 +43,7 @@ if DEBUG:
 ################################################################################
 ############# Auto Annotation tool ##################
 
-from flask import Flask, render_template, request, json, session, Response, url_for, send_file
+from flask import Flask, render_template, request, json, session, Response, url_for, send_file, redirect
 import os, base64, random
 from datetime import timedelta, datetime
 from os.path import join, dirname, realpath
@@ -1175,6 +1175,119 @@ def fire_det_video_feed1():
     
     return Response(gen_fire_det1(Fire_detection1(url1)), mimetype='multipart/x-mixed-replace; boundary=frame')
 
+############### store the camera sources in database tabel ###################
+from apps.authentication.models import Users
+
+
+class User_camera_sources(db.Model):
+    __tablename__ = 'User_camera_sources'
+    id = db.Column('source_id', db.Integer, primary_key = True)
+    username = db.Column(db.String(1000),unique=True)
+    link1 = db.Column(db.String(3000))  
+    link2 = db.Column(db.String(3000))
+    link3= db.Column(db.String(3000))
+    link4= db.Column(db.String(3000))
+
+    def __init__(self, username,link1, link2,link3,link4):
+        self.username = username
+        self.link1 = link1
+        self.link2 = link2
+        self.link3 = link3
+        self.link4 = link4
+@app.route('/new', methods = ['GET', 'POST'])
+def new():
+    if request.method == 'POST':
+    #   if not request.form['link1'] or not request.form['link2'] or not request.form['link3']:
+    #      print('Please enter all the fields', 'error')
+    #   else:
+      if current_user.is_authenticated:
+       
+        current_loggin_user = current_user.username
+        user = Users.query.filter_by(username=current_loggin_user).first()
+        user=str(user)[21:-1]
+        print(user)
+
+        link1=request.form['link1']
+        link2=request.form['link2']
+        link3=request.form['link3']
+        link4=request.form['link4']
+        add_camerasources =User_camera_sources(username=current_loggin_user,link1=link1, link2=link2,
+                link3=link3, link4=link4)
+            
+        db.session.add(add_camerasources)
+        db.session.commit()
+        
+        print('Record was successfully added')
+    return render_template('home/new.html')
+
+###############################################################
+
+@app.route('/storeRtmpLink')
+def Test():
+    current_loggin_user = current_user.username
+    user = Users.query.filter_by(username=current_loggin_user).first()
+    user=str(user)[21:-1]
+    if user:
+        db.session.execute("SELECT * FROM User_camera_sources")
+        
+        db.session.close()
+
+    return render_template('home/camera_source_db.html',User_camera_sources=User_camera_sources.query.filter_by(username=current_user.username),data=current_user.username,table=User_camera_sources)
+
+
+@app.route('/insert', methods = ['POST'])
+def insert():
+    if request.method == "POST":
+        print("Data Inserted Successfully")
+        link1= request.form['link1']
+        link2 = request.form['link2']
+        link3= request.form['link3']
+        link4= request.form['link4']
+        # cur = db.session.connection()
+        current_loggin_user = current_user.username
+        # db.session.execute("INSERT INTO User_camera_sources (link1,link2,link3,link4) VALUES (%s, %s, %s, %s,)," ,(link1, link2 , link3 , link4))
+        add_camerasources =User_camera_sources(username=current_loggin_user,link1=link1, link2=link2,
+                link3=link3, link4=link4)
+       
+        db.session.add(add_camerasources)
+
+     
+        db.session.commit()    
+        
+        return redirect(url_for('Test'))
+
+# @app.route('/delete/<string:id_data>', methods = ['GET'])
+# def delete(id_data):
+#     print("Record Has Been Deleted Successfully")
+   
+#     db.session.execute("DELETE FROM User_camera_sources WHERE id=%s", (id_data,))
+#     db.session.commit()
+#     return redirect(url_for('Test'))
+
+
+
+@app.route('/update', methods= ['POST', 'GET'])
+def update():
+    if request.method == 'POST':
+        
+       
+        link1= request.form['link1']
+        link2 = request.form['link2']
+        link3= request.form['link3']
+        link4= request.form['link4']
+        current_loggin_user = current_user.username
+        admin = User_camera_sources.query.filter_by(username=current_loggin_user).first()
+        admin.link1 = link1
+        admin.link2 = link2
+        admin.link3 = link3
+        admin.link4 = link4
+        
+        db.session.commit()
+       
+        print("Data Updated Successfully")
+    return redirect(url_for('Test'))
+########################################################
+
 #################################################################################
 
 
@@ -1190,6 +1303,10 @@ def test():
     imageList = os.listdir(url)
     imagelist = ['a1/' + image for image in imageList]
     return render_template("home/images.html", imagelist=imagelist)
+
+
+
+
 
 
 

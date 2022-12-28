@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TechSky</title>
+
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+</head>
+<body>
+    
+<div class="container-fluid">
+<h1 class="text-center alert alert-danger">CAMERA SOURCES</h1>
+        <div class="row">
+            <div class="col-sm-2"></div>
+
+            <!-- content goes here -->
+            <div class="col-sm-8">
+<h2 >{{ data }} <button class="btn btn-primary float-right" data-toggle="modal" data-target="#myModal">Add New Camera Source</button></h2>
+
+{%with messages = get_flashed_messages()%}
+{%if messages%}
+{% for message in messages %}
+<div class="alert alert-success alert-dismissable" role="alert">
+    <button type="button" class="close" data-dismiss="alert" aria-label="close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+    {{message}}
+</div>
+{%endfor%}
+{%endif%}
+{%endwith%}
+
+
+
+    <!-- Enter New Student Modal -->
+    <div id="myModal" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+   
+                <div class="modal-header">
+                    <h5 class="modal-title text-primary" style="align-content: center;">Please Add New Student</h5>    
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                    </button>
+                  </div>
+                  
+
+                <div class="modal-body">
+                    
+                    <form action="{{ url_for('insert')}}" method="POST">
+                        <div class="form-group">
+                          <label>link1</label>
+                          <input type="text" name="link1" class="form-control" id="exampleFormControlInput1" placeholder="Enter the camera source 1">
+                        </div>
+
+                        <div class="form-group">
+                            <label>link2</label>
+                            <input type="text" name="link2" class="form-control" id="exampleFormControlInput2" placeholder="Enter the camera source 2">
+                        </div>
+
+                        <div class="form-group">
+                            <label>link3</label>
+                            <input name="link3" type="text" class="form-control" id="exampleFormControlInput3" placeholder="Enter the camera source 3">
+                          </div>
+
+                        <div class="form-group">
+                            <label>link4</label>
+                            <input name="link4" type="text" class="form-control" id="exampleFormControlInput4" placeholder="Enter the camera source 4">
+                          </div>
+
+                          <button type="submit" class="btn btn-primary mb-2">Save</button>
+                     
+                      </form>
+
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+    <!-- End of Enter New Student Modal -->
+
+
+
+
+<table class="table table-hover">
+    <thead>
+        <tr>
+           
+            <th scope="col">Link Sources</th>
+            
+          
+            
+        </tr>
+       
+    </thead>
+    <tbody>
+        
+        {% for row in User_camera_sources %}
+        
+           
+               
+               
+                <tr><td>{{ row.link1 }}</td>
+                    
+                </tr>
+                <tr><td>{{ row.link2 }}</td>
+                    
+              </tr>
+                <tr><td>{{ row.link3 }}</td>
+                    
+              </tr>
+                <tr><td>{{ row.link4 }}</td>
+                   
+              </tr>
+            
+        <td>
+            <a href="/update/{{row.0}}" class="btn btn-warning btn-sm" data-toggle="modal" data-target="#modaledit{{row.0}}">Edit</a>
+            <!-- <a href="/delete/{{ row.0 }}" onclick="return confirm('Are Sure Want To Deleted ?')" class="btn btn-danger btn-sm">Delete</a> -->
+
+        </td>
+
+          <!-- Enter New Student Modal -->
+          <div id="modaledit{{row.0}}" class="modal fade" role="dialog">
+            <div class="modal-dialog">
+                <div class="modal-content">
+       
+                    <div class="modal-header">
+                        <h5 class="modal-title text-primary" style="align-content: center;">Update Camera sources</h5>    
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                          <span aria-hidden="true">&times;</span>
+                        </button>
+                      </div>
+                      
+    
+                    <div class="modal-body">
+                        
+                        <form action="{{ url_for('update')}}" method="POST">
+                            <input type="hidden" name="id" value="{{row.0}}">
+                            <div class="form-group">
+                              <label>camera source link 1</label>
+                              <input value="{{row.link1}}" type="text" name="link1" class="form-control" id="exampleFormControlInput1" placeholder="Enter Full Name">
+                            </div>
+    
+                            <div class="form-group">
+                                <label>camera source link 2</label>
+                                <input value="{{row.link2}}" type="text" name="link2" class="form-control" id="exampleFormControlInput1" placeholder="Enter Email">
+                            </div>
+    
+                            <div class="form-group">
+                                <label>camera source link 3</label>
+                                <input value="{{row.link3}}" name="link3" type="text" class="form-control" id="exampleFormControlInput1" placeholder="Enter Phone Number">
+                              </div>
+
+                            <div class="form-group">
+                                <label>camera source link 4</label>
+                                <input value="{{row.link4}}" name="link4" type="text" class="form-control" id="exampleFormControlInput1" placeholder="Enter Phone Number">
+                              </div>
+    
+                              <button type="submit" class="btn btn-success mb-2">Update</button>
+                         
+                          </form>
+    
+  
+
+
+     
+    
+    
+                    </div>
+                </div>
+            </div>
+    
+        </div>
+    
+    
+        <!-- End of Edit Student Modal -->
+
+
+
+
+        {% endfor %}
+    </tbody>
+
+</table>
+            </div>
+            <!-- Content ends here-->
+
+
+            <div class="col-sm-2"></div>
+
+        </div>
+    </div>
+
+   
+
+   
+ <script type="text/javascript" src="{{ url_for('static', filename='js/jquery-3.2.1.min.js') }}"></script>    
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>    
+</body>
+</html>

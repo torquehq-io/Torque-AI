@@ -1045,7 +1045,12 @@ def pc_video_feed():
 
 class Fire_detection():
     def __init__(self, url):
-        self.video = cv2.VideoCapture('rtmp://media1.ambicam.com:1938/dvr7/fd9b67cc-6c2e-46c6-99c4-0e13ac403e32')
+        # self.video = cv2.VideoCapture('rtmp://media1.ambicam.com:1938/dvr7/fd9b67cc-6c2e-46c6-99c4-0e13ac403e32')
+        current_loggin_user=current_user.username
+        fetch_url =  User_camera_sources.query.filter_by(username=current_loggin_user).first()
+        print(fetch_url.link1)
+        self.video = cv2.VideoCapture(fetch_url.link1)
+
         self.url = url
         self.error_count = 0
         self.model = torch.hub.load('yolov5', 'custom', path='Fire_detection/fire.pt', source='local', force_reload=True)
@@ -1114,7 +1119,12 @@ def fire_det_video_feed():
 #################################################################################
 class Fire_detection1():
     def __init__(self, url1):
-        self.video = cv2.VideoCapture('rtmp://media1.ambicam.com:1938/dvr7/3803ff24-f7cc-48bb-bc25-bbc5486ef728')
+        # self.video = cv2.VideoCapture('rtmp://media1.ambicam.com:1938/dvr7/3803ff24-f7cc-48bb-bc25-bbc5486ef728')
+        current_loggin_user=current_user.username
+        fetch_url =  User_camera_sources.query.filter_by(username=current_loggin_user).first()
+        print(fetch_url.link2)
+        self.video = cv2.VideoCapture(fetch_url.link2)
+
         self.url1 = url1
         self.error_count = 0
         self.model = torch.hub.load('yolov5', 'custom', path='Fire_detection/fire.pt', source='local', force_reload=True)

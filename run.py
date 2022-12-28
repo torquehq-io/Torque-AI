@@ -11,6 +11,8 @@ from   sys import exit
 from apps.config import config_dict
 from apps import create_app, db
 
+
+
 # WARNING: Don't run with debug turned on in production!
 DEBUG = (os.getenv('DEBUG', 'False') == 'True')
 
@@ -37,6 +39,7 @@ if DEBUG:
     app.logger.info('Page Compression = ' + 'FALSE' if DEBUG else 'TRUE' )
     app.logger.info('DBMS             = ' + app_config.SQLALCHEMY_DATABASE_URI)
     app.logger.info('ASSETS_ROOT      = ' + app_config.ASSETS_ROOT )
+    # app.logger.info('DATA_ROOT      = ' + app_config.DATA_ROOT )
 ################################################################################
 ############# Auto Annotation tool ##################
 
@@ -446,7 +449,11 @@ def det_video_feed():
 
 
 ###################################################################################
-
+@app.route("/BWphotos")
+def bwPhotos():
+    binderList = os.listdir("/home/torquehq/torquehq-io/Github/Torque-AI/Users_slab/test/a1")
+    binderList = ['test/a1/' + image for image in binderList]
+    return render_template("images.html", binderList=binderList)
 #####################fr candidate addon####################
 from flask import Flask, Response, json, render_template
 from werkzeug.utils import secure_filename
@@ -1169,6 +1176,22 @@ def fire_det_video_feed1():
     return Response(gen_fire_det1(Fire_detection1(url1)), mimetype='multipart/x-mixed-replace; boundary=frame')
 
 #################################################################################
+
+
+
+
+@app.route('/test')
+def test():
+    # url = "/home/torquehq/torquehq-io/Github/Torque-AI/Users_slab/test/a1"
+    # full_filename = os.path.join(app.config['img'], 'full.jpg')
+    # return render_template("home/images.html",image = full_filename)
+
+    url = "/home/torquehq/torquehq-io/Github/Torque-AI/apps/static/a1"
+    imageList = os.listdir(url)
+    imagelist = ['a1/' + image for image in imageList]
+    return render_template("home/images.html", imagelist=imagelist)
+
+
 
 if __name__ == "__main__":
     app.run()

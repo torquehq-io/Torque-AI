@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Hello Worl!</title>
+</head>
+<body>
+
+    <div class="card" style="width: 18rem;">
+        
+        {% for imagelist in imagelist %}
+        <img class="card-img-top" src="{{ url_for('static', filename=imagelist)}}" alt=""> 
+        {% endfor %}
+        <div class="card-body">
+            
+           
+            
+          <h5 class="card-title">Card title</h5>
+          <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+          <a href="#" class="btn btn-primary">Go somewhere</a>
+        </div>
+      </div>
+
+
+
+
+
+</body>
+</html>

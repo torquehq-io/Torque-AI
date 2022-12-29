@@ -1,3 +1,13 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Typography {% endblock %}
+
+<!-- Specific CSS goes HERE -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -18,10 +28,10 @@
 <h1 class="text-center alert alert-danger">CAMERA SOURCES</h1>
         <div class="row">
             <div class="col-sm-2"></div>
-
+            
             <!-- content goes here -->
             <div class="col-sm-8">
-<h2 >{{ data }} <button class="btn btn-primary float-right" data-toggle="modal" data-target="#myModal">Add New Camera Source</button></h2>
+<h2 > <button class="btn btn-primary float-lg-right float-sm-none"  style="width:170px" data-toggle="modal" data-target="#myModal">Add Camera Source</button></h2>
 
 {%with messages = get_flashed_messages()%}
 {%if messages%}
@@ -44,7 +54,7 @@
             <div class="modal-content">
    
                 <div class="modal-header">
-                    <h5 class="modal-title text-primary" style="align-content: center;">Please Add New Student</h5>    
+                    <h5 class="modal-title text-primary" style="align-content: center;">Please Add Camera Sourse</h5>    
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                       <span aria-hidden="true">&times;</span>
                     </button>
@@ -52,13 +62,16 @@
                   
 
                 <div class="modal-body">
-                    
+
+                    <center>
+                      <h3>User Name: {{data}}</h3>
+                    </center>
                     <form action="{{ url_for('insert')}}" method="POST">
                         <div class="form-group">
                           <label>link1</label>
                           <input type="text" name="link1" class="form-control" id="exampleFormControlInput1" placeholder="Enter the camera source 1">
                         </div>
-
+                        
                         <div class="form-group">
                             <label>link2</label>
                             <input type="text" name="link2" class="form-control" id="exampleFormControlInput2" placeholder="Enter the camera source 2">
@@ -91,7 +104,7 @@
 
 
 
-<table class="table table-hover">
+<table class="table "> <!-- table-hover -->
     <thead>
         <tr>
            
@@ -209,3 +222,8 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>    
 </body>
 </html>
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}{% endblock javascripts %}

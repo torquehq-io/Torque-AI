@@ -1309,9 +1309,9 @@ def test():
     # full_filename = os.path.join(app.config['img'], 'full.jpg')
     # return render_template("home/images.html",image = full_filename)
 
-    url = "/home/torquehq/torquehq-io/Github/Torque-AI/apps/static/a1"
+    url = "/home/torquehq/torquehq-io/Github/Torque-AI/apps/static/dgsb"
     imageList = os.listdir(url)
-    imagelist = ['a1/' + image for image in imageList]
+    imagelist = ['dgsb/' + image for image in imageList]
     return render_template("home/images.html", imagelist=imagelist)
 
 

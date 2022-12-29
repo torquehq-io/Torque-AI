@@ -22,7 +22,7 @@
 *.cfg
 !setup.cfg
 !cfg/yolov3*.cfg
-runs/*
+runs/train/*
 storage.googleapis.com
 data/*
 data/images/*

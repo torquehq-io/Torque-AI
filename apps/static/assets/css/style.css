@@ -7496,7 +7496,8 @@ html:not([dir="rtl"]) .me-auto {
   margin-bottom: 1rem !important; }
 
 .mb-4 {
-  margin-bottom: 1.5rem !important; }
+  margin-bottom: 0.5rem !important; 
+}
 
 .mb-5 {
   margin-bottom: 3rem !important; }

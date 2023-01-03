@@ -202,6 +202,7 @@ def api_addLabel():
 
     print("Spliting", gPath)
     Path(gPath).mkdir(parents=True, exist_ok=True)
+    Path(gPath + "/model").mkdir(parents=True, exist_ok=True)
     Path(gPath + "/data").mkdir(parents=True, exist_ok=True)
     Path(gPath + "/data/images").mkdir(parents=True, exist_ok=True)
     Path(gPath + "/data/labels").mkdir(parents=True, exist_ok=True)
@@ -324,16 +325,27 @@ def move_modelfile():
         current_loggin_user = current_user.username
         print(current_loggin_userid)
         print(current_loggin_user )
-    custom_models = os.path.join(str(getcwd()+"/Users_slab/"+current_loggin_user+"/Models/"),gLabel)
+    #custom_models = os.path.join(str(getcwd()+"/Users_slab/"+current_loggin_user+"/Models/"),gLabel)
 
-    os.makedirs(custom_models)
+    #os.makedirs(custom_models)
     source_dir = str(getcwd()+"/yolov5/runs/train/"+gLabel+"/")
-    target_dir = str(getcwd()+"/Users_slab/"+current_loggin_user+"/Models/"+gLabel)
+    target_dir = str(getcwd()+"/Users_slab/"+current_loggin_user+'/'+gLabel+'/model')
     file_names = os.listdir(source_dir)
+
+    
+    
+
     #shutil.move(os.path.join(source_dir), target_dir)
     for file_name in file_names:
         shutil.move(os.path.join(source_dir, file_name), target_dir)
     print("Model file is successfully move at user folder")
+
+    source_dir1 = str(getcwd()+"/Users_slab/"+current_loggin_user+'/'+gLabel+'/model/weights/'+gLabel+'.pt')
+    target_dir1 = str(getcwd()+"/Users_slab/"+current_loggin_user+'/Models/')
+    shutil.move(source_dir1, target_dir1)
+    
+        
+    
 
     # filenames=os.listdir(target_dir)
     # for filename in filenames:
@@ -357,7 +369,7 @@ def training():
 
     dataset_path = str(os.getcwd())+"/Users_slab/"+current_loggin_user+"/"+gLabel
     data1 = dataset_path + "/data/" +'data.yaml'
-    subprocess.run(['python3','-m','torch.distributed.run', '--nproc_per_node', '2','yolov5/train.py','--data', data1, '--name', gLabel])
+    subprocess.run(['python3','yolov5/train.py','--data', data1, '--name', gLabel])
     rename_modelfile()
        
     return "None"  
@@ -365,7 +377,7 @@ def training():
 model_path = (str(os.getcwd()))    
 @app.route('/downloadModel')
 def download():
-    Path = (model_path+"/Users_slab/"+current_loggin_user+"/Models/"+gLabel+"/weights/"+gLabel+'.pt')
+    Path = (model_path+"/Users_slab/"+current_loggin_user+"/Models/"+gLabel+'.pt')
     print(Path)
     return send_file(Path, as_attachment=True) 
 
@@ -1314,8 +1326,16 @@ def test():
     imagelist = ['dgsb/' + image for image in imageList]
     return render_template("home/images.html", imagelist=imagelist)
 
-
-
+############################################################################
+##################  model display #################################
+@app.route('/model_display')
+def model_display():
+    current_loggin_user = current_user.username
+   
+    url = str(os.getcwd())+"/Users_slab/"+ current_loggin_user + "/Models" 
+    modelList = os.listdir(url)
+    
+    return render_template('home/model_display.html', modellist=modelList)
 
 
 

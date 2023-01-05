@@ -244,15 +244,15 @@ display: none;
 <!-- Buttons to choose list or grid view -->
 
 <div class="row">
-  {% for model in modellist %}
+  {% for model in User_Models_record %}
       
       
 
       <div  class="col-lg-4 col-md-4 col-xs-6 thumb" >
         <div class="card cardd">
           <div class="card-body">
-            <h2 class="card-title buttonupar">{{ model[:-3] }}</h2>
-            <!-- <p class="card-text">With supporting text below as a natural lead-in to additional content.</p> -->
+            <h2 class="card-title buttonupar">{{ model.model_name }}</h2>
+            <p class="card-text"> Generated on <br> {{ model.generated_date }}</p>
             <a href="#" class="btn-md btn-primary buttonn">Go somewhere</a>
           </div>
         </div>

@@ -11,6 +11,7 @@ from   sys import exit
 from apps.config import config_dict
 from apps import create_app, db
 
+from datetime import date
 
 
 # WARNING: Don't run with debug turned on in production!
@@ -344,7 +345,12 @@ def move_modelfile():
     target_dir1 = str(getcwd()+"/Users_slab/"+current_loggin_user+'/Models/')
     shutil.move(source_dir1, target_dir1)
     
-    add_model =User_Models_record(username=current_loggin_user,user_id=current_loggin_userid, model_name=gLabel)
+    
+
+    today = date.today()
+    genrated_on= today.strftime("%B %d, %Y")
+
+    add_model =User_Models_record(username=current_loggin_user,user_id=current_loggin_userid, model_name=gLabel,generated_date=genrated_on)
     db.session.add(add_model)
 
      
@@ -1331,28 +1337,26 @@ def test():
 ##################  model display #################################
 @app.route('/model_display')
 def model_display():
-    current_loggin_user = current_user.username
-   
-    url = str(os.getcwd())+"/Users_slab/"+ current_loggin_user + "/Models" 
-    modelList = os.listdir(url)
+ 
     
-    return render_template('home/model_display.html', modellist=modelList)
+    return render_template('home/model_display.html',User_Models_record=User_Models_record.query.filter_by(username=current_user.username))
 
 ##############################################################################
 ################################### model storing at database ###################
 class User_Models_record(db.Model):
     __tablename__ = 'Custom_Models_record'
-    user_id = db.Column('user_id', db.Integer, primary_key = True)
-    username = db.Column(db.String(1000),unique=True)
+    serial_no = db.Column(db.Integer, primary_key = True)
+    user_id = db.Column('user_id', db.Integer)
+    username = db.Column(db.String(1000))
     model_name = db.Column(db.String(3000))  
-   
+    generated_date = db.Column( db.Integer)
 
-    def __init__(self,user_id  ,username,model_name):
+    def __init__(self,user_id  ,username,model_name,generated_date):
 
         self.user_id  = user_id 
         self.username = username
         self.model_name= model_name
-       
+        self.generated_date= generated_date
 
 
 

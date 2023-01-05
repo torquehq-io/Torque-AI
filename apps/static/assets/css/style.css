@@ -5851,9 +5851,10 @@ html:not([dir="rtl"]) .callout-dark {
   padding: 0.25rem 0.75rem;
   font-size: 1.25rem;
   color: var(--cui-header-color, rgba(44, 56, 74, 0.681));
-  background-color: var(--cui-header-toggler-bg, transparent);
+  background-color: rgba(115, 187, 255, 50%),  ; /*var(--cui-header-toggler-bg, transparent)*/
   border: 0;
-  border-radius: 0.25rem; }
+  
+  border-radius: 20%; }
   .header-toggler:hover {
     color: rgba(44, 56, 74, 0.95);
     text-decoration: none; }
@@ -5937,7 +5938,7 @@ html:not([dir="rtl"]) .callout-dark {
   width: var(--cui-sidebar-width);
   padding: 0 0;
   color: var(--cui-sidebar-color, rgba(255, 255, 255, 0.87));
-  background: var(--cui-sidebar-bg, #3c4b64);
+  background: #fff;
   box-shadow: none;
   transition: margin-left 0.15s, margin-right 0.15s, box-shadow 0.075s, transform 0.15s, width 0.15s, z-index 0s ease 0.15s; }
   html:not([dir="rtl"]) .sidebar {
@@ -6187,7 +6188,7 @@ html:not([dir="rtl"]) .callout-dark {
     margin-top: 1rem;
     font-size: 80%;
     font-weight: 700;
-    color: var(--cui-sidebar-nav-title-color, rgba(255, 255, 255, 0.6));
+    color: #000;
     text-transform: uppercase;
     transition: height 0.15s, margin 0.15s; }
     @media (prefers-reduced-motion: reduce) {
@@ -6198,7 +6199,7 @@ html:not([dir="rtl"]) .callout-dark {
     flex: 1;
     align-items: center;
     padding: 0.8445rem 1rem;
-    color: var(--cui-sidebar-nav-link-color, rgba(255, 255, 255, 0.6));
+    color: #000015;
     text-decoration: none;
     white-space: nowrap;
     background: var(--cui-sidebar-nav-link-bg, transparent);
@@ -6207,10 +6208,13 @@ html:not([dir="rtl"]) .callout-dark {
       .sidebar-nav .nav-link {
         transition: none; } }
     .sidebar-nav .nav-link.active {
-      color: var(--cui-sidebar-nav-link-active-color, rgba(255, 255, 255, 0.87));
-      background: var(--cui-sidebar-nav-link-active-bg, rgba(255, 255, 255, 0.05)); }
+      color: #1c569b;
+      background: var(--cui-sidebar-nav-link-active-bg, rgba(0, 0, 0, 0.10));
+    border-radius: 10px;
+  /* margin:auto 10px;  */
+}
       .sidebar-nav .nav-link.active .nav-icon {
-        color: var(--cui-sidebar-nav-link-active-icon-color, rgba(255, 255, 255, 0.87)); }
+        color: #1c569b; }
     .sidebar-nav .nav-link.disabled {
       color: var(--cui-sidebar-nav-link-disabled-color, rgba(255, 255, 255, 0.38));
       pointer-events: none;
@@ -6226,18 +6230,20 @@ html:not([dir="rtl"]) .callout-dark {
           background-image: var(--cui-sidebar-nav-group-indicator-hover, url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='rgba%28255, 255, 255, 0.87%29'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e")); }
     @media (hover: hover), (-ms-high-contrast: none) {
       .sidebar-nav .nav-link:hover {
-        color: var(--cui-sidebar-nav-link-hover-color, rgba(255, 255, 255, 0.87));
+        color: #1c569b;
         text-decoration: none;
-        background: var(--cui-sidebar-nav-link-hover-bg, rgba(255, 255, 255, 0.05)); }
+        background: var(--cui-sidebar-nav-link-hover-bg, rgba(0,0,0,0.10)); 
+        border-radius: 10px;
+      }
         .sidebar-nav .nav-link:hover .nav-icon {
-          color: var(--cui-sidebar-nav-link-hover-icon-color, rgba(255, 255, 255, 0.87)); }
+          color: #1c569b; }
         .sidebar-nav .nav-link:hover.nav-group-toggle::after {
           background-image: var(--cui-sidebar-nav-group-indicator-hover, url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='rgba%28255, 255, 255, 0.87%29'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e")); } }
   .sidebar-nav .nav-icon {
     flex: 0 0 4rem;
     height: 1.25rem;
     font-size: 1.25rem;
-    color: var(--cui-sidebar-nav-link-icon-color, rgba(255, 255, 255, 0.6));
+    color: #000;
     text-align: center;
     fill: currentColor;
     transition: inherit; }

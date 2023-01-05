@@ -344,12 +344,13 @@ def move_modelfile():
     target_dir1 = str(getcwd()+"/Users_slab/"+current_loggin_user+'/Models/')
     shutil.move(source_dir1, target_dir1)
     
-        
-    
+    add_model =User_Models_record(username=current_loggin_user,user_id=current_loggin_userid, model_name=gLabel)
+    db.session.add(add_model)
 
-    # filenames=os.listdir(target_dir)
-    # for filename in filenames:
-    #     print(filename)
+     
+    db.session.commit()
+        
+    print("Model is stored in database successfully !!")
 
 def rename_modelfile():
     source_filepath = (str(os.getcwd())+"/yolov5/runs/train/"+gLabel+"/weights/best.pt")
@@ -1336,6 +1337,27 @@ def model_display():
     modelList = os.listdir(url)
     
     return render_template('home/model_display.html', modellist=modelList)
+
+##############################################################################
+################################### model storing at database ###################
+class User_Models_record(db.Model):
+    __tablename__ = 'Custom_Models_record'
+    user_id = db.Column('user_id', db.Integer, primary_key = True)
+    username = db.Column(db.String(1000),unique=True)
+    model_name = db.Column(db.String(3000))  
+   
+
+    def __init__(self,user_id  ,username,model_name):
+
+        self.user_id  = user_id 
+        self.username = username
+        self.model_name= model_name
+       
+
+
+
+
+#####################################################################################
 
 
 

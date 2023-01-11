@@ -749,6 +749,33 @@ CLASSES = ["background", "aeroplane", "bicycle", "bird", "boat",
 
 
 
+import cv2
+import threading
+ 
+class RecordingThread (threading.Thread):
+    def __init__(self, name, camera):
+        threading.Thread.__init__(self)
+        self.name = name
+        self.isRunning = True
+ 
+        self.cap = camera
+        fourcc = cv2.VideoWriter_fourcc(*'MJPG')
+        self.out = cv2.VideoWriter('./static/video.avi',fourcc, 20.0, (640,480))
+ 
+    def run(self):
+        while self.isRunning:
+            ret, frame = self.cap.read()
+            if ret:
+                self.out.write(frame)
+ 
+        self.out.release()
+ 
+    def stop(self):
+        self.isRunning = False
+ 
+    def __del__(self):
+        self.out.release()
+
 
 
 class CentroidTracker:
@@ -933,7 +960,12 @@ class Person_Counter(object):
         self.url = url
         self.error_count = 0
 
-
+        self.is_record = False
+        self.out = None
+ 
+        # Thread for recording
+        self.recordingThread = None
+       
         
    
 
@@ -990,7 +1022,7 @@ class Person_Counter(object):
         self.total_frames = self.total_frames + 1
 
         (H, W) = frame.shape[:2]
-
+       
         blob = cv2.dnn.blobFromImage(frame, 0.007843, (W, H), 127.5)
 
         detector.setInput(blob)
@@ -1037,12 +1069,24 @@ class Person_Counter(object):
 
         cv2.putText(frame, fps_text, (5, 30),
                     cv2.FONT_HERSHEY_COMPLEX_SMALL, 1, (0, 0, 255), 1)
-
+        
+  
         #self.fps.update()
+
         ret, jpeg = cv2.imencode('.jpg', frame)
+    
         return jpeg.tobytes()
 
-
+    def start_record(self):
+        self.is_record = True
+        self.recordingThread = RecordingThread("Video Recording Thread", self.vs)
+        self.recordingThread.start()
+ 
+    def stop_record(self):
+        self.is_record = False
+ 
+        if self.recordingThread != None:
+            self.recordingThread.stop()
 
 #####################
 def gen_pc(camera):
@@ -1168,7 +1212,7 @@ class Fire_detection1():
         # model.iou = 0.45  # NMS IoU threshold (0-1) 
         
             # Capture frame-by-fram ## read the camera frame
-        
+       
         success, frame = self.video.read()
         if success == True:
 
@@ -1187,6 +1231,8 @@ class Fire_detection1():
             img = np.squeeze(results.render()) #RGB
             # read image as BGR
             img_BGR = cv2.cvtColor(img, cv2.COLOR_RGB2BGR) #BGR
+           
+ 
             frame = cv2.imencode('.jpg', img_BGR)[1].tobytes()
             return frame
        
@@ -1341,6 +1387,54 @@ def model_display():
     
     return render_template('home/model_display.html',User_Models_record=User_Models_record.query.filter_by(username=current_user.username))
 
+@app.route('/delete/<int:id>', methods = ['GET','POST'])
+def delete(id):
+    print(id)
+    current_loggin_user = current_user.username
+    model_to_delete = User_Models_record.query.get_or_404(id)
+    model_to_delete_file = User_Models_record.query.filter_by(serial_no=id).first()
+    model_to_delete_local= model_to_delete_file.model_name
+    print(model_to_delete)
+    os.remove(os.path.join(str(os.getcwd()+"/Users_slab/"+current_loggin_user+"/Models/"), model_to_delete_local+".pt"))
+    db.session.delete(model_to_delete)
+  
+   
+    
+    db.session.commit()
+    print("Record Has Been Deleted Successfully")
+    return redirect(url_for('model_display'))
+
+
+
+
+@app.route('/rename_modelname/<int:id>', methods= ['POST', 'GET'])
+def rename_modelname(id):
+   
+    model_to_rename = User_Models_record.query.get_or_404(id)
+    if request.method == 'POST':
+        current_loggin_user = current_user.username
+        
+        new_model_name= request.form['model_name']
+        rename_to_model_filename_path =(os.path.join(str(os.getcwd()+"/Users_slab/"+current_loggin_user+"/Models/"), model_to_rename.model_name +".pt"))
+        renamed_model_path=(os.path.join(str(os.getcwd()+"/Users_slab/"+current_loggin_user+"/Models/"), new_model_name +".pt"))
+        renamed_file=os.rename(rename_to_model_filename_path,renamed_model_path)
+        
+        model_to_rename.model_name =new_model_name
+        try:
+           
+            
+            db.session.commit()
+            # return render_template("model_display.html",form=form,model_to_rename = model_to_rename)
+        except:
+            print("model not rename...")
+            
+
+
+       
+        print("model name Updated Successfully")
+    return redirect(url_for('model_display'))
+
+
 ##############################################################################
 ################################### model storing at database ###################
 class User_Models_record(db.Model):
@@ -1362,7 +1456,22 @@ class User_Models_record(db.Model):
 
 
 #####################################################################################
+######################################### uplode the camera source text file from user ###############
+from distutils.log import debug
+from fileinput import filename
+  
+@app.route('/camera_source_textfile', methods = ['POST'])  
+def camera_source_textfile():  
+    if request.method == 'POST':  
+        f = request.files['file']
+        f.save(f.filename)  
+        return render_template("home/camera_source_textfile.html", name = f.filename)  
 
+
+
+
+
+    
 
 
 

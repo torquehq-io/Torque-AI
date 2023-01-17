@@ -1456,16 +1456,57 @@ class User_Models_record(db.Model):
 
 
 #####################################################################################
+##################################camera sources database table ########################
+class User_camera_sources_record(db.Model):
+    __tablename__ = 'User_camera_sources_record'
+    serial_no = db.Column(db.Integer, primary_key = True)
+    user_id = db.Column('user_id', db.Integer)
+    username = db.Column(db.String(1000))
+    source = db.Column(db.String(3000))  
+    name_source = db.Column(db.String(3000))
+
+    def __init__(self,user_id  ,username,source,name_source):
+
+        self.user_id  = user_id 
+        self.username = username
+        self.source= source
+        self.name_source= name_source
 ######################################### uplode the camera source text file from user ###############
 from distutils.log import debug
 from fileinput import filename
-  
+import csv  
 @app.route('/camera_source_textfile', methods = ['POST'])  
 def camera_source_textfile():  
     if request.method == 'POST':  
         f = request.files['file']
-        f.save(f.filename)  
-        return render_template("home/camera_source_textfile.html", name = f.filename)  
+        f.save(f.filename)
+        current_loggin_userid = current_user.get_id() # return username in get_id()
+        current_loggin_user = current_user.username 
+        with open (f.filename ,'r') as csv_file:
+            csvfile= csv.reader(csv_file,delimiter=",")
+            listformate_csvfile=list(csvfile)
+            for row in listformate_csvfile:
+                    if(len(row)!=0):
+                       
+                        source=row[0]
+
+                       
+                        name_source=row[1]
+                        add_model =User_camera_sources_record(username=current_loggin_user,user_id=current_loggin_userid, source=source,name_source=name_source)
+                        db.session.add(add_model)
+
+        
+                        db.session.commit()
+                
+                        print("SOURCE :  {} , CAMERA_NAME: {} is successfully added in database ! ".format(source,name_source))
+
+
+
+           
+        
+        # print("Model is stored in database successfully !!")
+            
+        return render_template("home/camera_source_textfile.html", name = f.filename , User_camera_sources=User_camera_sources_record.query.filter_by(username=current_user.username),data=current_user.username,table=User_camera_sources )  
 
 
 

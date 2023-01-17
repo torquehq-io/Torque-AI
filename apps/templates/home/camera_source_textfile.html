@@ -1,0 +1,132 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Typography {% endblock %}
+
+<!-- Specific CSS goes HERE -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+<html>  
+<head>  
+    <meta name="apple-mobile-web-app-capable" content="yes">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+		<title>Test</title>
+
+		<script src="static/assets/js/annotation/less.js"></script>
+
+		<script src="static/assets/js/annotation/jquery-3.5.1.min.js"></script>
+    <script>
+			  src="https://code.jquery.com/jquery-3.3.1.min.js"
+			  integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+			  crossorigin="anonymous"</script>
+    <title>upload the file : GFG</title>  
+</head> 
+<style>
+  html {
+  text-align: center;
+  background-color: #282c34;
+  color: white;
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+
+
+.pre_img{
+  height: 600px;
+  width: 600px;
+  /* background-color: white; */
+}
+
+input[type=file]{
+  background-color: #4CAF50;
+  border: none;
+  color: white;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+  margin: 40px 40px;
+  /* display: none; */
+
+}
+
+#pre{
+  background-color: #4CAF50; /* Green */
+  border: none;
+  color: white;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+  margin: 10px 40px;
+}
+
+p{
+  margin: 50px;
+  font-size: 72px;
+}
+
+</style> 
+<body>
+  <table class="table "> <!-- table-hover -->
+    <thead>
+        <tr>
+           
+            <th scope="col">Link Sources</th>
+            <th scope="col">camera_name</th>
+            
+          
+            
+        </tr>
+       
+    </thead>
+    <tbody>
+        
+        {% for row in User_camera_sources %}
+        
+           
+               
+               
+                <tr><td>{{ row.source }}</td>
+                  <td>{{ row.name_source }}</td>
+                    
+                </tr>
+        {%endfor%}
+              
+   <form action = "/camera_source_textfile" method = "post" enctype="multipart/form-data">  
+        <input type="file" name="file" />  
+        <input type = "submit" value="Upload" id="data">  
+    </form>
+   
+   
+
+</script>
+
+</html>
+
+
+
+{% endblock content %}
+
+<!-- Specific JS goes HERE -->
+{% block javascripts %}{% endblock javascripts %}

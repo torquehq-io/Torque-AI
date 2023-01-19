@@ -12,8 +12,19 @@ gunicorn==20.1.0
 flask-restx==0.5.1
 python-dotenv==0.19.2
 Flask-Minify==0.37
+pascal_voc_writer
+PyQt5
+lxml
+mtcnn
+tensorflow
+mxnet
+numpy==1.23.1
+scikit-learn
+scikit-image
+imutils
 # opencv-python
-
+# pip install cmake
+# pip install dlib
 # PyQt5
 # lxml
 # mtcnn

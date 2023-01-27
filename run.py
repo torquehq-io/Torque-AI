@@ -67,6 +67,15 @@ import torch
 import glob
 import cv2
 import shutil
+# def ffmpegfeedall():
+#     subprocess.Popen(['python3','feed1.py'])
+#     #subprocess.Popen(['gnome-terminal', '-e', 'python3 ffmpegfeed/feed1.py'])
+#     # subprocess.Popen(['gnome-terminal', '-e', 'python3 ffmpegfeed/feed2.py'])
+#     # subprocess.Popen(['gnome-terminal', '-e', 'python3 ffmpegfeed/feed3.py'])
+#     # subprocess.Popen(['gnome-terminal', '-e', 'python3 ffmpegfeed/feed4.py'])
+    
+# ffmpegfeedall()
+
 #####################################################
 roi_x = 0
 roi_y = 0
@@ -1190,6 +1199,13 @@ class Fire_detection1():
 
         self.url1 = url1
         self.error_count = 0
+        self.frame_width = int(self.video.get(3))
+        self.frame_height = int(self.video.get(4))
+        self.rtmp_url = "rtmp://media.torqueai.io:1938/live/nmstest11"
+        self.ffmpeg = "ffmpeg -f rawvideo -pix_fmt bgr24 -s {}x{} -r 30 -i - -c:v libx264 -preset ultrafast -f flv {}".format(self.frame_width, self.frame_height, self.rtmp_url)
+
+        self.process = sp.Popen(self.ffmpeg.split(), stdin=sp.PIPE)
+
         self.model = torch.hub.load('yolov5', 'custom', path='Fire_detection/fire.pt', source='local', force_reload=True)
 
        
@@ -1202,9 +1218,9 @@ class Fire_detection1():
 
         
         # Set Model Settings Dynamic
-        self.model.eval()
-        self.model.conf = 0.6  # confidence threshold (0-1)
-        self.model.iou = 0.45  # NMS IoU threshold (0-1) 
+        # self.model.eval()
+        # self.model.conf = 0.6  # confidence threshold (0-1)
+        # self.model.iou = 0.45  # NMS IoU threshold (0-1) 
       
         # Set Model Settings Static
         # model.eval()
@@ -1216,25 +1232,43 @@ class Fire_detection1():
         success, frame = self.video.read()
         if success == True:
 
-            ret,buffer=cv2.imencode('.jpg',frame)
-            frame=buffer.tobytes()
+            # ret,buffer=cv2.imencode('.jpg',frame)
+            # frame=buffer.tobytes()
             
-            #print(type(frame))
+            # #print(type(frame))
 
-            img = Image.open(io.BytesIO(frame))
-            results = self.model(img, size=640)
+            # img = Image.open(io.BytesIO(frame))
+            # results = self.model(img, size=640)
         
-            results.print()  # print results to screen
+            # results.print()  # print results to screen
             
             
-            #convert remove single-dimensional entries from the shape of an array
-            img = np.squeeze(results.render()) #RGB
-            # read image as BGR
-            img_BGR = cv2.cvtColor(img, cv2.COLOR_RGB2BGR) #BGR
+            # #convert remove single-dimensional entries from the shape of an array
+            # img = np.squeeze(results.render()) #RGB
+            # # read image as BGR
+            # img_BGR = cv2.cvtColor(img, cv2.COLOR_RGB2BGR) #BGR
            
  
-            frame = cv2.imencode('.jpg', img_BGR)[1].tobytes()
-            return frame
+            # frame = cv2.imencode('.jpg', img_BGR)[1].tobytes()
+            # return frame
+            new_img = fct.draw_anchor_box(frame, fct.detection(frame, self.model))
+
+            # get the frame rate
+            cTime = time.time()
+            fps = 1 / (cTime - pTime)
+            pTime = cTime
+
+            # display the fps on the screen
+            cv2.putText(
+                new_img,                    # draw on the screen
+                str(int(fps)),          # round fps
+                (10, 70),               # text position
+                cv2.FONT_HERSHEY_PLAIN, # font type
+                3,                      # fonct scale
+                (255, 0, 255),          # color purple
+                3                       # thickness
+            )
+            self.process.stdin.write(frame.tobytes())
        
 
 def gen_fire_det1(camera1):
@@ -1509,12 +1543,25 @@ def camera_source_textfile():
         return render_template("home/camera_source_textfile.html", name = f.filename , User_camera_sources=User_camera_sources_record.query.filter_by(username=current_user.username),data=current_user.username,table=User_camera_sources )  
 
 
+###########################################################################3
+            #                 ffmpeg feed1
+import cv2
+import time
+import torch
+import ffmpegfeed.feeds as fct
+import subprocess as sp
+from flask_login import (
+    current_user,
+    login_user,
+    logout_user
+)
 
 
 
-    
 
 
 
 if __name__ == "__main__":
+   
     app.run()
+    

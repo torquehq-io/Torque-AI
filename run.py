@@ -44,7 +44,7 @@ if DEBUG:
 ################################################################################
 ############# Auto Annotation tool ##################
 
-from flask import Flask, render_template, request, json, session, Response, url_for, send_file, redirect
+from flask import Flask, render_template, request, json, session, Response, url_for, send_file, redirect,stream_with_context
 import os, base64, random
 from datetime import timedelta, datetime
 from os.path import join, dirname, realpath
@@ -1543,19 +1543,144 @@ def camera_source_textfile():
         return render_template("home/camera_source_textfile.html", name = f.filename , User_camera_sources=User_camera_sources_record.query.filter_by(username=current_user.username),data=current_user.username,table=User_camera_sources )  
 
 
-###########################################################################3
-            #                 ffmpeg feed1
-import cv2
-import time
-import torch
-import ffmpegfeed.feeds as fct
-import subprocess as sp
-from flask_login import (
-    current_user,
-    login_user,
-    logout_user
-)
+###########################################################################
+Row=[]
+object, object2 = '', ''
+class Objdetection_try():
+   
+  
+    def __init__(self, url):
+      
+        print("in detect...................................")
+        self.video = cv2.VideoCapture("rtmp://media5.ambicam.com:1938/live/1efa24f9-0cd0-47c5-b604-c7e3ee118302")
+        self.url = url
+        self.error_count = 0
+        self.model = torch.hub.load('yolov5', 'custom', path='/home/torque/Documents/torque_AI/Torque-AI/yolov5/yolov5s.pt', source='local', force_reload=True)
+       
+        
+    def __del__(self):
+        self.video.release()
+    
+    def get_frame(self):
+        global Row
+        global object
+        global object2
+        
+        
+        # Set Model Settings
+        self.model.eval()
+        self.model.conf = 0.6  # confidence threshold (0-1)
+        self.model.iou = 0.45  # NMS IoU threshold (0-1) 
+      
+    
+        
+            # Capture frame-by-fram ## read the camera frame
+        success, frame = self.video.read()
+        if success == True:
 
+            ret,buffer=cv2.imencode('.jpg',frame)
+            frame=buffer.tobytes()
+            
+            #print(type(frame))
+
+            img = Image.open(io.BytesIO(frame))
+
+            # object =self.model(img, size=640)
+            names = self.model.module.names if hasattr(self.model, 'module') else self.model.names
+            pred = self.model(img, augment='store_true')
+            # print("ttttttttt",pred.xyxy[0])  # im predictions (tensor)
+            # print("pppnnnn",pred.pandas().xyxy[0])
+
+            # print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaa",dir(pred.print()))
+            # print("ggggggggggggggggggg",getattr(pred, 'pred.print()', 0))
+            
+            
+            # object.print()  # print results to screen
+          
+            
+            img = np.squeeze(pred.render())
+              # batch_size >= 1
+                # p, s, im0, frame = path[i], '%g: ' % i, im0s[i].copy(), dataset.count
+            p, object, pred,frame = path,'', pred,frame.count
+                # print('p {} , s {} , img {},frame {} '.format(p , object,img,frame))
+            det = pred.xyxy[0]
+            # if len(pred.xyxy[0]):
+                # Rescale boxes from img_size to im0 size
+               
+            # object+= '%gx%g ' % img.shape[2:]
+            for c in  det[:, -1].unique():  # detections per class
+                    n = (det[:, -1] == c).sum()
+                    # object +=   str(names[int(c)])  # add to string
+                    print("ccccccc:", c)
+                    print("nnnnnnn:", n)
+                    print("sssssss:", names[int(c)])
+                    object += f"{n} {names[int(c)]}{'object' * (n > 1)}, "
+                    print(object)
+
+            
+            if object == '':
+                object = 'Empty.'
+                print(object)
+            else:
+                object = object[:-2] + '.'
+                print(object)    
+            #convert remove single-dimensional entries from the shape of an array
+            # img = np.squeeze(object.render()) #RGB
+            # read image as BGR
+            img_BGR = cv2.cvtColor(img, cv2.COLOR_RGB2BGR) #BGR
+            frame = cv2.imencode('.jpg', img_BGR)[1].tobytes()
+            return frame
+           
+
+def gen_det_obj(camera):
+    while True:
+        frame = camera.get_frame()
+        yield (b'--frame\r\n'
+                b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
+
+
+@app.route('/video_feed_det_try')
+def det_video_feed_try():
+    url = request.args.get('url')
+    return Response(gen_det_obj(Objdetection_try(url)), mimetype='multipart/x-mixed-replace; boundary=frame')
+    
+
+def out():
+    global object2
+    global object
+    while(True):
+        if object2!=object and object.endswith("."):
+           object2 = object
+           yield "|--" + object2 + "----|" + "<br>"
+        else:
+            yield ''
+           
+
+
+def stream_template(template_name, **context):
+    app.update_template_context(context)
+    t = app.jinja_env.get_template(template_name)
+    rv = t.stream(context)
+    rv.disable_buffering()
+    return rv
+
+
+
+@app.route('/try', methods = ['POST', 'GET'])
+def stream_view():
+    global Row
+    rows = []
+    for i in range(10):
+      rows.append(str(i))
+      print("you are in try {}".format(i))
+    # rows = Row
+    return Response(stream_with_context(stream_template('home/try.html', rows=Row)))
+@app.route('/output')
+def output():
+    print("you are in output")
+    return Response(out(), mimetype='text/html')
+
+########################################################################3
 
 
 

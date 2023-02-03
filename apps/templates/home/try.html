@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+      <!-- load CSS -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,400">
+    <!-- Google web font "Open Sans" -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css')}}">
+    <!-- https://getbootstrap.com/ -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/templatemo-style.css')}}">
+    <!-- Templatemo style -->
+    <title>Computer Vision Web App</title>
+<!-- 
+
+Timeless Template 
+
+http://www.templatemo.com/tm-517-timeless
+
+-->
+
+</head>
+
+<body>
+
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12" >
+                <header class="text-center tm-site-header">
+                    <div class="tm-site-logo"></div>
+                    <h2 class="pl-4 tm-site-title">Computer Vision</h2>
+                    <h6 > by Ayush Tarway</h6>
+                </header>
+            </div>
+        </div>
+        <div class="container tm-container-2" style="margin-bottom:30px">
+            <div class="row" >
+                <div class="col-lg-12" align="middle" >
+                    <h5 class="welcome-text" >Welcome to my Webpage for Object Detection</h5>
+                </div>
+            </div>
+        </div>
+        <div class="row" style="margin:15px 50px 10px">
+            <div class="col-lg-12">
+                <div class="video-container" id="first" align="middle">
+                    <img src="/video_feed_det_try" width="40%">
+
+                </div>
+
+                <div class="container" align="middle" style="margin-top:10px">
+                    <button class="b1" onclick="switchOn()">Show Video</button>
+                    <button class="b2" onclick="switchOff()">Hide Video</button>
+                 </div>
+
+            </div>
+
+        </div>
+
+        <div align="middle">
+                <div>
+                    <h6>In frame</h6>
+                </div>
+                    <iframe src="/output" align="middle" width="900px" height="60px" border-radius="10px" title="Output window" id="my_iframe" style="background-color:#f2fff6 ;"></iframe>
+        </div>
+
+            <hr>
+        <!-- Footer -->
+        <footer>
+            <div class="col-lg-12">
+                <p class="text-center tm-text-gray tm-copyright-text mb-0">Copyright &copy;
+                    <span class="tm-current-year">2021</span> Ayush Tarway
+                    
+                    | Design: <a href="http://templatemo.com/tm-517-timeless" class="tm-text-white">Timeless</a>
+                </p>
+            </div>
+        </footer>
+    </div>
+    <!-- .container -->
+    <script>
+        const switchOn = () => {
+            document.getElementById("first").style.display ='block';
+        }
+
+        const switchOff = () => {
+            document.getElementById("first").style.display ='none';
+        }
+    </script>
+    <script src="{{ url_for('static', filename='js/jquery.min.js')}}"></script>
+    <!-- <script src="js/jquery-3.2.1.slim.min.js"></script> -->
+    <script src="{{ url_for('static', filename='js/templatemo-script.js')}}"></script>
+        <script>
+        setInterval(function(){
+            var text = $("#my_iframe").contents().find('body').html();
+            var lines = text.split("<br>")
+            var last_line = lines[lines.length - 2]
+            if (last_line.includes("cell phone"))
+            {
+                $("#my_iframe").css( "background-color", "#58ff05" );
+            }
+            else
+            {
+                $("#my_iframe").css( "background-color", "#f2fff6" );
+            }
+            }, 500);
+    </script>
+
+</body>
+</html>

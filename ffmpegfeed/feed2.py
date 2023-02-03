@@ -12,10 +12,10 @@ def feed2():
     pTime = 0   # previous time
     cTime = 0   # current time
 
-    video_cap = cv2.VideoCapture('rtmp://media1.ambicam.com:1938/dvr7/3803ff24-f7cc-48bb-bc25-bbc5486ef728') # number of the webcam, here the first
+    video_cap = cv2.VideoCapture('rtmp://media5.ambicam.com:1938/live/3eb6f300-bb4a-4f66-af0c-15290833e3de') # number of the webcam, here the first
     frame_width = int(video_cap.get(3))
     frame_height = int(video_cap.get(4))
-    rtmp_url = "rtmp://media.torqueai.io:1938/live/flask2"
+    rtmp_url = "rtmp://media.torqueai.io:1938/live/feed2"
     ffmpeg = "ffmpeg -f rawvideo -pix_fmt bgr24 -s {}x{} -r 30 -i - -c:v libx264 -preset ultrafast -f flv {}".format(frame_width, frame_height, rtmp_url)
 
     process = sp.Popen(ffmpeg.split(), stdin=sp.PIPE)

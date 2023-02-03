@@ -412,7 +412,7 @@ from io import BytesIO
 
 class Objdetection():
     def __init__(self, url):
-        self.video = cv2.VideoCapture(url)
+        self.video = cv2.VideoCapture("rtmp://media5.ambicam.com:1938/live/3eb6f300-bb4a-4f66-af0c-15290833e3de")
         self.url = url
         self.error_count = 0
 
@@ -620,7 +620,7 @@ def frca_modeltrain():
     frmt = TrainFaceRecogModel()
     frmt.trainKerasModelForFaceRecognition()
 
-    return None
+    return 
 
 ################## Face recognition ####################
 from mtcnn import MTCNN

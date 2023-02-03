@@ -1555,7 +1555,7 @@ class Objdetection_try():
         self.video = cv2.VideoCapture("rtmp://media5.ambicam.com:1938/live/1efa24f9-0cd0-47c5-b604-c7e3ee118302")
         self.url = url
         self.error_count = 0
-        self.model = torch.hub.load('yolov5', 'custom', path='/home/torque/Documents/torque_AI/Torque-AI/yolov5/yolov5s.pt', source='local', force_reload=True)
+        self.model = torch.hub.load('yolov5', 'custom', path='/home/torquehqio/torquehq-io/main/Torque-AI/yolov5s.pt', source='local', force_reload=True)
        
         
     def __del__(self):

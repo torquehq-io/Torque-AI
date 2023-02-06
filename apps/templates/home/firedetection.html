@@ -88,6 +88,10 @@
 		.loading {
 			background: transparent url('https://icons8.com/preloaders/preloaders/22/Fading%20circles.gif') center no-repeat;
 		}
+		.card11 {
+        border-radius: 15px !important;
+        box-shadow: rgba(0, 0, 0, 0.05) 0 5px 11px;
+    }
 	</style>
 
 </head>
@@ -97,12 +101,12 @@
 <body style="background-color: rgba(200,200,200,0.5);">
 	<center>
 		<div class="row">
-			<div class="col-xl-11">
-				<div class="card">
-					<center>
-						<h1>Fire detection</h1>
-					</center>
-				</div>
+			<div class="col-sm-12">
+				<center>
+					<h1>Fire detection</h1>
+				</center>
+				<!-- <div class="card">
+				</div> -->
 			</div>
 		</div>
 	</center>
@@ -148,21 +152,21 @@
 			<br>
 
 
-			<div class="row mt-4">
+			<div class="row mt-4" style="margin-left:15px;">
 				<!-- <div class="col-lg-7 mb-lg-0 mb-4">
 					<div class="card">
 					</div>
 				</div> -->
 
 				<div class="col-lg-6">
-					<div class="card h-100 p-4">
+					<div class="card card11 h-100 p-4">
 						<img class="loading" id='videoImage' src="" style="display:visible;" />
 					</div>
 				</div>
 
 
 				<div class="col-lg-6">
-					<div class="card h-100 p-4">
+					<div class="card card11 h-100 p-4">
 						<img class="loading"  id='videoImage1' src="" style="display:visible;"
 							 />
 					</div>

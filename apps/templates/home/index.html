@@ -24,6 +24,10 @@
     color: #66b3ff;
     border-color: #66b3ff;
   }
+  .getstarted{
+    text-decoration: none;
+     color: #66b3ff;
+  }
 </style>
 
   <div class="">
@@ -120,28 +124,35 @@
           </div>
         </div>
         <!-- /.col-->
+
+        <div style="display: flex; margin-left: 45px;">
+        <div class="col-lg-8">
+
+
+
+
         <div style="display:flex">
-        <div class="col-sm-6 col-lg-8" style="margin-left: 15px;">
+        <div class="col-sm-8 col-lg-12" style="margin-left: 15px; width: 101.3%;">
           <div class="card mb-4 text-white bg-white " style="cursor: pointer; border-radius: 15px;">
             <h3 style="color: rgb(27, 27, 27); padding: 25px 0 0 25px;" class="nav-link">Auto Annotation </h3>
-         <a class="nav-link" href="firedetection.html" style="color: rgb(27, 27, 27); padding: 0px 0 0 25px; ">Get Started with our Easy to Auto Annotation Tool.</a>
+         <a class="nav-link" href="" style="color: rgb(27, 27, 27); padding: 0px 0 0 25px; ">Get Started with our Easy to Auto Annotation Tool.</a>
          <p class="nav-link" style="color: rgb(85, 85, 85); padding: 8px 0 0 25px; width:50%; font-size: 14px;">Begin your journey with Ultralytics HUB and gain the knowledge and skills needed to effectively utilize its powerful features and capabilities.</p>
-        <a href="autoLabel.html">
+        
 
-          <button type="button" class=" btn btn-outline-primary hehe" style="width: fit-content; margin: 10px 0 20px 25px;">Get Started</button>
-        </a>
+          <button type="button" class=" btn btn-outline-primary hehe" style="width: fit-content; margin: 10px 0 20px 25px; "><a class="getstarted" href="autoLabel.html">Get Started</a></button>
+       
 
          </div>
         </div>
 
 
-        <div class="image-container col-lg-4">
+        <div class="image-container col-lg-6">
           
-          <video style="width: 100%; height:240px; object-fit: contain;" autoplay muted loop>
+          <!-- <video style="width: 100%; height:240px; object-fit: contain;" autoplay muted loop>
             <source src="{{ config.ASSETS_ROOT }}/img/torqueai.mp4" type="video/mp4">
             <source src="movie.ogg" type="video/ogg">
           
-          </video>
+          </video> -->
         </div>
       </div>
 
@@ -150,11 +161,11 @@
 
 
 
-      <div style="display:flex">
-      <div class="col-sm-6 col-lg-4" style="margin-left: 15px;">
+      <div style="display:flex;  margin:10px 0px; ">
+      <div class="col-sm-8 col-lg-6" style="margin-left: 15px;">
         <div class="card mb-4 text-white bg-white " style="cursor: pointer; border-radius: 15px;">
           <h3 style="color: rgb(27, 27, 27); padding: 25px 0 0 25px;" class="nav-link">Fire Detection</h3>
-       <a class="nav-link" href="firedetection.html" style="color: rgb(27, 27, 27); padding: 0px 0 0 25px; ">Get Started with our Easy to Auto Annotation Tool.</a>
+       <a class="nav-link" href="firedetection.html" style="color: rgb(27, 27, 27); padding: 0px 0 0 25px;">Get Started with our Easy to Auto Annotation Tool.</a>
        <p class="nav-link" style="color: rgb(85, 85, 85); padding: 8px 0 0 25px; width:100%; font-size: 14px;">Experience Fire Detection with TorqueAI</p>
        <a href="firedetection.html">
        <button type="button" class=" btn btn-outline-primary hehe" style="width: fit-content; margin: 10px 0 20px 25px;">Get Started</button>
@@ -166,7 +177,7 @@
 
 
     
-      <div class="col-sm-6 col-lg-4" style="margin-left: 15px;">
+      <div class="col-sm-8 col-lg-6" style="margin-left: 15px;">
         <div class="card mb-4 text-white bg-white " style="cursor: pointer; border-radius: 15px;">
           <h3 style="color: rgb(27, 27, 27); padding: 25px 0 0 25px;" class="nav-link">Custom Model Detection</h3>
        <a class="nav-link" href="firedetection.html" style="color: rgb(27, 27, 27); padding: 0px 0 0 25px; ">Get Started with our Easy to Auto Annotation Tool.</a>
@@ -185,7 +196,7 @@
 
     <div style="display:flex">
 
-      <div class="col-sm-6 col-lg-4" style="margin-left: 15px;">
+      <div class="col-sm-8 col-lg-6" style="margin-left: 15px;">
         <div class="card mb-4 text-white bg-white " style="cursor: pointer; border-radius: 15px;">
           <h3 style="color: rgb(27, 27, 27); padding: 25px 0 0 25px;" class="nav-link">Person Counter</h3>
        <a class="nav-link" href="person_counter.html" style="color: rgb(27, 27, 27); padding: 0px 0 0 25px; ">Get Started with our Easy to Auto Annotation Tool.</a>
@@ -203,7 +214,7 @@
 
 
 
-      <div class="col-sm-6 col-lg-4" style="margin-left: 15px;">
+      <div class="col-sm-8 col-lg-6" style="margin-left: 15px;">
         <div class="card mb-4 text-white bg-white " style="cursor: pointer; border-radius: 15px;">
           <h3 style="color: rgb(27, 27, 27); padding: 25px 0 0 25px;" class="nav-link">Face Recognition</h3>
        <a class="nav-link" href="/face_recognition.html" style="color: rgb(27, 27, 27); padding: 0px 0 0 25px; ">Get Started with our system to recognition face.</a>
@@ -228,8 +239,21 @@
 
 
       
+  </div>
 
-
+  <div class="col-lg-1">
+  </div>
+  <div class="col-lg-2">
+    <div class="card card11" style="border-radius: 15px; padding: 32px; background: linear-gradient(180deg,#3371d9 0%,#66b3ff 100%);">
+      <div class="image" style="display: flex; flex-direction: column; justify-content: center; align-items: center;">
+        <img style=" border-radius: 50%; width:50%;border-style: solid; border-color: #d6d6d6; border-width: 5px; " src="https://lh3.googleusercontent.com/a/AEdFTp7S9Ys878LHTEIAiv9h1Vzs5bR3v0cvKbtvevMl=s96-c" alt="">
+        <h6 style=" margin-bottom: 0px; padding-top:12px; color:#ffffff" >Hello Abhi</h6>
+        <p style="font-size: 12px; color: #ffffff;">abhiparmar.vmukti@gmail.com</p>
+      </div>
+      
+    </div>
+  </div>
+</div>
 
         <!-- /.col-->
         

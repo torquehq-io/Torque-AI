@@ -8,6 +8,22 @@
 {% block content %}
 
 <style>
+
+    .card11 {
+        border-radius: 15px !important;
+        box-shadow: rgba(0, 0, 0, 0.05) 0 5px 11px;
+    }
+
+    input {
+        width: 100px;
+        /* margin: 8px; */
+        padding: 5px;
+        border:none !important;
+        background-color: rgba(102, 179, 255, 0.19);
+        margin:5px 0 5px 0;
+        border-radius: 10px;
+    }
+
     button {
         appearance: none;
         background-color: transparent;
@@ -37,36 +53,115 @@
         will-change: transform;
     }
 
+    button:disabled {
+        pointer-events: none;
+        background-color: rgb(112, 108, 108);
+        background: rgb(129, 122, 122);
+        display: none;
+
+    }
+
     button:hover {
         color: #fff;
         background-color: #1a1a1a;
-        box-shadow: rgba(0, 0, 0, 0.25) 0 8px 15px;
-        transform: translateY(-2px);
+        /* box-shadow: rgba(0, 0, 0, 0.25) 0 8px 15px; */
+        /* transform: translateY(-2px); */
     }
 
-    button:disabled {
-				pointer-events: none;
-				background-color: rgb(112, 108, 108);
-				background: rgb(129, 122, 122);
-				display: none;
+    button:active {
+        box-shadow: none;
+        transform: translateY(0);
+    }
 
-			}
-    
-	button:active {
-				box-shadow: none;
-				transform: translateY(0);
-			}
-    input {
-				width: 100px;
-				margin: 8px;
-				padding: 5px;
-				border-radius: 10px;
-			}
     label {
-        margin-left: 30px;
+        /* margin-left: 30px; */
         font-size: 15px;
-        width: 80px;
-      }
+        /* width: 111px; */
+    }
+
+
+    .hint {
+        height: 30px;
+        width: 30px;
+        color: black;
+        background-color: rgba(102, 179, 255, 0.19);
+        border-radius: 15px;
+        position: absolute;
+        right: 19px;
+        top: 27px;
+        transition: .2s ease;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 999999;
+        cursor: pointer;
+    }
+
+    
+
+    .hint>span {
+        position: absolute;
+        top: 7px;
+        right: 12px;
+    }
+
+    .hint>p {
+        overflow: hidden;
+        max-height: 0px;
+        transition-delay: 0.2s;
+    }
+
+
+    .rtmpmaate {
+        color: #000000;
+        padding: 10px;
+        background-color: rgb(219, 219, 219);
+        position: absolute;
+        font-size: 10px;
+        border-radius: 40px;
+        left: 95%;
+        width: 100%;
+        top: 11%;
+        display: none;
+    }
+
+    .hehe {
+        margin-left: 0px;
+        /* margin-bottom: 25px; */
+        margin-top: 10px;
+        background-color: aliceblue;
+        color: #66b3ff;
+        border-color: #66b3ff;
+        border-radius: 10px;
+    }
+
+    .hehe1 {
+        margin-left: 0px;
+        /* margin-bottom: 25px; */
+        margin-top: 10px;
+        background: -webkit-linear-gradient(180deg,#3371d9 0%,#66b3ff );
+        color: #ffffff;
+        border-color: #66b3ff;
+        border-radius: 10px;
+        
+    }
+
+    .hehe1:hover {
+        color: #fff;
+        border-color: #66b3ff;
+        background: -webkit-linear-gradient(180deg,#66b3ff 0%,#3371d9 );				
+    }
+
+    .hehe:hover {
+        background-color: rgba(102, 179, 255, 0.3);
+        color: #66b3ff;
+        border-color: #66b3ff;
+        
+    }
+
+    input::placeholder {
+        opacity: 0.5;
+    }
 </style>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -98,31 +193,36 @@
             </div>
         </div>
     </div>
-    <div class="pcoded-content">
+    <div class="pcoded-content"> -->
         <!-- [ Main Content ] start -->
 
-        <div class="row">
+        <div class="row" style="margin-left:25px;">
             <!-- [ Typography ] start -->
-            <div class="col-sm-12">
-                <div class="card">
-                    <div class="card-header">
-                        <center><h2>CANDIDATE ADDON FOR FACE RECOGNITION</h2> </center>
+            <div class="col-sm-12 col-lg-6" style="">
+                <center>
+                    <!-- <h2>CANDIDATE ADDON FOR FACE RECOGNITION</h2> -->
+                    <h1 style="text-align: center; margin-bottom: 30px; font-size: 35px; color: #1d4fa5;">Candidate Addon</h1>
+        
+                 </center>
+                <div class="card card11">
+                    <div class="">
+                       
 
                     </div>
                     <div class="card-body">
                         
                         <form id="urlForm">
                             
-                            <label>RTMP URL:</label>
+                            <label>RTMP URL:</label><br/>
                             <input id="rtmpUrl" style="width: 50%" type="text" name="rtmpUrl" value="" />
                             <br>
-                            <label>Candidate Name :</label>
+                            <label>Candidate Name :</label><br/>
                             <input id="candname" style="width: 50%" type="text" name="candname" value="" />
                             <br>
                            
                             
-                            <button id="btnPlay">Play</button>
-                            <button id="btnStop" onclick="showtrain()">Stop</button>
+                            <button class="btn btn-outline-primary hehe" id="btnPlay">Play</button>
+                            <button class="btn btn-outline-primary hehe1" id="btnStop" onclick="showtrain()">Stop</button>
                             <button id="train" style="display:none">Train</button>
                            
                         </form>
@@ -130,18 +230,28 @@
                     </div>
                 </div>
             </div>
-            <div class="col-sm-12">
-                <div class="card">
-                    <div class="card-header">
-                        <h5>Video Streaming</h5>
-                    </div>
-                    <div class="demo-container">
-                        <img id='videoImage' src="" style="display:visible;" />
-                    </div>
-                   
-                </div>
-            </div>
 
+
+            <div class="col-sm-12 col-lg-6">
+
+                <center>
+                    <!-- <h2>CANDIDATE ADDON FOR FACE RECOGNITION</h2> -->
+                    <h1 style="text-align: center; margin-bottom: 30px; font-size: 35px; color: #1d4fa5;">Video Streaming</h1>
+                    
+                </center>
+                <!-- <div class=""><br/><br/> -->
+                    <div class="card card11">
+                        <div class="">
+                            <!-- <h5>Video Streaming</h5> -->
+                        </div>
+                        <div class="demo-container">
+                            <img id='videoImage' src="" style="display:visible;" />
+                        </div>
+                        
+                    </div>
+                </div>
+                
+            </div>
             <!-- [ Typography ] end -->
         </div>
         <!-- [ Main Content ] end -->

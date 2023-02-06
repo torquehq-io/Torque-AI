@@ -25,7 +25,7 @@ def feed1():
 
     # Model
     #model_detection = torch.hub.load('ultralytics/yolov5', 'yolov5s')
-    model_detection = torch.hub.load("ultralytics/yolov5", "custom", path = "/home/torquehqio/torquehq-io/Testing/Torque-AI/Fire_detection/fire.pt", force_reload=True)
+    model_detection = torch.hub.load("ultralytics/yolov5", "custom", path = "/home/torquehqio/torquehq-io/main/Torque-AI/yolov5s.pt", force_reload=True)
 
     # Using the cam
     while True:

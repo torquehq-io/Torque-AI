@@ -9,6 +9,22 @@
 
 
 <style>
+
+    .card11 {
+        border-radius: 15px !important;
+        box-shadow: rgba(0, 0, 0, 0.05) 0 5px 11px;
+    }
+
+    input {
+        width: 100px;
+        /* margin: 8px; */
+        padding: 5px;
+        border:none !important;
+        background-color: rgba(102, 179, 255, 0.19);
+        margin:5px 0 5px 0;
+        border-radius: 10px;
+    }
+
     button {
         appearance: none;
         background-color: transparent;
@@ -38,32 +54,115 @@
         will-change: transform;
     }
 
+    button:disabled {
+        pointer-events: none;
+        background-color: rgb(112, 108, 108);
+        background: rgb(129, 122, 122);
+        display: none;
+
+    }
+
     button:hover {
         color: #fff;
         background-color: #1a1a1a;
-        box-shadow: rgba(0, 0, 0, 0.25) 0 8px 15px;
-        transform: translateY(-2px);
+        /* box-shadow: rgba(0, 0, 0, 0.25) 0 8px 15px; */
+        /* transform: translateY(-2px); */
     }
-    button:disabled {
-				pointer-events: none;
-				background-color: rgb(112, 108, 108);
-				background: rgb(129, 122, 122);
-				display: none;
 
-			}
+    button:active {
+        box-shadow: none;
+        transform: translateY(0);
+    }
+
+    label {
+        /* margin-left: 30px; */
+        font-size: 15px;
+        width: 111px;
+    }
+
+
+    .hint {
+        height: 30px;
+        width: 30px;
+        color: black;
+        background-color: rgba(102, 179, 255, 0.19);
+        border-radius: 15px;
+        position: absolute;
+        right: 19px;
+        top: 27px;
+        transition: .2s ease;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 999999;
+        cursor: pointer;
+    }
+
     
-	button:active {
-				box-shadow: none;
-				transform: translateY(0);
-			}
-    input {
-				width: 100px;
-				margin: 8px;
-				padding: 5px;
-				border-radius: 10px;
-			}
+
+    .hint>span {
+        position: absolute;
+        top: 7px;
+        right: 12px;
+    }
+
+    .hint>p {
+        overflow: hidden;
+        max-height: 0px;
+        transition-delay: 0.2s;
+    }
 
 
+    .rtmpmaate {
+        color: #000000;
+        padding: 10px;
+        background-color: rgb(219, 219, 219);
+        position: absolute;
+        font-size: 10px;
+        border-radius: 40px;
+        left: 95%;
+        width: 100%;
+        top: 11%;
+        display: none;
+    }
+
+    .hehe {
+        margin-left: 0px;
+        /* margin-bottom: 25px; */
+        margin-top: 10px;
+        background-color: aliceblue;
+        color: #66b3ff;
+        border-color: #66b3ff;
+        border-radius: 10px;
+    }
+
+    .hehe1 {
+        margin-left: 0px;
+        /* margin-bottom: 25px; */
+        margin-top: 10px;
+        background: -webkit-linear-gradient(180deg,#3371d9 0%,#66b3ff );
+        color: #ffffff;
+        border-color: #66b3ff;
+        border-radius: 10px;
+        
+    }
+
+    .hehe1:hover {
+        color: #fff;
+        border-color: #66b3ff;
+        background: -webkit-linear-gradient(180deg,#66b3ff 0%,#3371d9 );				
+    }
+
+    .hehe:hover {
+        background-color: rgba(102, 179, 255, 0.3);
+        color: #66b3ff;
+        border-color: #66b3ff;
+        
+    }
+
+    input::placeholder {
+        opacity: 0.5;
+    }
 </style>
 
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -98,37 +197,39 @@
                     </div>
                 </div>
             </div>
-            <div class="pcoded-content">
+            <div class="pcoded-content"> -->
                 <!-- [ Main Content ] start -->
         
                 <div class="row">
                     <!-- [ Typography ] start -->
-                    <div class="col-sm-12">
-                        <div class="card">
-                            <div class="card-header">
-                                <center><h2>PERSON COUNTER</h2></center>
+                    <div class="col-sm-12 col-lg-5">
+                        <center><h2>PERSON COUNTER</h2></center>
+                        <div class="card card11" style="margin-left: 15px; padding-left: 10px; ">
+                            <div class="">
         
                             </div>
-                            <div class="card-body">
+                            <div class="card-body" >
                                 <form id="urlForm">
                                     <label>RTMP URL:</label>
-                                    <input id="rtmpUrl" style="width: 50%" type="text" name="rtmpUrl" value="" />
+                                    <input id="rtmpUrl" style="width: 40%" type="text" name="rtmpUrl" value="" />
                                  
                                     
                                     
                                     
         
-                                    <button id="btnPlay">Play</button>
-                                    <button id="btnStop">Stop</button>
+                                    <button style="margin-left: 15px; margin-bottom:15px;" class="btn btn-outline-primary hehe" id="btnPlay">Play</button>
+                                    <button style="margin-left: 5px; margin-bottom:15px;" class="btn btn-outline-primary hehe1" id="btnStop">Stop</button>
                                    
                                 </form>
                             </div>
                         </div>
                     </div>
-                    <div class="col-sm-12">
-                        <div class="card">
-                            <div class="card-header">
-                                <h5>Video Streaming </h5>
+                    <!-- <div class="col-lg-6"></div> -->
+                    <div class="col-sm-12 col-lg-6" style="margin:15px 0px 0px 15px">
+                        <center><h2>VIDEO STREAMING</h2></center>
+                        <div class="card card11">
+                            <div class="">
+                                <!-- <h5>Video Streaming </h5> -->
                             </div>
                             <div class="demo-container">
                                 <img id='videoImage' src="" style="display:visible;" />

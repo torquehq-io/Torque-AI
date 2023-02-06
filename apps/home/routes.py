@@ -7,13 +7,14 @@ from apps.home import blueprint
 from flask import render_template, request
 from flask_login import login_required
 from jinja2 import TemplateNotFound
-
+from flask_login import current_user
 
 @blueprint.route('/index')
 @login_required
 def index():
-
-    return render_template('home/index.html', segment='index')
+    current_user_name = current_user
+    current_user_email = current_user.email
+    return render_template('home/index.html', segment='index', user_name = current_user_name, user_email = current_user_email)
 
 
 @blueprint.route('/<template>')

@@ -247,8 +247,8 @@
     <div class="card card11" style="border-radius: 15px; padding: 32px; background: linear-gradient(180deg,#3371d9 0%,#66b3ff 100%);">
       <div class="image" style="display: flex; flex-direction: column; justify-content: center; align-items: center;">
         <img style=" border-radius: 50%; width:50%;border-style: solid; border-color: #d6d6d6; border-width: 5px; " src="https://lh3.googleusercontent.com/a/AEdFTp7S9Ys878LHTEIAiv9h1Vzs5bR3v0cvKbtvevMl=s96-c" alt="">
-        <h5 style=" margin-bottom: 0px; padding-top:12px; color:#ffffff" >Hello {{user_name}}! </h5>
-        <p style="font-size: 16px; color: #ffffff;">{{ user_email }}</p>
+        <h5 style=" margin-bottom: 0px; padding-top:12px; color:#ffffff" >Hello {{ current_user.username }} ! </h5>
+        <p style="font-size: 16px; color: #ffffff;">{{ current_user.email }}</p>
       </div>
       
     </div>

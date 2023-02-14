@@ -93,8 +93,10 @@ from flask_login import (
 )
 global current_loggin_user
 
+
 class VideoCamera():
     def __init__(self, url):
+        # cityList=db.execute("SELECT * FROM User_camera_sources order by username ")
         self.video = cv2.VideoCapture(url)
         self.url = url
         self.error_count = 0
@@ -174,7 +176,11 @@ def gen(camera):
                    b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
 
 
-
+@app.route('/autoLabel.html' ,methods=["POST","GET"])
+def autoLabel():
+    
+   
+    return render_template('home/autoLabel.html', User_camera_sources=User_camera_sources_record.query.filter_by(username=current_user.username))
 
 ############################   Camera Stream API Url  ############################
 
@@ -1201,13 +1207,7 @@ class Fire_detection1():
 
         self.url1 = url1
         self.error_count = 0
-        self.frame_width = int(self.video.get(3))
-        self.frame_height = int(self.video.get(4))
-        self.rtmp_url = "rtmp://media.torqueai.io:1938/live/nmstest11"
-        self.ffmpeg = "ffmpeg -f rawvideo -pix_fmt bgr24 -s {}x{} -r 30 -i - -c:v libx264 -preset ultrafast -f flv {}".format(self.frame_width, self.frame_height, self.rtmp_url)
-
-        self.process = sp.Popen(self.ffmpeg.split(), stdin=sp.PIPE)
-
+       
         self.model = torch.hub.load('yolov5', 'custom', path='Fire_detection/fire.pt', source='local', force_reload=True)
 
        
@@ -1219,10 +1219,10 @@ class Fire_detection1():
        
 
         
-        # Set Model Settings Dynamic
-        # self.model.eval()
-        # self.model.conf = 0.6  # confidence threshold (0-1)
-        # self.model.iou = 0.45  # NMS IoU threshold (0-1) 
+       # Set Model Settings Dynamic
+        self.model.eval()
+        self.model.conf = 0.6  # confidence threshold (0-1)
+        self.model.iou = 0.45  # NMS IoU threshold (0-1) 
       
         # Set Model Settings Static
         # model.eval()
@@ -1230,47 +1230,27 @@ class Fire_detection1():
         # model.iou = 0.45  # NMS IoU threshold (0-1) 
         
             # Capture frame-by-fram ## read the camera frame
-       
+        
         success, frame = self.video.read()
         if success == True:
 
-            # ret,buffer=cv2.imencode('.jpg',frame)
-            # frame=buffer.tobytes()
+            ret,buffer=cv2.imencode('.jpg',frame)
+            frame=buffer.tobytes()
             
-            # #print(type(frame))
+            #print(type(frame))
 
-            # img = Image.open(io.BytesIO(frame))
-            # results = self.model(img, size=640)
+            img = Image.open(io.BytesIO(frame))
+            results = self.model(img, size=640)
         
-            # results.print()  # print results to screen
+            results.print()  # print results to screen
             
             
-            # #convert remove single-dimensional entries from the shape of an array
-            # img = np.squeeze(results.render()) #RGB
-            # # read image as BGR
-            # img_BGR = cv2.cvtColor(img, cv2.COLOR_RGB2BGR) #BGR
-           
- 
-            # frame = cv2.imencode('.jpg', img_BGR)[1].tobytes()
-            # return frame
-            new_img = fct.draw_anchor_box(frame, fct.detection(frame, self.model))
-
-            # get the frame rate
-            cTime = time.time()
-            fps = 1 / (cTime - pTime)
-            pTime = cTime
-
-            # display the fps on the screen
-            cv2.putText(
-                new_img,                    # draw on the screen
-                str(int(fps)),          # round fps
-                (10, 70),               # text position
-                cv2.FONT_HERSHEY_PLAIN, # font type
-                3,                      # fonct scale
-                (255, 0, 255),          # color purple
-                3                       # thickness
-            )
-            self.process.stdin.write(frame.tobytes())
+            #convert remove single-dimensional entries from the shape of an array
+            img = np.squeeze(results.render()) #RGB
+            # read image as BGR
+            img_BGR = cv2.cvtColor(img, cv2.COLOR_RGB2BGR) #BGR
+            frame = cv2.imencode('.jpg', img_BGR)[1].tobytes()
+            return frame
        
 
 def gen_fire_det1(camera1):
@@ -1333,17 +1313,17 @@ def new():
 
 ###############################################################
 
-@app.route('/storeRtmpLink')
-def Test():
-    current_loggin_user = current_user.username
-    user = Users.query.filter_by(username=current_loggin_user).first()
-    user=str(user)[21:-1]
-    if user:
-        db.session.execute("SELECT * FROM User_camera_sources")
+# @app.route('/storeRtmpLink')
+# def Test():
+#     current_loggin_user = current_user.username
+#     user = Users.query.filter_by(username=current_loggin_user).first()
+#     user=str(user)[21:-1]
+#     if user:
+#         db.session.execute("SELECT * FROM User_camera_sources")
         
-        db.session.close()
+#         db.session.close()
 
-    return render_template('home/camera_source_db.html',User_camera_sources=User_camera_sources.query.filter_by(username=current_user.username),data=current_user.username,table=User_camera_sources)
+#     return render_template('home/autoLabel.html',User_camera_sources=User_camera_sources.query.filter_by(username=current_user.username),data=current_user.username,table=User_camera_sources)
 
 
 @app.route('/insert', methods = ['POST'])

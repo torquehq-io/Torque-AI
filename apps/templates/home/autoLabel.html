@@ -208,9 +208,6 @@
 
 <body>
 
-
-
-
 	<div class="pcoded-content"></div>
 	<div class="row">
 		<!-- [ Typography ] start -->
@@ -235,17 +232,22 @@
 							<div class="card">
 							</div>
 						</div> -->
+						
 						<div style="margin-left: 25px;" class="col-lg-4" <div class="col-lg-4">
 
 							<div style="padding: 25px 25px 25px 25px ;"  class="card card11 h-100 pt-3" style="border-radius: 2.8125rem;">
+								
+							
 								<form id="urlForm" ,action="/training">
-									<p class="rtmpmaate" id="rtmpmaate">
-										rtmp://host:port/live/1efa24f9-0cd0-47c5-streamkey</p>
-									<label style="text-align: start;">Camera Source:</label><br />
-									<input id="rtmpUrl" style="width: 70%"
-										placeholder="rtmps://host:port/application/streamName/streamkey" type="text"
-										name="rtmpUrl" value="" />
 
+									 <label>Select Camera Source:</label>
+									 <select style="width: 70%; margin-right: 20px;" name="row.source" data-live-search="true" id="car_brand" class="form-control" title="Select Car Brand"> 
+									 {% for row in User_camera_sources %}
+										 <option value="{{row.serial_no}}">{{row.source}}</option>
+									 {% endfor %}
+									 </select>
+								 
+										
 										
 									<div style="left: 90%;" onmouseover="rtmphover()" onmouseleave="rtmpout()" id="demo" class="hint">
 										<span class="fa fa-info"></span>
@@ -270,6 +272,12 @@
 										style="display:none">Download The
 										Model</button>
 								</form>
+								<!-- Choose a City<SELECT name="city">
+									{% for row in User_camera_sources %}
+									  <OPTION value={{row.username}}>{{row.link1}}</option>
+										<OPTION value={{row.username}}>{{row.link2}}</option>
+									{% endfor %}
+									</SELECT> -->
 							</div>
 							<!-- <div class="col-lg-4">
 									<div class="demo-container">
@@ -282,7 +290,7 @@
 							</div>
 							 -->
 					</div>
-
+					
 					
 					<center class="col-lg-5">
 						<div class="demo-container">
@@ -293,13 +301,15 @@
 							
 						</div>
 					</center>
+
 				</div>
 					
 			</div>
 			<br>
+			
 
 			</section>
-		</div>
+
 		<script>
 			var gDrawing = false;
 			var x, y, w, h, canvas;
@@ -351,10 +361,14 @@
 
 				console.log("Playing stream ...");
 				var spinner = '<div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div>'
-				var rtmpUrl = $("#rtmpUrl").val();
+				// var rtmpUrl = $("#rtmpUrl").val();
+				var e = document.getElementById("car_brand");
+				var value = e.value;
+                var text = e.options[e.selectedIndex].text;
+                console.log(value, text);
 				$("#btnPlay").html(spinner);
 				// play in image
-				$("#videoImage").attr("src", "/video_feed1?url=" + rtmpUrl);
+				$("#videoImage").attr("src", "/video_feed1?url=" + text);
 				gDrawing = true;
 				setTimeout(drawImge, 300);
 				initCanvas();

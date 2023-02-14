@@ -134,6 +134,13 @@
                 <tr><td>{{ row.link4 }}</td>
                    
               </tr>
+
+              Choose a City<SELECT name="city">
+                {% for row in User_camera_sources %}
+                  <OPTION value={{row.username}}>{{row.link1}}</option>
+                    <OPTION value={{row.username}}>{{row.link2}}</option>
+                {% endfor %}
+                </SELECT>
             
         <td>
             <a href="/update/{{row.0}}" class="btn btn-warning btn-sm" data-toggle="modal" data-target="#modaledit{{row.0}}">Edit</a>

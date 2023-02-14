@@ -246,7 +246,13 @@
 										 <option value="{{row.serial_no}}">{{row.source}}</option>
 									 {% endfor %}
 									 </select>
-								 
+									 <p style="margin-left: 25%;"> OR </p>
+									 <p class="rtmpmaate" id="rtmpmaate">
+                                        rtmp://host:port/live/1efa24f9-0cd0-47c5-streamkey</p>
+                                    <label style="text-align: start;">Camera Source:</label><br />
+                                    <input id="rtmpUrl" style="width: 70%"
+                                        placeholder="rtmps://host:port/application/streamName/streamkey" type="text"
+                                        name="rtmpUrl" value="" />
 										
 										
 									<div style="left: 90%;" onmouseover="rtmphover()" onmouseleave="rtmpout()" id="demo" class="hint">
@@ -272,23 +278,9 @@
 										style="display:none">Download The
 										Model</button>
 								</form>
-								<!-- Choose a City<SELECT name="city">
-									{% for row in User_camera_sources %}
-									  <OPTION value={{row.username}}>{{row.link1}}</option>
-										<OPTION value={{row.username}}>{{row.link2}}</option>
-									{% endfor %}
-									</SELECT> -->
+								
 							</div>
-							<!-- <div class="col-lg-4">
-									<div class="demo-container">
-										<img id='videoImage' src="" style="display: none;" />
-									</div>
-									<div>
-										<canvas id="drawCanvas" style="cursor: crosshair;"></canvas>
-		
-									</div>
-							</div>
-							 -->
+							
 					</div>
 					
 					
@@ -361,14 +353,24 @@
 
 				console.log("Playing stream ...");
 				var spinner = '<div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div>'
-				// var rtmpUrl = $("#rtmpUrl").val();
+				var rtmpUrl = $("#rtmpUrl").val();
 				var e = document.getElementById("car_brand");
 				var value = e.value;
                 var text = e.options[e.selectedIndex].text;
                 console.log(value, text);
 				$("#btnPlay").html(spinner);
 				// play in image
-				$("#videoImage").attr("src", "/video_feed1?url=" + text);
+				if (rtmpUrl != "") {
+                    // play in image
+                    $("#videoImage").attr("src", "/video_feed1?url=" + rtmpUrl);
+
+                }
+                else{
+                    // play in image
+                    $("#videoImage").attr("src", "/video_feed1?url=" + text);
+                }
+
+				
 				gDrawing = true;
 				setTimeout(drawImge, 300);
 				initCanvas();

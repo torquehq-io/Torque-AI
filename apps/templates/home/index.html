@@ -28,6 +28,41 @@
     text-decoration: none;
      color: #66b3ff;
   }
+  .bhajan{
+    border-radius: 15px; padding: 32px; background: linear-gradient(180deg,#3371d9 0%,#66b3ff 100%);
+  }
+  .bhajanimg{
+    border-radius: 50%; width:50%;border-style: solid; border-color: #d6d6d6; border-width: 5px; 
+  }
+  .bhajanh5{
+    margin-bottom: 0px; padding-top:12px; color:#ffffff
+  }
+  .bhajanp{
+    font-size: 16px; color: #ffffff;
+  }
+
+  @media screen and (max-width:1400px) {
+    .bhajanh5{
+      font-size: 17px;
+    }
+    .bhajanp{
+      font-size: 13px;
+    }
+
+  }
+
+  @media screen and (max-width:900px) {
+    
+    #haha{
+      visibility: hidden;
+    }
+  }
+
+
+  .nanubhajan{
+    display: flex; flex-direction: column; justify-content: center; align-items: center;
+  }
+
 </style>
 
   <div class="">
@@ -179,9 +214,9 @@
     
       <div class="col-sm-8 col-lg-6" style="margin-left: 15px;">
         <div class="card mb-4 text-white bg-white " style="cursor: pointer; border-radius: 15px;">
-          <h3 style="color: rgb(27, 27, 27); padding: 25px 0 0 25px;" class="nav-link">Custom Model Detection</h3>
+          <h3 style="color: rgb(27, 27, 27); padding: 25px 0 0 25px;" class="nav-link">Model Detection</h3>
        <a class="nav-link" href="firedetection.html" style="color: rgb(27, 27, 27); padding: 0px 0 0 25px; ">Get Started with our Easy to Auto Annotation Tool.</a>
-       <p class="nav-link" style="color: rgb(85, 85, 85); padding: 8px 0 0 25px; width:100%; font-size: 14px;">Experience Custom Model Detection with TorqueAI</p>
+       <p class="nav-link" style="color: rgb(85, 85, 85); padding: 8px 0 0 25px; width:100%; font-size: 14px;">Experience Model Detection with TorqueAI</p>
        <a href="detection.html">
        <button type="button" class=" btn btn-outline-primary hehe" style="width: fit-content; margin: 10px 0 20px 25px;">Get Started</button>
         </a>
@@ -230,12 +265,12 @@
 
   <div class="col-lg-1">
   </div>
-  <div class="col-lg-2">
-    <div class="card card11" style="border-radius: 15px; padding: 32px; background: linear-gradient(180deg,#3371d9 0%,#66b3ff 100%);">
-      <div class="image" style="display: flex; flex-direction: column; justify-content: center; align-items: center;">
-        <img style=" border-radius: 50%; width:50%;border-style: solid; border-color: #d6d6d6; border-width: 5px; " src="https://lh3.googleusercontent.com/a/AEdFTp7S9Ys878LHTEIAiv9h1Vzs5bR3v0cvKbtvevMl=s96-c" alt="">
-        <h5 style=" margin-bottom: 0px; padding-top:12px; color:#ffffff" >Hello {{ current_user.username }} ! </h5>
-        <p style="font-size: 16px; color: #ffffff;">{{ current_user.email }}</p>
+  <div class="col-lg-2" id="haha">
+    <div class="card card11 bhajan" style="">
+      <div class="image nanubhajan" style="">
+        <img class="bhajanimg" style="" src="https://lh3.googleusercontent.com/a/AEdFTp7S9Ys878LHTEIAiv9h1Vzs5bR3v0cvKbtvevMl=s96-c" alt="">
+        <h5 class="bhajanh5" style="" >Hello {{ current_user.username }} ! </h5>
+        <p class="bhajanp" style="">{{ current_user.email }}</p>
       </div>
       
     </div>

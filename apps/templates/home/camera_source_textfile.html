@@ -165,7 +165,7 @@ p{
                
                 <tr><td>{{ row.source }}</td>
                   <td>{{ row.name_source }}</td>
-                    
+                  <td><a href="/delete_src/{{ row.serial_no }}" onclick="return confirm('Are Sure Want To Deleted ?')" class="btn btn-danger btn-delete btn-sm ">Delete</a></td>  
                 </tr>
         {%endfor%}
               

@@ -1541,6 +1541,25 @@ def insert_src():
         db.session.commit()
         
         return redirect(url_for('camera_src_display'))
+    
+##### ---------------------- delete camera source -------------------------
+
+@app.route('/delete_src/<int:id>', methods = ['GET','POST'])
+def delete_src(id):
+    print(id)
+    current_loggin_user = current_user.username
+    source_to_delete = User_camera_sources_record.query.get_or_404(id)
+    source_to_delete_file = User_camera_sources_record.query.filter_by(serial_no=id).first()
+    # source_to_delete_local= source_to_delete_file.model_name
+    print(source_to_delete)
+    #os.remove(os.path.join(str(os.getcwd()+"/Users_slab/"+current_loggin_user+"/Models/"), model_to_delete_local+".pt"))
+    db.session.delete(source_to_delete)
+  
+   
+    
+    db.session.commit()
+    print("Record Has Been Deleted Successfully")
+    return redirect(url_for('camera_src_display'))
 
 ###########################################################################
 Row=[]

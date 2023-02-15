@@ -54,16 +54,18 @@
 }
 
 input[type=file]{
-  background-color: #4CAF50;
+  background-color: #ffffff;
   border: none;
+  border-radius: 15px;
   color: white;
-  padding: 15px 32px;
+  padding: 10px 10px;
   text-align: center;
   text-decoration: none;
   display: inline-block;
   font-size: 16px;
-  box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
-  margin: 40px 40px;
+  cursor: pointer;
+  /* box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19); */
+  margin-right: 5px;
   /* display: none; */
 
 }
@@ -71,7 +73,7 @@ input[type=file]{
 #pre{
   background-color: #4CAF50; /* Green */
   border: none;
-  color: white;
+  color: #3371d9;
   padding: 15px 32px;
   text-align: center;
   text-decoration: none;
@@ -85,6 +87,60 @@ p{
   margin: 50px;
   font-size: 72px;
 }
+
+.hehe {
+				margin-left: 0px;
+				/* margin-bottom: 25px; */
+				margin-top: 10px;
+				background-color: aliceblue;
+				color: #66b3ff;
+				border-color: #66b3ff;
+				border-radius: 10px;
+			}
+.hehe:hover {
+				background-color: rgba(102, 179, 255, 0.3);
+				color: #66b3ff;
+				border-color: #66b3ff;
+				
+			}
+
+      .hehe1 {
+				margin-left: 0px;
+				/* margin-bottom: 25px; */
+				margin-top: 10px;
+				background: -webkit-linear-gradient(180deg,#3371d9 0%,#66b3ff );
+				color: #ffffff;
+				border-color: #66b3ff;
+				border-radius: 10px;
+				
+			}
+
+			.hehe1:hover {
+				color: #fff;
+				border-color: #66b3ff;
+				background: -webkit-linear-gradient(180deg,#66b3ff 0%,#3371d9 );				
+			}
+
+      .camerainput{
+        width: 100px;
+				/* margin: 8px; */
+				padding: 5px;
+				border:none !important;
+        border-color: #66b3ff;
+				background-color: rgba(102, 179, 255, 0.19);
+				margin:5px 0 5px 0;
+				border-radius: 10px;
+      }
+
+      input::placeholder {
+				opacity: 0.5;
+			}
+
+      .cameraPage{
+        display: flex;
+      }
+      
+     
 
 </style> 
 <body>
@@ -113,11 +169,33 @@ p{
                 </tr>
         {%endfor%}
               
-   <form action = "/camera_source_textfile" method = "post" enctype="multipart/form-data">  
-        <input type="file" name="file" />  
-        <input type = "submit" value="Upload" id="data">  
+   <form style="display: flex;" action = "/camera_source_textfile" method = "post" enctype="multipart/form-data">  
+    <div style="display: flex; margin: auto;">
+
+      <input style="color:#3371d9" class="garba" type="file" name="file" />  
+      <!-- <input type = "submit" value="Upload" id="data">   -->
+      <button style="" class="btn btn-outline-primary hehe" type="submit" id="data">Upload</button>
+    </div>
     </form>
-   
+    <br/>
+    <h6>----OR----</h6>
+    <br/>
+    <form id="urlForm" action = "/insert_src" method = "post">
+
+      <div class="cameraPage" style=" margin: auto;">
+      <!-- <label>RTMP URL:</label> -->
+      <input class="camerainput" id="rtmpUrl" style="width: 100%; margin-left:10px;" placeholder="Enter RTMP URL here" type="text" name="rtmpUrl" value="" />
+      <!-- </div>
+
+      <div style="display: flex; margin: auto; margin-top: 5px;"> -->
+      <!-- <label>CAMERA NAME:</label> -->
+      <input class="camerainput" id="cam_name" style="width: 50%; margin-left:10px;" type="text" placeholder="Enter Camera Name here" name="camera_name" value="" />
+      </div>
+      <button style="margin:auto; margin-top:8px;" class="btn btn-outline-primary hehe1" id="btnPlay">submit</button>
+      <br/>
+     
+     
+  </form>
    
 
 </script>

@@ -1491,6 +1491,11 @@ class User_camera_sources_record(db.Model):
 from distutils.log import debug
 from fileinput import filename
 import csv  
+
+
+@app.route('/camera_src_display')
+def camera_src_display():
+    return render_template('home/camera_source_textfile.html',User_camera_sources=User_camera_sources_record.query.filter_by(username=current_user.username),data=current_user.username,table=User_camera_sources)
 @app.route('/camera_source_textfile', methods = ['POST'])  
 def camera_source_textfile():  
     if request.method == 'POST':  
@@ -1523,7 +1528,19 @@ def camera_source_textfile():
         # print("Model is stored in database successfully !!")
             
         return render_template("home/camera_source_textfile.html", name = f.filename , User_camera_sources=User_camera_sources_record.query.filter_by(username=current_user.username),data=current_user.username,table=User_camera_sources )  
-
+@app.route('/insert_src', methods = ['POST'])
+def insert_src():
+    if request.method == "POST":
+        print("Data Inserted Successfully")
+        source_link = request.form['rtmpUrl']
+        name_of_camera  = request.form['camera_name']
+        current_loggin_userid = current_user.get_id() 
+        current_loggin_user = current_user.username 
+        add_model =User_camera_sources_record(username=current_loggin_user,user_id=current_loggin_userid, source=source_link,name_source=name_of_camera)
+        db.session.add(add_model)
+        db.session.commit()
+        
+        return redirect(url_for('camera_src_display'))
 
 ###########################################################################
 Row=[]

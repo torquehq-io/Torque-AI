@@ -7,6 +7,7 @@ import subprocess as sp
 
 
 
+
 def feed1():
 
     # to get the frame rate
@@ -18,14 +19,14 @@ def feed1():
     video_cap = cv2.VideoCapture("rtmp://media5.ambicam.com:1938/live/1efa24f9-0cd0-47c5-b604-c7e3ee118302") # number of the webcam, here the first
     frame_width = int(video_cap.get(3))
     frame_height = int(video_cap.get(4))
-    rtmp_url = "rtmp://media.torqueai.io:1938/live/feed1"
+    rtmp_url = "rtmp://media5.ambicam.com:1938/live/feed1"
     ffmpeg = "ffmpeg -f rawvideo -pix_fmt bgr24 -s {}x{} -r 30 -i - -c:v libx264 -preset ultrafast -f flv {}".format(frame_width, frame_height, rtmp_url)
 
     process = sp.Popen(ffmpeg.split(), stdin=sp.PIPE)
 
     # Model
     #model_detection = torch.hub.load('ultralytics/yolov5', 'yolov5s')
-    model_detection = torch.hub.load("ultralytics/yolov5", "custom", path = "/home/torquehqio/torquehq-io/main/Torque-AI/yolov5s.pt", force_reload=True)
+    model_detection = torch.hub.load("ultralytics/yolov5", "custom", path = "./yolov5s.pt",device='cpu', force_reload=True)
 
     # Using the cam
     while True:

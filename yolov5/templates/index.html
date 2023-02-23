@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Object Detection Results</title>
+</head>
+<body>
+	<h1>Object Detection Results</h1>
+	<div id="feed1"></div>
+	<div id="feed2"></div>
+	<script>
+		// Create an EventSource to subscribe to the Flask app's event stream
+		const source = new EventSource("/detections");
+
+		// Define a callback function to handle incoming events
+		source.onmessage = function(event) {
+			// Parse the event data as JSON
+			const detections = JSON.parse(event.data);
+
+			// Update the appropriate feed's div with the detections
+			if (detections.feed === "feed1") {
+				document.getElementById("feed1").innerHTML = detections.detections;
+			} else if (detections.feed === "feed2") {
+				document.getElementById("feed2").innerHTML = detections.detections;
+			}
+		};
+	</script>
+</body>
+</html>

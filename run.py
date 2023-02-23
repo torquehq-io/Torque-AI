@@ -68,6 +68,8 @@ import glob
 import cv2
 import shutil
 
+subprocess.Popen(['gnome-terminal', '-e', 'python3 ffmpegfeed/feed1.py'])
+subprocess.Popen(['gnome-terminal', '-e', 'python3 ffmpegfeed/feed2.py'])
 
 # def ffmpegfeedall():
 #     subprocess.Popen(['python3','feed1.py'])
@@ -393,7 +395,8 @@ def training():
 
     dataset_path = str(os.getcwd())+"/Users_slab/"+current_loggin_user+"/"+gLabel
     data1 = dataset_path + "/data/" +'data.yaml'
-    subprocess.run(['python3','yolov5/train.py','--data', data1, '--name', gLabel])
+    #subprocess.run(['python3','yolov5/train.py','--data', data1, '--name', gLabel])
+    subprocess.run(['python3','-m','torch.distributed.run','--nproc_per_node','2','yolov5/train.py','--data', data1, '--name', gLabel,'--device','0,1'])
     rename_modelfile()
        
     return "None"  
@@ -402,6 +405,11 @@ model_path = (str(os.getcwd()))
 @app.route('/downloadModel')
 def download():
     Path = (model_path+"/Users_slab/"+current_loggin_user+"/Models/"+gLabel+'.pt')
+
+
+
+
+    
     print(Path)
     return send_file(Path, as_attachment=True) 
 

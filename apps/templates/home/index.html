@@ -5,8 +5,8 @@
 <!-- Specific Page CSS goes HERE  -->
 {% block stylesheets %}
     
-    <link href="/static/assets/vendors/@coreui/chartjs/css/coreui-chartjs.css" rel="stylesheet">
-
+  <link href="/static/assets/vendors/@coreui/chartjs/css/coreui-chartjs.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/driver.js/dist/driver.min.css">
 {% endblock stylesheets %}
 
 {% block content %}
@@ -160,21 +160,23 @@
         </div>
         <!-- /.col-->
 
+        
+
         <div style="display: flex; margin-left: 45px;">
         <div class="col-lg-8">
 
-
+        
 
 
         <div style="display:flex">
         <div class="col-sm-8 col-lg-12" style="margin-left: 15px; width: 101.3%;">
           <div class="card mb-4 text-white bg-white " style="cursor: pointer; border-radius: 15px;">
-            <h3 style="color: rgb(27, 27, 27); padding: 25px 0 0 25px;" class="nav-link">Auto Annotation </h3>
-         <a class="nav-link" href="" style="color: rgb(27, 27, 27); padding: 0px 0 0 25px; ">Get Started with our Easy to Auto Annotation Tool.</a>
-         <p class="nav-link" style="color: rgb(85, 85, 85); padding: 8px 0 0 25px; width:50%; font-size: 14px;">Begin your journey with Ultralytics HUB and gain the knowledge and skills needed to effectively utilize its powerful features and capabilities.</p>
+            <h3 style="color: rgb(27, 27, 27); padding: 25px 0 0 25px;" class="nav-link"  >Get Started with our Easy to Use Tutorial</h3>
+         <a class="nav-link" href="" style="color: rgb(27, 27, 27); padding: 0px 0 0 25px; " >Begin your journey with Ultralytics HUB and gain the knowledge and skills needed to effectively utilize its powerful features and capabilities.</a>
+         <p class="nav-link" style="color: rgb(85, 85, 85); padding: 8px 0 0 25px; width:50%; font-size: 14px;">Please take a moment to leave us feedback using the tab on the right. Your input is invaluable to us.</p>
         
 
-          <button type="button" class=" btn btn-outline-primary hehe" style="width: fit-content; margin: 10px 0 20px 25px; "><a class="getstarted" href="autoLabel.html">Get Started</a></button>
+          <button type="button" class=" btn btn-outline-primary hehe getstarted" style="width: fit-content; margin: 10px 0 20px 25px; " id="startdemotour">Start the tutorial !!</button>
        
 
          </div>
@@ -199,7 +201,7 @@
       <div style="display:flex;  margin:10px 0px; ">
       <div class="col-sm-8 col-lg-6" style="margin-left: 15px;">
         <div class="card mb-4 text-white bg-white " style="cursor: pointer; border-radius: 15px;">
-          <h3 style="color: rgb(27, 27, 27); padding: 25px 0 0 25px;" class="nav-link">Fire Detection</h3>
+          <h3 style="color: rgb(27, 27, 27); padding: 25px 0 0 25px;" class="nav-link" >Fire Detection</h3>
        <a class="nav-link" href="firedetection.html" style="color: rgb(27, 27, 27); padding: 0px 0 0 25px;">Get Started with our Easy to Auto Annotation Tool.</a>
        <p class="nav-link" style="color: rgb(85, 85, 85); padding: 8px 0 0 25px; width:100%; font-size: 14px;">Experience Fire Detection with TorqueAI</p>
        <a href="firedetection.html">
@@ -214,7 +216,7 @@
     
       <div class="col-sm-8 col-lg-6" style="margin-left: 15px;">
         <div class="card mb-4 text-white bg-white " style="cursor: pointer; border-radius: 15px;">
-          <h3 style="color: rgb(27, 27, 27); padding: 25px 0 0 25px;" class="nav-link">Model Detection</h3>
+          <h3 style="color: rgb(27, 27, 27); padding: 25px 0 0 25px;" class="nav-link" >Model Detection</h3>
        <a class="nav-link" href="firedetection.html" style="color: rgb(27, 27, 27); padding: 0px 0 0 25px; ">Get Started with our Easy to Auto Annotation Tool.</a>
        <p class="nav-link" style="color: rgb(85, 85, 85); padding: 8px 0 0 25px; width:100%; font-size: 14px;">Experience Model Detection with TorqueAI</p>
        <a href="detection.html">
@@ -233,7 +235,7 @@
 
       <div class="col-sm-8 col-lg-6" style="margin-left: 15px;">
         <div class="card mb-4 text-white bg-white " style="cursor: pointer; border-radius: 15px;">
-          <h3 style="color: rgb(27, 27, 27); padding: 25px 0 0 25px;" class="nav-link">Person Counter</h3>
+          <h3 style="color: rgb(27, 27, 27); padding: 25px 0 0 25px;" class="nav-link" >Person Counter</h3>
        <a class="nav-link" href="person_counter.html" style="color: rgb(27, 27, 27); padding: 0px 0 0 25px; ">Get Started with our Easy to Auto Annotation Tool.</a>
        <p class="nav-link" style="color: rgb(85, 85, 85); padding: 8px 0 0 25px; width:100%; font-size: 14px;">Experience Person Counter with TorqueAI</p>
        <button type="button" class=" btn btn-outline-primary hehe" style="width: fit-content; margin: 10px 0 20px 25px;">Get Started</button>
@@ -251,7 +253,7 @@
 
       <div class="col-sm-8 col-lg-6" style="margin-left: 15px;">
         <div class="card mb-4 text-white bg-white " style="cursor: pointer; border-radius: 15px;">
-          <h3 style="color: rgb(27, 27, 27); padding: 25px 0 0 25px;" class="nav-link">Face Recognition</h3>
+          <h3 style="color: rgb(27, 27, 27); padding: 25px 0 0 25px;" class="nav-link" >Face Recognition</h3>
        <a class="nav-link" href="/face_recognition.html" style="color: rgb(27, 27, 27); padding: 0px 0 0 25px; ">Get Started with our system to recognition face.</a>
        <p class="nav-link" style="color: rgb(85, 85, 85); padding: 8px 0 0 25px; width:100%; font-size: 14px;">Experience Face Recognition with TorqueAI</p>
        <button type="button" class=" btn btn-outline-primary hehe" style="width: fit-content; margin: 10px 0 20px 25px;">Get Started</button>
@@ -266,11 +268,11 @@
   <div class="col-lg-1">
   </div>
   <div class="col-lg-2" id="haha">
-    <div class="card card11 bhajan" style="">
-      <div class="image nanubhajan" style="">
-        <img class="bhajanimg" style="" src="https://lh3.googleusercontent.com/a/AEdFTp7S9Ys878LHTEIAiv9h1Vzs5bR3v0cvKbtvevMl=s96-c" alt="">
-        <h5 class="bhajanh5" style="" >Hello {{ current_user.username }} ! </h5>
-        <p class="bhajanp" style="">{{ current_user.email }}</p>
+    <div class="card card11 bhajan">
+      <div class="image nanubhajan">
+        <img class="bhajanimg" src="https://lh3.googleusercontent.com/a/AEdFTp7S9Ys878LHTEIAiv9h1Vzs5bR3v0cvKbtvevMl=s96-c" alt="">
+        <h5 class="bhajanh5" >Hello {{ current_user.username }} ! </h5>
+        <p class="bhajanp">{{ current_user.email }}</p>
       </div>
       
     </div>
@@ -289,7 +291,9 @@
   <script src="/static/assets/vendors/@coreui/chartjs/js/coreui-chartjs.js"></script>
   <script src="/static/assets/vendors/@coreui/utils/js/coreui-utils.js"></script>
   <script src="/static/assets/js/main.js"></script>
-  <script>
-  </script>
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js"></script>
+  <script src="https://unpkg.com/driver.js/dist/driver.min.js"></script>
+  <script src="/static/assets/js/tour.js"></script>
+ 
 
 {% endblock javascripts %}

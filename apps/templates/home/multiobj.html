@@ -1,0 +1,50 @@
+<html>
+<head>
+<title>Multiple Select option using Python Flask Jquery Ajax and PostgreSQL database</title>
+<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.2/css/bootstrap-select.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.2/js/bootstrap-select.min.js"></script>
+</head>
+<body>
+<br /><br />
+<div class="container">
+   <br />
+   <h2 align="center">Multiple Select option using Python Flask Jquery Ajax and PostgreSQL database</h2>
+   <br />
+    <div class="col-md-4" style="margin-left:200px;">
+        <form method="post" id="multiple_select_form">
+        <select name="skills" id="skills" class="form-control selectpicker" data-live-search="true" multiple>
+            <!-- {% for row in classes %}
+            <option value="{{row}}">{{row + '\n'}}</option>
+            {% endfor %} -->
+            
+            {%for i in range(0, len)%}
+                    <option value="{{ data[i] }}">{{ data[i] }}</option>
+            {% endfor %}
+           
+        </select>
+        <br /><br />
+     
+        <input type="submit" name="submit" class="btn btn-info" value="Submit" id="add"/>
+        </form>
+    <br />
+   </div>
+</div>
+
+<script>
+   $('#add').bind('click',function(){    
+    $.ajax({
+        url: "/try",
+        type: "POST",
+        data: $('[name=skills]').serialize(),
+        
+       
+    });    
+})
+
+
+</script>
+</body>
+</html>

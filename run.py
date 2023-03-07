@@ -67,9 +67,10 @@ import torch
 import glob
 import cv2
 import shutil
+import inspect
 
-subprocess.Popen(['gnome-terminal', '-e', 'python3 ffmpegfeed/feed1.py'])
-subprocess.Popen(['gnome-terminal', '-e', 'python3 ffmpegfeed/feed2.py'])
+# subprocess.Popen(['gnome-terminal', '-e', 'python3 ffmpegfeed/feed1.py'])
+# subprocess.Popen(['gnome-terminal', '-e', 'python3 ffmpegfeed/feed2.py'])
 
 # def ffmpegfeedall():
 #     subprocess.Popen(['python3','feed1.py'])
@@ -1570,6 +1571,10 @@ def delete_src(id):
     return redirect(url_for('camera_src_display'))
 
 ###########################################################################
+object_list={0: 'person', 1: 'bicycle', 2: 'car', 3: 'motorcycle', 4: 'airplane', 5: 'bus', 6: 'train', 7: 'truck', 8: 'boat', 9: 'traffic light', 10: 'fire hydrant', 11: 'stop sign', 12: 'parking meter', 13: 'bench', 14: 'bird', 15: 'cat', 16: 'dog', 17: 'horse', 18: 'sheep', 19: 'cow', 20: 'elephant',
+              21: 'bear', 22: 'zebra', 23: 'giraffe', 24: 'backpack', 25: 'umbrella', 26: 'handbag', 27: 'tie', 28: 'suitcase', 29: 'frisbee', 30: 'skis', 31: 'snowboard', 32: 'sports ball', 33: 'kite', 34: 'baseball bat', 35: 'baseball glove', 36: 'skateboard', 37: 'surfboard', 38: 'tennis racket', 39: 'bottle', 40: 'wine glass',
+                41: 'cup', 42: 'fork', 43: 'knife', 44: 'spoon', 45: 'bowl', 46: 'banana', 47: 'apple', 48: 'sandwich', 49: 'orange', 50: 'broccoli', 51: 'carrot', 52: 'hot dog', 53: 'pizza', 54: 'donut', 55: 'cake', 56: 'chair', 57: 'couch', 58: 'potted plant', 59: 'bed', 60: 'dining table', 
+                61: 'toilet', 62: 'tv', 63: 'laptop', 64: 'mouse', 65: 'remote', 66: 'keyboard', 67: 'cell phone', 68: 'microwave', 69: 'oven', 70: 'toaster', 71: 'sink', 72: 'refrigerator', 73: 'book', 74: 'clock', 75: 'vase', 76: 'scissors', 77: 'teddy bear', 78: 'hair drier', 79: 'toothbrush'}
 Row=[]
 object, object2 = '', ''
 class Objdetection_try():
@@ -1581,7 +1586,7 @@ class Objdetection_try():
         self.video = cv2.VideoCapture("rtmp://media5.ambicam.com:1938/live/1efa24f9-0cd0-47c5-b604-c7e3ee118302")
         self.url = url
         self.error_count = 0
-        self.model = torch.hub.load('yolov5', 'custom', path='/home/torquehqio/torquehq-io/main/Torque-AI/yolov5s.pt', source='local', force_reload=True)
+        self.model = torch.hub.load('yolov5', 'custom', path='/home/torque/Desktop/main/torqueai/yolov5s.pt', source='local', force_reload=True)
        
         
     def __del__(self):
@@ -1613,6 +1618,9 @@ class Objdetection_try():
 
             # object =self.model(img, size=640)
             names = self.model.module.names if hasattr(self.model, 'module') else self.model.names
+            keys=[0,1,2]
+            values = list( map(names.get, keys) )
+            print("TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",values)
             pred = self.model(img, augment='store_true')
             # print("ttttttttt",pred.xyxy[0])  # im predictions (tensor)
             # print("pppnnnn",pred.pandas().xyxy[0])
@@ -1696,18 +1704,286 @@ def stream_template(template_name, **context):
 def stream_view():
     global Row
     rows = []
+    cknames = request.form.getlist('skills')
+    print(cknames)
     for i in range(10):
       rows.append(str(i))
       print("you are in try {}".format(i))
     # rows = Row
-    return Response(stream_with_context(stream_template('home/try.html', rows=Row)))
+    return Response(stream_with_context(stream_template('home/try.html', rows=Row,data=object_list,len = len(object_list))))
 @app.route('/output')
 def output():
     print("you are in output")
     return Response(out(), mimetype='text/html')
 
 ########################################################################3
+######################### multi streaming ###################################
+# import sys
 
+# arg1 = sys.argv[1]
+# arg2 = sys.argv[2]
+
+# testing = arg1
+# print(testing)
+
+# import torch
+# import numpy as np
+# import cv2
+# import time
+
+
+# class  ObjectDetection :
+#     """
+#     Class implements Yolo5 model to make inferences on a youtube video using OpenCV.
+#     """
+
+#     def __init__(self):
+#         """
+#         Initializes the class with youtube url and output file.
+#         :param url: Has to be as youtube URL,on which prediction is made.
+#         :param out_file: A valid output file name.
+#         """
+#         self.model = self.load_model()
+#         self.classes = self.model.names
+#         self.device = 'cuda' if torch.cuda.is_available() else 'cpu'
+#         print("\n\nDevice Used:",self.device)
+#         current_loggin_user=current_user.username
+#         self.fetch_url =  User_camera_sources.query.filter_by(username=current_loggin_user).first()
+#         print(self.fetch_url.link1)
+
+
+
+#     def load_model(self):
+#         """
+#         Loads Yolo5 model from pytorch hub.
+#         :return: Trained Pytorch model.
+#         """
+#         model = torch.hub.load("ultralytics/yolov5", "custom", path = "./yolov5s.pt",device='cpu', force_reload=True)
+#         return model
+
+
+#     def score_frame(self, frame):
+#         """
+#         Takes a single frame as input, and scores the frame using yolo5 model.
+#         :param frame: input frame in numpy/list/tuple format.
+#         :return: Labels and Coordinates of objects detected by model in the frame.
+#         """
+#         self.model.to(self.device)
+#         frame = [frame]
+#         results = self.model(frame)
+
+#         labels, cord = results.xyxyn[0][:, -1], results.xyxyn[0][:, :-1]
+#         return labels, cord
+
+
+#     def class_to_label(self, x):
+#         """
+#         For a given label value, return corresponding string label.
+#         :param x: numeric label
+#         :return: corresponding string label
+#         """
+#         return self.classes[int(x)]
+
+
+#     def plot_boxes(self, results, frame):
+#         """
+#         Takes a frame and its results as input, and plots the bounding boxes and label on to the frame.
+#         :param results: contains labels and coordinates predicted by model on the given frame.
+#         :param frame: Frame which has been scored.
+#         :return: Frame with bounding boxes and labels ploted on it.
+#         """
+#         labels, cord = results
+#         n = len(labels)
+#         x_shape, y_shape = frame.shape[1], frame.shape[0]
+#         for  i  in  range ( n ):
+#             row = cord[i]
+#             if row[4] >= 0.2:
+#                 x1, y1, x2, y2 = int(row[0]*x_shape), int(row[1]*y_shape), int(row[2]*x_shape), int(row[3]*y_shape)
+#                 bgr = (0, 255, 0)
+#                 cv2.rectangle(frame, (x1, y1), (x2, y2), bgr, 2)
+#                 cv2.putText(frame, self.class_to_label(labels[i]), (x1, y1), cv2.FONT_HERSHEY_SIMPLEX, 0.9, bgr, 2)
+
+#         return frame
+
+
+#     def __call__(self):
+#         """
+#         This function is called when class is executed, it runs the loop to read the video frame by frame,
+#         and write the output into a new file.
+#         :return: void
+#         """
+#         import subprocess as sp
+        
+#         cap = cv2.VideoCapture("rtmp://media5.ambicam.com:1938/live/1efa24f9-0cd0-47c5-b604-c7e3ee118302")
+#         frame_width = int(cap.get(3))
+#         frame_height = int(cap.get(4))
+#         rtmp_url = "rtmp://media5.ambicam.com:1938/live/test12"
+#         #ffmpeg = "ffmpeg -stream_loop -1 -f rawvideo -pix_fmt bgr24 -s {}x{} -r 10 -i - -c:v libx264 -f flv {}".format(frame_width, frame_height, rtmp_url)
+#         ffmpeg = "ffmpeg -f rawvideo -pix_fmt bgr24 -s {}x{} -r 15 -i - -pix_fmt yuv420p -vcodec libx264 -ar 8K -f flv {}".format(
+#             frame_width, frame_height, rtmp_url)
+
+#         process = sp.Popen(ffmpeg.split(), stdin=sp.PIPE)
+#         while cap.isOpened():
+
+#             start_time = time.perf_counter()
+#             ret, frame = cap.read()
+#             if not ret:
+#                 break
+#             results = self.score_frame(frame)
+#             frame = self.plot_boxes(results, frame)
+#             end_time = time.perf_counter()
+#             fps = 1 / np.round(end_time - start_time, 3)
+#             cv2.putText(frame, f'FPS: {int(fps)}', (20,70), cv2.FONT_HERSHEY_SIMPLEX, 1.5, (0,255,0), 2)
+            
+
+# @app.route('/output_4multi')
+# def output_4multi():
+
+#     # Create a new object and execute.
+#     detection = ObjectDetection()
+#     #detection()
+#     return Response( detection())
+
+#########################################################################
+########## multi object detection list ###################3
+@app.route('/object_list')
+def objectlist():
+    object_list=['person', 'bicycle', 'car', 'motorcycle', 'airplane', 'bus', 'train', 
+                 'truck', 'boat', 'traffic light', 'fire hydrant', 'stop sign', 'parking meter', 
+                 'bench', 'bird', 'cat', 'dog', 'horse', 'sheep', 'cow', 'elephant', 'bear', 
+                 'zebra', 'giraffe', 'backpack', 'umbrella', 'handbag', 'tie', 'suitcase', 
+                 'frisbee', 'skis','snowboard', 'sports ball', 'kite', 
+                 'baseball bat', 'baseball glove', 'skateboard', 'surfboard', 
+                 'tennis racket', 'bottle', 'wine glass', 'cup', 'fork', 
+                 'knife', 'spoon', 'bowl', 'banana', 'apple', 'sandwich', 'orange', 
+                 'broccoli', 'carrot', 'hot dog', 'pizza', 'donut', 'cake', 'chair', 
+                 'couch', 'potted plant', 'bed', 'dining table', 'toilet', 'tv', 'laptop', 'mouse', 
+                 'remote', 'keyboard', 'cell phone', 'microwave', 'oven', 'toaster', 'sink', 
+                 'refrigerator', 'book', 'clock', 'vase', 'scissors', 'teddy bear', 'hair drier', 
+                 'toothbrush'] 
+    
+
+    print(object_list)
+    print(len(object_list)) 
+    return render_template('home/multiobj.html', len = len(object_list),data=object_list )
+
+Row1=[]
+cknames =[]
+object1, object21= '', ''
+class Objdetection_4multi():
+   
+  
+    def __init__(self, url):
+      
+        print("in detect...................................")
+        self.video = cv2.VideoCapture("rtmp://media5.ambicam.com:1938/live/1efa24f9-0cd0-47c5-b604-c7e3ee118302")
+        self.url = url
+        self.error_count = 0
+        self.model = torch.hub.load('yolov5', 'custom', path='/home/torque/Desktop/main/torqueai/yolov5s.pt', source='local', force_reload=True)
+        self.cknames = cknames
+        
+    def __del__(self):
+        self.video.release()
+    
+    def get_frame(self):
+        global Row
+        
+        
+        
+        
+        # Set Model Settings
+        self.model.eval()
+        self.model.conf = 0.6  # confidence threshold (0-1)
+        self.model.iou = 0.45  # NMS IoU threshold (0-1) 
+      
+    
+        
+        # Capture frame-by-fram ## read the camera frame
+        success, frame = self.video.read()
+        if success == True:
+
+           
+            print("OOObject detection multi")
+           
+            names = self.model.module.names if hasattr(self.model, 'module') else self.model.names
+            # print(names)
+            
+            
+            keys =[]
+            for v in cknames:
+                value = [i for i in names if names[i]==v]
+                keys.extend(value)
+                
+              
+            # keys=keys.index(cknames)
+           
+            
+            print(keys) 
+            values = list( map(names.get, keys) )
+            
+            pred = self.model(frame, augment='store_true')
+           
+            
+            # object.print()  # print results to screen
+            objects = pred.xyxy[0]
+            labels =  self.model.module.names if hasattr(self.model, 'module') else self.model.names
+            for i in range(len(objects)):
+                obj = objects[i]
+                print(obj[5])
+                if obj[5] in keys:
+                    print("ooooo",obj)
+                    label =labels[int(obj[5])]
+                    print(label)
+                    cv2.rectangle(frame, (int(obj[0]), int(obj[1])), (int(obj[2]), int(obj[3])), (0, 255, 0), 2)
+                    cv2.putText(frame, label, (int(obj[0]), int(obj[1]) - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
+         
+            # read image as BGR
+            img_BGR = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR) #BGR
+            frame = cv2.imencode('.jpg', img_BGR )[1].tobytes()
+            return frame
+           
+
+def gen_det_obj_4multi(camera):
+    while True:
+        frame = camera.get_frame()
+        yield (b'--frame\r\n'
+                b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
+
+
+@app.route('/video_feed_det_try_4multi')
+def det_video_feed_try_4multi():
+    url = request.args.get('url')
+    return Response(gen_det_obj_4multi(Objdetection_4multi(url)), mimetype='multipart/x-mixed-replace; boundary=frame')
+    
+
+
+
+def stream_template(template_name, **context):
+    app.update_template_context(context)
+    t = app.jinja_env.get_template(template_name)
+    rv = t.stream(context)
+    rv.disable_buffering()
+    return rv
+
+
+
+@app.route('/try_4multi', methods = ['POST', 'GET'])
+def stream_view_4multi():
+    global Row1,cknames
+    rows = []
+    cknames = request.form.getlist('skills')
+    print(cknames)
+    for i in range(10):
+      rows.append(str(i))
+      print("you are in try {}".format(i))
+    # rows = Row
+    return render_template("home/try_multi.html",data=object_list,len = len(object_list))
+
+
+
+
+
+###########################################################3
 
 
 

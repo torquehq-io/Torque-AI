@@ -13,38 +13,82 @@
     <head>
         <title>HLS Player</title>
         <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+        <script src="https://cdn.bootcss.com/flv.js/1.5.0/flv.min.js"></script>
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     </head>
 
     <body>
 		<div style="display: flex; margin-left: 6.2%";>
-        <video class="col-lg-6" id="video" style=" margin: 5px -50px;"  controls></video>
+        <video class="col-lg-6" id="videoElement" style=" margin: 5px -50px;"  controls></video>
         <br>
-        <video class="col-lg-6"  id="video1"  style=" margin: 5px 60px;" controls></video>
+        <video class="col-lg-6"  id="videoElement1"  style=" margin: 5px 60px;" controls></video>
 		</div>
+        <br>
+        <!-- button for calling ffmpeg video feed -->
+        <button onclick="callRoutes()">Call Routes</button>
+        <script>
+          function callRoutes() {
+            $.ajax({
+              url: "/video_feed_multifeed1",
+              type: "GET",
+              success: function(result) {
+                console.log(result);
+              }
+            });
+            $.ajax({
+              url: "/video_feed_multifeed2",
+              type: "GET",
+              success: function(result) {
+                console.log(result);
+              }
+            });
+          }
+        </script>
         
 
         <script>
-            var video = document.getElementById('video');
-            var hls = new Hls();
-            hls.loadSource('');
+            // var video = document.getElementById('video');
+            // var hls = new Hls();
+            // hls.loadSource('');
 
-            hls.loadSource('https://media5.ambicam.com/live/feed1/feed1.m3u8');
+            // hls.loadSource('http://media5.ambicam.com:8080/live/feed1111.flv');
 
-            hls.attachMedia(video);
-            hls.on(Hls.Events.MANIFEST_PARSED, function () {
-                video.play();
-            });
+            // hls.attachMedia(video);
+            // hls.on(Hls.Events.MANIFEST_PARSED, function () {
+            //     video.play();
+            // });
 
-            var video1 = document.getElementById('video1');
-            var hls1 = new Hls();
-            hls1.loadSource('');
+            if (flvjs.isSupported()) {
+                var videoElement = document.getElementById('videoElement');
+                var flvPlayer = flvjs.createPlayer({
+                    type: 'flv',
+                    url: 'http://media5.ambicam.com:8080/live/feed111111.flv'
+                });
+                flvPlayer.attachMediaElement(videoElement);
+                flvPlayer.load();
+                flvPlayer.play();
+            }
 
-            hls1.loadSource('https://media5.ambicam.com/live/feed2/feed2.m3u8');
+            // var video1 = document.getElementById('video1');
+            // var hls1 = new Hls();
+            // hls1.loadSource('');
 
-            hls1.attachMedia(video1);
-            hls1.on(Hls.Events.MANIFEST_PARSED, function () {
-                video1.play();
-            });
+            // hls1.loadSource('https://media5.ambicam.com/live/feed2/feed2.m3u8');
+
+            // hls1.attachMedia(video1);
+            // hls1.on(Hls.Events.MANIFEST_PARSED, function () {
+            //     video1.play();
+            // });
+            if (flvjs.isSupported()) {
+                var videoElement1 = document.getElementById('videoElement1');
+                var flvPlayer1 = flvjs.createPlayer({
+                    type: 'flv',
+                    url: 'http://media5.ambicam.com:8080/live/feed22222.flv'
+                });
+                flvPlayer1.attachMediaElement(videoElement1);
+                flvPlayer1.load();
+                flvPlayer1.play();
+            }
 
             function seek() {
                 var startTime = document.getElementById('startTime').value;

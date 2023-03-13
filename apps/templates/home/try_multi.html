@@ -1,4 +1,11 @@
+{% extends "layouts/base.html" %}
 
+{% block title %} Typography {% endblock %}
+
+<!-- Specific CSS goes HERE -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
 
 <head>
     <meta charset="UTF-8">
@@ -8,19 +15,20 @@
       <!-- load CSS -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,400">
     <!-- Google web font "Open Sans" -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css')}}">
-    <!-- https://getbootstrap.com/ -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/templatemo-style.css')}}">
-    <!-- Templatemo style -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css')}}"> 
+   <!-- https://getbootstrap.com/ -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/templatemo-style.css')}}">  -->
+    <!-- Templatemo style
     <title>Computer Vision Web App</title>
 <!-- for checkbox-----------
 
 
 
-http://www.templatemo.com/tm-517-timeless
+
 
 -->
-<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+<link rel="stylesheet" href="../../static/assets/css/trymulti.css">
+ <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"> 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
 <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.2/css/bootstrap-select.min.css">
@@ -33,6 +41,20 @@ http://www.templatemo.com/tm-517-timeless
      
 
     <div class="container">
+
+        <label>Select Camera Source:</label>
+									 <select style="width: 70%; margin-right: 20px;" name="row.source" data-live-search="true" id="car_brand" class="form-control" title="Select Car Brand"> 
+									 {% for row in User_camera_sources %}
+										 <option value="{{row.serial_no}}">{{row.source}}</option>
+									 {% endfor %}
+									 </select>
+									 <p style="margin-left: 25%;"> OR </p>
+									 
+                                    <label style="text-align: start;">Camera Source:</label><br />
+                                    <input id="rtmpUrl" style="width: 70%"
+                                        placeholder="rtmps://host:port/application/streamName/streamkey" type="text"
+                                        name="rtmpUrl" value="" />
+
        
         <div class="col-md-4" style="margin-left:200px;">
             <form method="post" id="multiple_select_form">
@@ -41,61 +63,74 @@ http://www.templatemo.com/tm-517-timeless
                 {%for i in range(0, len)%}
                         <option value="{{ data[i] }}">{{ data[i] }}</option>
                 {% endfor %}
+
+               
                
             </select>
             <br /><br />
+            
          
             <input type="submit" name="submit" class="btn btn-info" value="Submit" id="add"/>
             </form>
+            
         <br />
        </div>
+       <br>
+     
         
-        <div class="row" style="margin:15px 50px 10px">
-            <div class="col-lg-12">
-                <div class="video-container" id="first" align="middle">
-                    <img src="/video_feed_det_try_4multi" width="40%">
-
-                </div>
-
-                <div class="container" align="middle" style="margin-top:10px">
-                    <button class="b1" onclick="switchOn()">Show Video</button>
-                    <button class="b2" onclick="switchOff()">Hide Video</button>
-                 </div>
-
-            </div>
-
-        </div>
-
       
+
+        <div class="col-sm-12 col-lg-6">
+            <center><h2>VIDEO STREAMING</h2></center>
+            <div class="card card11">
+                <div class="">
+                </div>
+                <div class="demo-container">
+                    <img id='videoImage' src="" style="display:visible;" />
+                </div>
+               
+            </div>
+            <button style="margin-left: 15px; margin-bottom:15px;" class="btn btn-outline-primary hehe" id="btnPlay">Play</button>
+            <button style="margin-left: 5px; margin-bottom:15px;" class="btn btn-outline-primary hehe1" id="btnStop">Stop</button>
+        </div>
         
     </div>
-    <!-- .container -->
-    <script>
-        const switchOn = () => {
-            document.getElementById("first").style.display ='block';
-        }
 
-        const switchOff = () => {
-            document.getElementById("first").style.display ='none';
-        }
-    </script>
-    <script src="{{ url_for('static', filename='js/jquery.min.js')}}"></script>
-    <!-- <script src="js/jquery-3.2.1.slim.min.js"></script> -->
-    <script src="{{ url_for('static', filename='js/templatemo-script.js')}}"></script>
         <script>
-        setInterval(function(){
-            var text = $("#my_iframe").contents().find('body').html();
-            var lines = text.split("<br>")
-            var last_line = lines[lines.length - 2]
-            if (last_line.includes("cell phone"))
-            {
-                $("#my_iframe").css( "background-color", "#58ff05" );
-            }
-            else
-            {
-                $("#my_iframe").css( "background-color", "#f2fff6" );
-            }
-            }, 500);
+	$("#btnPlay").on("click", function (event) {
+				event.preventDefault();
+
+				console.log("Playing stream ...");
+				var spinner = '<div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div>'
+				var rtmpUrl = $("#rtmpUrl").val();
+				var e = document.getElementById("car_brand");
+				var value = e.value;
+                var text = e.options[e.selectedIndex].text;
+                console.log(value, text);
+				$("#btnPlay").html(spinner);
+				// play in image
+				if (rtmpUrl != "") {
+                    // play in image
+                    $("#videoImage").attr("src", "/video_feed_det_try_4multi?url=" + rtmpUrl);
+
+                }
+                else{
+                    // play in image
+                    $("#videoImage").attr("src", "/video_feed_det_try_4multi?url=" + text);
+                }
+
+				
+				gDrawing = true;
+				setTimeout(drawImge, 300);
+				initCanvas();
+			});
+    $("#btnStop").on("click", function (event) {
+        event.preventDefault();
+        console.log("Stop Stream ...");
+        $("#videoImage").attr("src", "/");
+
+    });
+      
             
    $('#add').bind('click',function(){    
     $.ajax({
@@ -110,6 +145,10 @@ http://www.templatemo.com/tm-517-timeless
 
 
     </script>
-
+<script async src="static/assets/js/annotation/opencv3.4.16.js" type="text/javascript"></script>
 </body>
 </html>
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}{% endblock javascripts %}

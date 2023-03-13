@@ -44,7 +44,7 @@ if DEBUG:
 ################################################################################
 ############# Auto Annotation tool ##################
 
-from flask import Flask, render_template, request, json, session, Response, url_for, send_file, redirect,stream_with_context
+from flask import Flask, render_template, request, json, session, Response, url_for, send_file, redirect,stream_with_context,escape
 import os, base64, random
 from datetime import timedelta, datetime
 from os.path import join, dirname, realpath
@@ -1846,37 +1846,16 @@ def output():
 
 #########################################################################
 ########## multi object detection list ###################3
-@app.route('/object_list')
-def objectlist():
-    object_list=['person', 'bicycle', 'car', 'motorcycle', 'airplane', 'bus', 'train', 
-                 'truck', 'boat', 'traffic light', 'fire hydrant', 'stop sign', 'parking meter', 
-                 'bench', 'bird', 'cat', 'dog', 'horse', 'sheep', 'cow', 'elephant', 'bear', 
-                 'zebra', 'giraffe', 'backpack', 'umbrella', 'handbag', 'tie', 'suitcase', 
-                 'frisbee', 'skis','snowboard', 'sports ball', 'kite', 
-                 'baseball bat', 'baseball glove', 'skateboard', 'surfboard', 
-                 'tennis racket', 'bottle', 'wine glass', 'cup', 'fork', 
-                 'knife', 'spoon', 'bowl', 'banana', 'apple', 'sandwich', 'orange', 
-                 'broccoli', 'carrot', 'hot dog', 'pizza', 'donut', 'cake', 'chair', 
-                 'couch', 'potted plant', 'bed', 'dining table', 'toilet', 'tv', 'laptop', 'mouse', 
-                 'remote', 'keyboard', 'cell phone', 'microwave', 'oven', 'toaster', 'sink', 
-                 'refrigerator', 'book', 'clock', 'vase', 'scissors', 'teddy bear', 'hair drier', 
-                 'toothbrush'] 
-    
 
-    print(object_list)
-    print(len(object_list)) 
-    return render_template('home/multiobj.html', len = len(object_list),data=object_list )
 
-Row1=[]
-cknames =[]
-object1, object21= '', ''
+
 class Objdetection_4multi():
    
   
     def __init__(self, url):
       
         print("in detect...................................")
-        self.video = cv2.VideoCapture("rtmp://media5.ambicam.com:1938/live/1efa24f9-0cd0-47c5-b604-c7e3ee118302")
+        self.video = cv2.VideoCapture(url)
         self.url = url
         self.error_count = 0
         self.model = torch.hub.load('yolov5', 'custom', path='/home/torque/Desktop/main/torqueai/yolov5s.pt', source='local', force_reload=True)
@@ -1958,12 +1937,7 @@ def det_video_feed_try_4multi():
 
 
 
-def stream_template(template_name, **context):
-    app.update_template_context(context)
-    t = app.jinja_env.get_template(template_name)
-    rv = t.stream(context)
-    rv.disable_buffering()
-    return rv
+
 
 
 
@@ -1973,22 +1947,90 @@ def stream_view_4multi():
     rows = []
     cknames = request.form.getlist('skills')
     print(cknames)
-    for i in range(10):
-      rows.append(str(i))
-      print("you are in try {}".format(i))
-    # rows = Row
-    return render_template("home/try_multi.html",data=object_list,len = len(object_list))
+ 
+    return render_template("home/try_multi.html",data=object_list,len = len(object_list),User_camera_sources=User_camera_sources_record.query.filter_by(username=current_user.username))
 
 
 
 
 
-###########################################################3
+###########################################################3######
+import ffmpegfeed.feeds as fct
+import subprocess as sp
+class multifeed1():
+    def __init__(self, url):
+        # self.video = cv2.VideoCapture('rtmp://media1.ambicam.com:1938/dvr7/fd9b67cc-6c2e-46c6-99c4-0e13ac403e32')
+        current_loggin_user=current_user.username
+        fetch_url =  User_camera_sources.query.filter_by(username=current_loggin_user).first()
+        print(fetch_url.link1)
+        self.video = cv2.VideoCapture(fetch_url.link1)
+        frame_width = int(self.video.get(3))
+        frame_height = int(self.video.get(4))
+        rtmp_url = "rtmp://media5.ambicam.com:1938/live/feed222"
+        ffmpeg = "ffmpeg -f rawvideo -pix_fmt bgr24 -s {}x{} -r 15 -i - -pix_fmt yuv420p -vcodec libx264 -preset ultrafast -tune zerolatency -http_persistent 0 -ar 8K -f flv {}".format(
+            frame_width, frame_height, rtmp_url)
+        self.url = url
+        self.error_count = 0
+        self.process = sp.Popen(ffmpeg.split(), stdin=sp.PIPE)
+        self.model = torch.hub.load('yolov5', 'custom', path='yolov5s.pt', source='local',_verbose=False, force_reload=True)
+
+       
+
+    def __del__(self):
+        self.video.release()
+    
+    def get_frame(self):
+       
+
+        
+        # Set Model Settings Dynamic
+        self.model.eval()
+        self.model.conf = 0.6  # confidence threshold (0-1)
+        self.model.iou = 0.45  # NMS IoU threshold (0-1) 
+      
+        success, frame = self.video.read()
+        if success == True:
+            new_img = fct.draw_anchor_box(
+                frame, fct.detection(frame, self.model))
+
+            # ret,buffer=cv2.imencode('.jpg',frame)
+            # frame=buffer.tobytes()
+            
+            # #print(type(frame))
+
+            # img = Image.open(io.BytesIO(frame))
+            # results = self.model(img, size=640)
+        
+            # results.print()  # print results to screen
+            
+            
+            # #convert remove single-dimensional entries from the shape of an array
+            # img = np.squeeze(results.render()) #RGB
+            # # read image as BGR
+            # img_BGR = cv2.cvtColor(img, cv2.COLOR_RGB2BGR) #BGR
+            # frame = cv2.imencode('.jpg', img_BGR)[1].tobytes()
+            self.process.stdin.write(frame.tobytes())
+            return frame
+       
+
+def gen_multifeed1(camera):
+    while True:
+        frame = camera.get_frame()
+        # yield (b'--frame\r\n'
+        #         b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
 
 
+@app.route('/video_feed_multifeed1')
+def video_feed_multifeed1():
+    url = request.args.get('url')
+    
+    return Response(gen_multifeed1(multifeed1(url)), mimetype='multipart/x-mixed-replace; boundary=frame')
+
+###############################
 
 
 if __name__ == "__main__":
    
     app.run()
+    
     

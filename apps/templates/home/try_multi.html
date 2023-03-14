@@ -12,141 +12,152 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
 
-      <!-- load CSS -->
+    <!-- load CSS -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,400">
     <!-- Google web font "Open Sans" -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css')}}"> 
-   <!-- https://getbootstrap.com/ -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/templatemo-style.css')}}">  -->
-    <!-- Templatemo style
-    <title>Computer Vision Web App</title>
-<!-- for checkbox-----------
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css')}}">
+    <!-- https://getbootstrap.com/ -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/templatemo-style.css')}}"> 
 
 
 
 
 
--->
-<link rel="stylesheet" href="../../static/assets/css/trymulti.css">
- <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"> 
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.2/css/bootstrap-select.min.css">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.2/js/bootstrap-select.min.js"></script>
+
+
+
+    <link rel="stylesheet" href="../../static/assets/css/trymulti.css">
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css">
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/css/bootstrap-select.css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/js/bootstrap-select.min.js"></script>
+
 
 </head>
 
 <body>
-   
-     
+
+
 
     <div class="container">
 
         <label>Select Camera Source:</label>
-									 <select style="width: 70%; margin-right: 20px;" name="row.source" data-live-search="true" id="car_brand" class="form-control" title="Select Car Brand"> 
-									 {% for row in User_camera_sources %}
-										 <option value="{{row.serial_no}}">{{row.source}}</option>
-									 {% endfor %}
-									 </select>
-									 <p style="margin-left: 25%;"> OR </p>
-									 
-                                    <label style="text-align: start;">Camera Source:</label><br />
-                                    <input id="rtmpUrl" style="width: 70%"
-                                        placeholder="rtmps://host:port/application/streamName/streamkey" type="text"
-                                        name="rtmpUrl" value="" />
+        <select style="width: 70%; margin-right: 20px;" name="row.source" data-live-search="true" id="car_brand"
+            class="form-control" title="Select Car Brand">
+            {% for row in User_camera_sources %}
+            <option value="{{row.serial_no}}">{{row.source}}</option>
+            {% endfor %}
+        </select>
+        <p style="margin-left: 25%;"> OR </p>
 
-       
+        <label style="text-align: start;">Camera Source:</label><br />
+        <input id="rtmpUrl" style="width: 70%" placeholder="rtmps://host:port/application/streamName/streamkey"
+            type="text" name="rtmpUrl" value="" />
+
+
         <div class="col-md-4" style="margin-left:200px;">
             <form method="post" id="multiple_select_form">
-            <select name="skills" id="skills" class="form-control selectpicker" data-live-search="true" multiple>
-             
-                {%for i in range(0, len)%}
-                        <option value="{{ data[i] }}">{{ data[i] }}</option>
-                {% endfor %}
+                <select name="skills" id="skills" class="selectpicker" data-live-search="true" multiple>
 
-               
-               
-            </select>
-            <br /><br />
-            
-         
-            <input type="submit" name="submit" class="btn btn-info" value="Submit" id="add"/>
+                    {%for i in range(0, len)%}
+                    <option value="{{ data[i] }}">{{ data[i] }}</option>
+                    {% endfor %}
+
+
+
+                </select>
+
+
+                <br /><br />
+
+
+                <input type="submit" name="submit" class="btn btn-info" value="Submit" id="add" />
             </form>
-            
-        <br />
-       </div>
-       <br>
-     
-        
-      
+
+            <br />
+        </div>
+        <br>
+
+
+
 
         <div class="col-sm-12 col-lg-6">
-            <center><h2>VIDEO STREAMING</h2></center>
+            <center>
+                <h2>VIDEO STREAMING</h2>
+            </center>
             <div class="card card11">
                 <div class="">
                 </div>
                 <div class="demo-container">
                     <img id='videoImage' src="" style="display:visible;" />
                 </div>
-               
+
             </div>
-            <button style="margin-left: 15px; margin-bottom:15px;" class="btn btn-outline-primary hehe" id="btnPlay">Play</button>
-            <button style="margin-left: 5px; margin-bottom:15px;" class="btn btn-outline-primary hehe1" id="btnStop">Stop</button>
+            <button style="margin-left: 15px; margin-bottom:15px;" class="btn btn-outline-primary hehe"
+                id="btnPlay">Play</button>
+            <button style="margin-left: 5px; margin-bottom:15px;" class="btn btn-outline-primary hehe1"
+                id="btnStop">Stop</button>
         </div>
-        
+
     </div>
 
-        <script>
-	$("#btnPlay").on("click", function (event) {
-				event.preventDefault();
+    <script>
+        $("#btnPlay").on("click", function (event) {
+            event.preventDefault();
 
-				console.log("Playing stream ...");
-				var spinner = '<div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div>'
-				var rtmpUrl = $("#rtmpUrl").val();
-				var e = document.getElementById("car_brand");
-				var value = e.value;
-                var text = e.options[e.selectedIndex].text;
-                console.log(value, text);
-				$("#btnPlay").html(spinner);
-				// play in image
-				if (rtmpUrl != "") {
-                    // play in image
-                    $("#videoImage").attr("src", "/video_feed_det_try_4multi?url=" + rtmpUrl);
+            console.log("Playing stream ...");
+            var spinner = '<div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div>'
+            var rtmpUrl = $("#rtmpUrl").val();
+            var e = document.getElementById("car_brand");
+            var value = e.value;
+            var text = e.options[e.selectedIndex].text;
+            console.log(value, text);
+            $("#btnPlay").html(spinner);
+            // play in image
+            if (rtmpUrl != "") {
+                // play in image
+                $("#videoImage").attr("src", "/video_feed_det_try_4multi?url=" + rtmpUrl);
 
-                }
-                else{
-                    // play in image
-                    $("#videoImage").attr("src", "/video_feed_det_try_4multi?url=" + text);
-                }
+            }
+            else {
+                // play in image
+                $("#videoImage").attr("src", "/video_feed_det_try_4multi?url=" + text);
+            }
 
-				
-				gDrawing = true;
-				setTimeout(drawImge, 300);
-				initCanvas();
-			});
-    $("#btnStop").on("click", function (event) {
-        event.preventDefault();
-        console.log("Stop Stream ...");
-        $("#videoImage").attr("src", "/");
 
-    });
-      
-            
-   $('#add').bind('click',function(){    
-    $.ajax({
-        url: "/try",
-        type: "POST",
-        data: $('[name=skills]').serialize(),
-        
-       
-    });    
-})
+            gDrawing = true;
+            setTimeout(drawImge, 300);
+            initCanvas();
+        });
+        $("#btnStop").on("click", function (event) {
+            event.preventDefault();
+            console.log("Stop Stream ...");
+            $("#videoImage").attr("src", "/");
+
+        });
+
+
+        $('#add').bind('click', function () {
+            $.ajax({
+                url: "/try",
+                type: "POST",
+                data: $('[name=skills]').serialize(),
+
+
+            });
+
+
+        })
 
 
 
     </script>
-<script async src="static/assets/js/annotation/opencv3.4.16.js" type="text/javascript"></script>
+    <script async src="static/assets/js/annotation/opencv3.4.16.js" type="text/javascript"></script>
 </body>
+
 </html>
 {% endblock content %}
 

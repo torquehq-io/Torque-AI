@@ -18,7 +18,19 @@
     </head>
 
     <body>
+     <div>
+
+<form id="urlForm" ,action="{{ url_for('video_feed_multifeed1') }}">
+      <label>Select Camera Source:</label>
+      <select style="width: 70%; margin-right: 20px;" name="model_name" data-live-search="true" id="car_brand" class="form-control" title="Select Car Brand"> 
+        {% for row in User_Models_record %}
+          <option value="{{row.serial_no}}">{{row.model_name}}</option>
+        {% endfor %}
+      </select>
+      </form>
+     </div>
 		<div style="display: flex; margin-left: 6.2%";>
+  
         <video class="col-lg-6" id="videoElement" style=" margin: 5px -50px;"  controls></video>
         <br>
         <video class="col-lg-6"  id="videoElement1"  style=" margin: 5px 60px;" controls></video>

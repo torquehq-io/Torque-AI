@@ -69,17 +69,7 @@ import cv2
 import shutil
 import inspect
 
-# subprocess.Popen(['gnome-terminal', '-e', 'python3 ffmpegfeed/feed1.py'])
-# subprocess.Popen(['gnome-terminal', '-e', 'python3 ffmpegfeed/feed2.py'])
 
-# def ffmpegfeedall():
-#     subprocess.Popen(['python3','feed1.py'])
-#     #subprocess.Popen(['gnome-terminal', '-e', 'python3 ffmpegfeed/feed1.py'])
-#     # subprocess.Popen(['gnome-terminal', '-e', 'python3 ffmpegfeed/feed2.py'])
-#     # subprocess.Popen(['gnome-terminal', '-e', 'python3 ffmpegfeed/feed3.py'])
-#     # subprocess.Popen(['gnome-terminal', '-e', 'python3 ffmpegfeed/feed4.py'])
-    
-# ffmpegfeedall()
 
 #####################################################
 roi_x = 0
@@ -99,7 +89,7 @@ global current_loggin_user
 
 class VideoCamera():
     def __init__(self, url):
-        # cityList=db.execute("SELECT * FROM User_camera_sources order by username ")
+       
         self.video = cv2.VideoCapture(url)
         self.url = url
         self.error_count = 0
@@ -1834,162 +1824,215 @@ def stream_view_4multi():
                         # Multi feed 
 #####################################################################################################################################################
 
-import cv2
-import time
-import torch
-import subprocess as sp
-import ffmpegfeed.feeds as fct 
 
-@app.route('/multi_model_excution')
-def multi_model_excution():
- 
-    
-    return render_template('home/detection.html',User_Models_record=User_Models_record.query.filter_by(username=current_user.username))
-
-
-
-
-class multifeed1():
+class Objdetection_multifeed():
+   
+  
     def __init__(self, url):
-    
-        # self.video = cv2.VideoCapture('rtmp://media1.ambicam.com:1938/dvr7/fd9b67cc-6c2e-46c6-99c4-0e13ac403e32')
-        current_loggin_user=current_user.username
-        fetch_url =  User_camera_sources.query.filter_by(username=current_loggin_user).first()
-        print(fetch_url.link1)
-        self.video = cv2.VideoCapture(fetch_url.link1)
-        frame_width = int(self.video.get(3))
-        frame_height = int(self.video.get(4))
-        rtmp_url = "rtmp://media5.ambicam.com:1938/live/feed22222"
-        ffmpeg = "ffmpeg -f rawvideo -pix_fmt bgr24 -s {}x{} -r 15 -i - -pix_fmt yuv420p -vcodec libx264 -preset ultrafast -tune zerolatency -http_persistent 0 -ar 8K -f flv {}".format(
-            frame_width, frame_height, rtmp_url)
+      
+        print("in detect...................................")
+        current_loggin_user = current_user.username
+        self.video = cv2.VideoCapture(url)
         self.url = url
         self.error_count = 0
-        self.process = sp.Popen(ffmpeg.split(), stdin=sp.PIPE)
-        self.model = torch.hub.load('yolov5', 'custom', path='/home/torquehqio/torquehq-io/main/Torque-AI/Users_slab/test/Models/coffeBottle.pt', source='local',_verbose=False, force_reload=True)
-
+        self.cknames = cknames[0]
+        
+        print(self.cknames)
+        print(self.url)
        
-
+        self.model = torch.hub.load('yolov5', 'custom', path=(str(os.getcwd())+"/Users_slab/"+current_loggin_user+"/Models/"+self.cknames+".pt"), source='local', force_reload=True)
+        
+        
     def __del__(self):
         self.video.release()
     
     def get_frame(self):
-       
-
+        global Row
         
-        # Set Model Settings Dynamic
+        
+        
+        
+        # Set Model Settings
         self.model.eval()
         self.model.conf = 0.6  # confidence threshold (0-1)
         self.model.iou = 0.45  # NMS IoU threshold (0-1) 
       
+    
+        
+        # Capture frame-by-fram ## read the camera frame
         success, frame = self.video.read()
         if success == True:
-            new_img = fct.draw_anchor_box(
-                frame, fct.detection(frame, self.model))
 
-            # ret,buffer=cv2.imencode('.jpg',frame)
-            # frame=buffer.tobytes()
-            
-            # #print(type(frame))
-
-            # img = Image.open(io.BytesIO(frame))
-            # results = self.model(img, size=640)
-        
-            # results.print()  # print results to screen
+           
+            print("OOObject detection multi")
+           
+            names = self.model.module.names if hasattr(self.model, 'module') else self.model.names
+            # print(names)
             
             
-            # #convert remove single-dimensional entries from the shape of an array
-            # img = np.squeeze(results.render()) #RGB
-            # # read image as BGR
-            # img_BGR = cv2.cvtColor(img, cv2.COLOR_RGB2BGR) #BGR
-            # frame = cv2.imencode('.jpg', img_BGR)[1].tobytes()
-            self.process.stdin.write(frame.tobytes())
+            # keys =[]
+            # for v in cknames:
+            #     value = [i for i in names if names[i]==v]
+            #     keys.extend(value)
+                
+              
+            # keys=keys.index(cknames)
+           
+            
+            # print(keys) 
+            # values = list( map(names.get, keys) )
+            
+            pred = self.model(frame, augment='store_true')
+           
+            
+            # object.print()  # print results to screen
+            objects = pred.xyxy[0]
+            labels =  self.model.module.names if hasattr(self.model, 'module') else self.model.names
+            for i in range(len(objects)):
+                obj = objects[i]
+                print(obj[5])
+               
+                print("ooooo",obj)
+                label =labels[int(obj[5])]
+                print(label)
+                cv2.rectangle(frame, (int(obj[0]), int(obj[1])), (int(obj[2]), int(obj[3])), (0, 255, 0), 2)
+                cv2.putText(frame, label, (int(obj[0]), int(obj[1]) - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
+         
+            # read image as BGR
+            # img_BGR = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR) #BGR
+            frame = cv2.imencode('.jpg', frame)[1].tobytes()
             return frame
-       
+           
 
-def gen_multifeed1(camera):
+def gen_det_obj_multifeed(camera):
     while True:
         frame = camera.get_frame()
-        # yield (b'--frame\r\n'
-        #         b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
+        yield (b'--frame\r\n'
+                b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
 
 
-@app.route('/video_feed_multifeed1')
-def video_feed_multifeed1():
-    selectValue = request.form.get('model_name')
-    print(selectValue)
+@app.route('/video_feed_det_multifeed1')
+def det_video_feed_multifeed1():
     url = request.args.get('url')
     
-    return Response(gen_multifeed1(multifeed1(url)), mimetype='multipart/x-mixed-replace; boundary=frame')
+    return Response(gen_det_obj_multifeed(Objdetection_multifeed(url)), mimetype='multipart/x-mixed-replace; boundary=frame')
 
-###############################################################################################################
-class multifeed2():
+# def stream_template(template_name, **context):
+#     app.update_template_context(context)
+#     t = app.jinja_env.get_template(template_name)
+#     rv = t.stream(context)
+#     rv.disable_buffering()
+#     return rv
+Roww=''
+@app.route('/model', methods = ['POST', 'GET'])
+def stream_view_model():
+    global Roww,cknames
+    rowss = []
+    cknames = request.form.getlist('select_model')
+    print(cknames)
+   
+    return render_template ('home/multifeed.html' ,User_Models_record=User_Models_record.query.filter_by(username=current_user.username),User_camera_sources=User_camera_sources_record.query.filter_by(username=current_user.username))
+#------------------------ feed 2 ------------------------------------#
+
+class Objdetection_multifeed2():
+   
+  
     def __init__(self, url):
-        # self.video = cv2.VideoCapture('rtmp://media1.ambicam.com:1938/dvr7/fd9b67cc-6c2e-46c6-99c4-0e13ac403e32')
-        current_loggin_user=current_user.username
-        fetch_url =  User_camera_sources.query.filter_by(username=current_loggin_user).first()
-        print(fetch_url.link1)
-        self.video = cv2.VideoCapture(fetch_url.link1)
-        frame_width = int(self.video.get(3))
-        frame_height = int(self.video.get(4))
-        rtmp_url = "rtmp://media5.ambicam.com:1938/live/feed111111"
-        ffmpeg = "ffmpeg -f rawvideo -pix_fmt bgr24 -s {}x{} -r 15 -i - -pix_fmt yuv420p -vcodec libx264 -preset ultrafast -tune zerolatency -http_persistent 0 -ar 8K -f flv {}".format(
-            frame_width, frame_height, rtmp_url)
+      
+        print("in detect...................................")
+        self.video = cv2.VideoCapture(url)
         self.url = url
         self.error_count = 0
-        self.process = sp.Popen(ffmpeg.split(), stdin=sp.PIPE)
-        self.model = torch.hub.load('yolov5', 'custom', path='yolov5s.pt', source='local',_verbose=False, force_reload=True)
-
-       
-
+        self.model = torch.hub.load('yolov5', 'custom', path='/home/torque/Desktop/main/torqueai/yolov5s.pt', source='local', force_reload=True)
+        self.cknames = cknames
+        
     def __del__(self):
         self.video.release()
     
     def get_frame(self):
-       
-
+        global Row
         
-        # Set Model Settings Dynamic
+        
+        
+        
+        # Set Model Settings
         self.model.eval()
         self.model.conf = 0.6  # confidence threshold (0-1)
         self.model.iou = 0.45  # NMS IoU threshold (0-1) 
       
+    
+        
+        # Capture frame-by-fram ## read the camera frame
         success, frame = self.video.read()
         if success == True:
-            new_img = fct.draw_anchor_box(
-                frame, fct.detection(frame, self.model))
 
-            # ret,buffer=cv2.imencode('.jpg',frame)
-            # frame=buffer.tobytes()
-            
-            # #print(type(frame))
-
-            # img = Image.open(io.BytesIO(frame))
-            # results = self.model(img, size=640)
-        
-            # results.print()  # print results to screen
+           
+            print("OOObject detection multi")
+           
+            names = self.model.module.names if hasattr(self.model, 'module') else self.model.names
+            # print(names)
             
             
-            # #convert remove single-dimensional entries from the shape of an array
-            # img = np.squeeze(results.render()) #RGB
-            # # read image as BGR
-            # img_BGR = cv2.cvtColor(img, cv2.COLOR_RGB2BGR) #BGR
-            # frame = cv2.imencode('.jpg', img_BGR)[1].tobytes()
-            self.process.stdin.write(frame.tobytes())
+            keys =[]
+            for v in cknames:
+                value = [i for i in names if names[i]==v]
+                keys.extend(value)
+                
+              
+            # keys=keys.index(cknames)
+           
+            
+            print(keys) 
+            values = list( map(names.get, keys) )
+            
+            pred = self.model(frame, augment='store_true')
+           
+            
+            # object.print()  # print results to screen
+            objects = pred.xyxy[0]
+            labels =  self.model.module.names if hasattr(self.model, 'module') else self.model.names
+            for i in range(len(objects)):
+                obj = objects[i]
+                print(obj[5])
+                if obj[5] in keys:
+                    print("ooooo",obj)
+                    label =labels[int(obj[5])]
+                    print(label)
+                    cv2.rectangle(frame, (int(obj[0]), int(obj[1])), (int(obj[2]), int(obj[3])), (0, 255, 0), 2)
+                    cv2.putText(frame, label, (int(obj[0]), int(obj[1]) - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
+         
+            # read image as BGR
+            img_BGR = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR) #BGR
+            frame = cv2.imencode('.jpg', img_BGR )[1].tobytes()
             return frame
-       
-
-def gen_multifeed2(camera):
+def gen_det_obj_multifeed2(camera):
     while True:
         frame = camera.get_frame()
-        # yield (b'--frame\r\n'
-        #         b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
+        yield (b'--frame\r\n'
+                b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
 
 
-@app.route('/video_feed_multifeed2')
-def video_feed_multifeed2():
+@app.route('/video_feed_det_multifeed2')
+def det_video_feed_multifeed2():
     url = request.args.get('url')
+    return Response(gen_det_obj_multifeed2(Objdetection_multifeed2(url)), mimetype='multipart/x-mixed-replace; boundary=frame')
     
-    return Response(gen_multifeed2(multifeed2(url)), mimetype='multipart/x-mixed-replace; boundary=frame')
+
+
+
+
+
+
+@app.route('/multifeed', methods = ['POST', 'GET'])
+def stream_view_4multifeed():
+    global Row1,cknames
+    rows = []
+    cknames = request.form.getlist('skills')
+    print(cknames)
+    # selectValue = request.args.get('label')
+    # print(selectValue)
+    return render_template("home/multifeed.html",User_Models_record=User_Models_record.query.filter_by(username=current_user.username),User_camera_sources=User_camera_sources_record.query.filter_by(username=current_user.username))
+
 
 
 #####################################################################################################################################################

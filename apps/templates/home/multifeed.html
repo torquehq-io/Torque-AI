@@ -206,13 +206,28 @@
 
 <body>
 
+    <div class="" style="right: 0px;">
+
+        <form action="./storeRtmpLink" method="POST">
+         <button class=" btn btn-outline-primary hehe1" style="margin-left: 78%; width: 20%;"
+                           >Add camera Source</button>
+       </form>
+
+</div>
+
+<div>
 
 
-    <div class="container row" style="padding-left: 35px;">
+    <div class="col-lg-12">
+        <center>
+            <h4>Screen 1</h4>
+        </center>
+    </div>
+    <div class="container  row" style="padding-left: 35px;">
 
-        <div style="padding: 25px 25px 25px 25px ;"  class="card card11 h-100 pt-3 col-lg-4" style="border-radius: 2.8125rem;">
+        <div style="padding: 5px 25px 5px 25px ;"  class="card card11 h-100 pt-3 col-lg-4" style="border-radius: 2.8125rem;">
 								
-            <label style="width:100%">Select Camera Source:</label>
+            <!-- <label style="width:100%">Select Camera Source:</label>
             <select style="width: 70%; margin-right: 20px;" name="row.source" data-live-search="true" id="car_brand"
                 class="haloo form-control" title="Select Car Brand">
                 {% for row in User_camera_sources %}
@@ -224,18 +239,24 @@
             <label style="text-align: start;">Camera Source:</label>
             <input id="rtmpUrl" style="width: 70%" placeholder="rtmps://host:port/application/streamName/streamkey"
                 type="text" name="rtmpUrl" value="" />
-    
-                    <br/>
-                    <hr/>
+     -->
+                    <!-- <br/> -->
+                    <!-- <hr/> -->
                     <br/>
     
             <div class="col-md-4" style="margin-left:0; padding-left: 0;">
                 <form method="post" id="multiple_select_form" action="">
                     <label style="text-align: start;">Select Objects:</label>
-                    <select name="select_model"  id="select_model" class="selectpicker" data-live-search="true" multiple>
-    
+                    <select name="select_model"  id="select_model" class="selectpicker" data-live-search="true" >
+                    
                         {% for i in User_Models_record%}
-                        <option value="{{ i.model_name }}" >{{ i.model_name }}</option>
+                        
+                        {% if i == default_model_name %}
+                            <option value="{{ default_model_name  }}" selected>{{ default_model_name }}</option>
+                        {% else %}
+                            <option value="{{ i.model_name }}">{{ i.model_name}}</option>
+                        {% endif %}
+                        
                         {% endfor %}
     
     
@@ -243,7 +264,82 @@
                     </select>
     
     
-                    <br /><br />
+                   
+    
+
+                    <input type="submit" name="submit" class="btn btn-outline-primary hehe1" value="Submit" id="add" />
+                </form>
+    
+                <br />
+            </div>			
+            
+            
+        </div>
+
+      
+        <br>
+
+        <div class="col-sm-12 col-lg-6">
+            
+            <div class="card card11">
+                <div class="">
+                </div>
+                <div class="demo-container">
+                    <img id='videoImage' src="" style="display:visible;" />
+                </div>
+
+            </div>
+            <!-- <button style="margin-left: 15px; margin-bottom:15px;" class="btn btn-outline-primary hehe"
+                id="btnPlay">Play</button>
+            <button style="margin-left: 5px; margin-bottom:15px;" class="btn btn-outline-primary hehe1"
+                id="btnStop">Stop</button> -->
+        </div>
+
+    </div>
+
+    <br/>
+
+
+    <div class="col-lg-12">
+        <center>
+            <h4>Screen 2</h4>
+        </center>
+    </div>
+    <div class="container row" style="padding-left: 35px;">
+
+        <div style="padding: 5px 25px 5px 25px ;"  class="card card11 h-100 pt-3 col-lg-4" style="border-radius: 2.8125rem;">
+								
+            <!-- <label style="width:100%">Select Camera Source:</label>
+            <select style="width: 70%; margin-right: 20px;" name="row.source" data-live-search="true" id="car_brand"
+                class="haloo form-control" title="Select Car Brand">
+                {% for row in User_camera_sources %}
+                <option value="{{row.serial_no}}">{{row.source}}</option>
+                {% endfor %}
+            </select><br/>
+            <p style="margin-left: 25%;"> OR </p>
+    
+            <label style="text-align: start;">Camera Source:</label>
+            <input id="rtmpUrl" style="width: 70%" placeholder="rtmps://host:port/application/streamName/streamkey"
+                type="text" name="rtmpUrl" value="" />
+     -->
+                    <!-- <br/> -->
+                    <!-- <hr/> -->
+                    <br/>
+    
+            <div class="col-md-4" style="margin-left:0; padding-left: 0;">
+                <form method="post" id="multiple_select_form" action="">
+                    <label style="text-align: start;">Select Objects:</label>
+                    <select name="select_model2"  id="select_model" class="selectpicker" data-live-search="true">
+                        
+                        {% for i in User_Models_record%}
+                        
+                        <option value="{{ i.model_name }}" >{{ i.model_name }}</option>
+                       
+                        {% endfor %}
+    
+    
+    
+                    </select>
     
 
                     <input type="submit" name="submit" class="btn btn-outline-primary hehe1" value="Submit" id="add" />
@@ -262,55 +358,27 @@
 
 
         <div class="col-sm-12 col-lg-6">
-            <center>
-                <h2>VIDEO STREAMING</h2>
-            </center>
+            
             <div class="card card11">
                 <div class="">
                 </div>
                 <div class="demo-container">
-                    <img id='videoImage' src="" style="display:visible;" />
+                    <img id='videoImage2' src="" style="display:visible;" />
                 </div>
 
             </div>
-            <button style="margin-left: 15px; margin-bottom:15px;" class="btn btn-outline-primary hehe"
-                id="btnPlay">Play</button>
-            <button style="margin-left: 5px; margin-bottom:15px;" class="btn btn-outline-primary hehe1"
-                id="btnStop">Stop</button>
+           
         </div>
 
     </div>
 
+
+
+</div>    
+
     <script>
-        $("#btnPlay").on("click", function (event) {
-            event.preventDefault();
-
-            console.log("Playing stream ...");
-            var spinner = '<div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div>'
-            var rtmpUrl = $("#rtmpUrl").val();
-            var e = document.getElementById("car_brand");
-            var value = e.value;
-            var text = e.options[e.selectedIndex].text;
-           
-            console.log(value, text);
-            $("#btnPlay").html(spinner);
-            // play in image
-            if (rtmpUrl != "") {
-                // play in image
-                $("#videoImage").attr("src", "/video_feed_det_multifeed1?url=" + rtmpUrl );
-               
-
-            }
-            else {
-                // play in image
-                $("#videoImage").attr("src", "/video_feed_det_multifeed1?url=" + text);
-            }
-           
-
-            gDrawing = true;
-            setTimeout(drawImge, 300);
-            initCanvas();
-        });
+        $("#videoImage").attr("src", "/video_feed_det_multifeed1?url="  );
+      
         $("#btnStop").on("click", function (event) {
             event.preventDefault();
             console.log("Stop Stream ...");
@@ -318,23 +386,24 @@
             $("#videoImage").attr("src", "/");
 
         });
+        $("#videoImage2").attr("src", "/video_feed_det_multifeed2?url="  );
+      
+        $("#btnStop").on("click", function (event) {
+          event.preventDefault();
+          console.log("Stop Stream ...");
+          $("#btnPlay").text("Play");
+          $("#videoImage").attr("src", "/");
 
+      });
+    document.getElementById('select_model').onchange = function() {
+    localStorage.setItem('selectedtem', document.getElementById('select_model').value);};
 
-        // $('#add').bind('click', function () {
-        //     $.ajax({
-        //         url: "/model",
-        //         type: "POST",
-        //         data: $('[name=skills]').serialize(),
+    if (localStorage.getItem('selectedtem')) {
+    document.getElementById('select_model').options[localStorage.getItem('selectedtem')].selected = true;}
+    
+      
 
-
-        //     });
-
-
-        // })
-
-
-
-    </script>
+</script>
     <script async src="static/assets/js/annotation/opencv3.4.16.js" type="text/javascript"></script>
 </body>
 

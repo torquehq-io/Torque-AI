@@ -1275,15 +1275,13 @@ class User_camera_sources(db.Model):
     username = db.Column(db.String(1000),unique=True)
     link1 = db.Column(db.String(3000))  
     link2 = db.Column(db.String(3000))
-    link3= db.Column(db.String(3000))
-    link4= db.Column(db.String(3000))
+  
 
-    def __init__(self, username,link1, link2,link3,link4):
+    def __init__(self, username,link1, link2):
         self.username = username
         self.link1 = link1
         self.link2 = link2
-        self.link3 = link3
-        self.link4 = link4
+        
 @app.route('/new', methods = ['GET', 'POST'])
 def new():
     if request.method == 'POST':
@@ -1299,10 +1297,9 @@ def new():
 
         link1=request.form['link1']
         link2=request.form['link2']
-        link3=request.form['link3']
-        link4=request.form['link4']
+      
         add_camerasources =User_camera_sources(username=current_loggin_user,link1=link1, link2=link2,
-                link3=link3, link4=link4)
+                )
             
         db.session.add(add_camerasources)
         db.session.commit()
@@ -1312,17 +1309,17 @@ def new():
 
 ###############################################################
 
-# @app.route('/storeRtmpLink')
-# def Test():
-#     current_loggin_user = current_user.username
-#     user = Users.query.filter_by(username=current_loggin_user).first()
-#     user=str(user)[21:-1]
-#     if user:
-#         db.session.execute("SELECT * FROM User_camera_sources")
+@app.route('/storeRtmpLink',methods=['GET','POST'])
+def Test():
+    current_loggin_user = current_user.username
+    user = Users.query.filter_by(username=current_loggin_user).first()
+    user=str(user)[21:-1]
+    if user:
+        db.session.execute("SELECT * FROM User_camera_sources")
         
-#         db.session.close()
+        db.session.close()
 
-#     return render_template('home/autoLabel.html',User_camera_sources=User_camera_sources.query.filter_by(username=current_user.username),data=current_user.username,table=User_camera_sources)
+    return render_template('home/camera_source_db.html',User_camera_sources=User_camera_sources.query.filter_by(username=current_user.username),data=current_user.username,table=User_camera_sources)
 
 
 @app.route('/insert', methods = ['POST'])
@@ -1331,13 +1328,12 @@ def insert():
         print("Data Inserted Successfully")
         link1= request.form['link1']
         link2 = request.form['link2']
-        link3= request.form['link3']
-        link4= request.form['link4']
+        
         # cur = db.session.connection()
         current_loggin_user = current_user.username
         # db.session.execute("INSERT INTO User_camera_sources (link1,link2,link3,link4) VALUES (%s, %s, %s, %s,)," ,(link1, link2 , link3 , link4))
-        add_camerasources =User_camera_sources(username=current_loggin_user,link1=link1, link2=link2,
-                link3=link3, link4=link4)
+        add_camerasources =User_camera_sources(username=current_loggin_user,link1=link1, link2=link2
+)
        
         db.session.add(add_camerasources)
 
@@ -1363,14 +1359,12 @@ def update():
        
         link1= request.form['link1']
         link2 = request.form['link2']
-        link3= request.form['link3']
-        link4= request.form['link4']
+       
         current_loggin_user = current_user.username
         admin = User_camera_sources.query.filter_by(username=current_loggin_user).first()
         admin.link1 = link1
         admin.link2 = link2
-        admin.link3 = link3
-        admin.link4 = link4
+       
         
         db.session.commit()
        
@@ -1824,23 +1818,36 @@ def stream_view_4multi():
                         # Multi feed 
 #####################################################################################################################################################
 
-
+pre_selected_model=''
 class Objdetection_multifeed():
-   
-  
+    global pre_selected_model
+    
+    
+    print("AAAAAAAAaaaaaaaaaaaaa",pre_selected_model)
+    
     def __init__(self, url):
       
         print("in detect...................................")
         current_loggin_user = current_user.username
-        self.video = cv2.VideoCapture(url)
+        fetch_url =  User_camera_sources.query.filter_by(username=current_loggin_user).first()
+        print("screen1 URL:",fetch_url.link1)
+        self.video = cv2.VideoCapture(fetch_url.link1)
         self.url = url
         self.error_count = 0
-        self.cknames = cknames[0]
-        
-        print(self.cknames)
-        print(self.url)
        
-        self.model = torch.hub.load('yolov5', 'custom', path=(str(os.getcwd())+"/Users_slab/"+current_loggin_user+"/Models/"+self.cknames+".pt"), source='local', force_reload=True)
+        self.cknamess = cknamess
+        # pre_selected_model =self.cknames
+   
+                    
+        self.model = torch.hub.load('yolov5', 'custom', path=(str(os.getcwd())+"/Users_slab/"+current_loggin_user+"/Models/"+self.cknamess+".pt"), source='local', force_reload=True)
+
+       
+
+        
+        print("Screen 1 model :",self.cknamess)
+     
+       
+        
         
         
     def __del__(self):
@@ -1862,7 +1869,7 @@ class Objdetection_multifeed():
         # Capture frame-by-fram ## read the camera frame
         success, frame = self.video.read()
         if success == True:
-
+            print("Screen 1 model :",self.cknames)
            
             print("OOObject detection multi")
            
@@ -1917,34 +1924,62 @@ def det_video_feed_multifeed1():
     
     return Response(gen_det_obj_multifeed(Objdetection_multifeed(url)), mimetype='multipart/x-mixed-replace; boundary=frame')
 
-# def stream_template(template_name, **context):
-#     app.update_template_context(context)
-#     t = app.jinja_env.get_template(template_name)
-#     rv = t.stream(context)
-#     rv.disable_buffering()
-#     return rv
+
 Roww=''
+
 @app.route('/model', methods = ['POST', 'GET'])
 def stream_view_model():
-    global Roww,cknames
+    global Roww,cknamess,cknames2
     rowss = []
-    cknames = request.form.getlist('select_model')
-    print(cknames)
-   
-    return render_template ('home/multifeed.html' ,User_Models_record=User_Models_record.query.filter_by(username=current_user.username),User_camera_sources=User_camera_sources_record.query.filter_by(username=current_user.username))
-#------------------------ feed 2 ------------------------------------#
+    default_model_name='yolov5s'
+    selected = ''
+    cknamess = request.form.get('select_model')
+    print(selected)
+    if cknamess :
+        if selected=='' :
+            selected=cknamess
+            print("EEEEEEEEEEEEEEEEEEEEEEEEe",selected)
 
+        
+    elif cknamess == None and selected != None:
+        
+        cknamess=selected
+        print("PRRRRRRRRRRRRRRRrrrrrr",cknamess)
+    else:
+        cknamess='yolov5s'
+    cknames2 = request.form.get('select_model2')
+    print(cknames2)
+  
+
+   
+    return render_template ('home/multifeed.html' ,User_Models_record=User_Models_record.query.filter_by(username=current_user.username),User_camera_sources=User_camera_sources_record.query.filter_by(username=current_user.username),default_model_name=default_model_name)
+#------------------------ feed 2 ------------------------------------#
 class Objdetection_multifeed2():
    
   
     def __init__(self, url):
       
         print("in detect...................................")
-        self.video = cv2.VideoCapture(url)
+        current_loggin_user = current_user.username
+        fetch_url =  User_camera_sources.query.filter_by(username=current_loggin_user).first()
+        print("Screen 2 URl :",fetch_url.link2)
+        self.video = cv2.VideoCapture(fetch_url.link2)
         self.url = url
         self.error_count = 0
-        self.model = torch.hub.load('yolov5', 'custom', path='/home/torque/Desktop/main/torqueai/yolov5s.pt', source='local', force_reload=True)
-        self.cknames = cknames
+      
+        self.cknames2 = cknames2
+       
+        if self.cknames2!=None:
+            self.model = torch.hub.load('yolov5', 'custom', path=(str(os.getcwd())+"/Users_slab/"+current_loggin_user+"/Models/"+self.cknames2+".pt"), source='local', force_reload=True)
+        
+        else:
+            self.model = torch.hub.load('yolov5', 'custom', path=(str(os.getcwd())+"/Users_slab/"+current_loggin_user+"/Models/yolov5s.pt"), source='local', force_reload=True)
+
+        print("Screen2 model :",self.cknames2)
+        print(self.url)
+       
+        
+        
         
     def __del__(self):
         self.video.release()
@@ -1966,24 +2001,24 @@ class Objdetection_multifeed2():
         success, frame = self.video.read()
         if success == True:
 
+            print("Screen2 model :",self.cknames2)
            
-            print("OOObject detection multi")
            
             names = self.model.module.names if hasattr(self.model, 'module') else self.model.names
             # print(names)
             
             
-            keys =[]
-            for v in cknames:
-                value = [i for i in names if names[i]==v]
-                keys.extend(value)
+            # keys =[]
+            # for v in cknames:
+            #     value = [i for i in names if names[i]==v]
+            #     keys.extend(value)
                 
               
             # keys=keys.index(cknames)
            
             
-            print(keys) 
-            values = list( map(names.get, keys) )
+            # print(keys) 
+            # values = list( map(names.get, keys) )
             
             pred = self.model(frame, augment='store_true')
            
@@ -1994,17 +2029,19 @@ class Objdetection_multifeed2():
             for i in range(len(objects)):
                 obj = objects[i]
                 print(obj[5])
-                if obj[5] in keys:
-                    print("ooooo",obj)
-                    label =labels[int(obj[5])]
-                    print(label)
-                    cv2.rectangle(frame, (int(obj[0]), int(obj[1])), (int(obj[2]), int(obj[3])), (0, 255, 0), 2)
-                    cv2.putText(frame, label, (int(obj[0]), int(obj[1]) - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
+               
+                
+                label =labels[int(obj[5])]
+                print(label)
+                cv2.rectangle(frame, (int(obj[0]), int(obj[1])), (int(obj[2]), int(obj[3])), (0, 255, 0), 2)
+                cv2.putText(frame, label, (int(obj[0]), int(obj[1]) - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
          
             # read image as BGR
-            img_BGR = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR) #BGR
-            frame = cv2.imencode('.jpg', img_BGR )[1].tobytes()
+            # img_BGR = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR) #BGR
+            frame = cv2.imencode('.jpg', frame)[1].tobytes()
             return frame
+           
+
 def gen_det_obj_multifeed2(camera):
     while True:
         frame = camera.get_frame()
@@ -2015,24 +2052,8 @@ def gen_det_obj_multifeed2(camera):
 @app.route('/video_feed_det_multifeed2')
 def det_video_feed_multifeed2():
     url = request.args.get('url')
-    return Response(gen_det_obj_multifeed2(Objdetection_multifeed2(url)), mimetype='multipart/x-mixed-replace; boundary=frame')
     
-
-
-
-
-
-
-@app.route('/multifeed', methods = ['POST', 'GET'])
-def stream_view_4multifeed():
-    global Row1,cknames
-    rows = []
-    cknames = request.form.getlist('skills')
-    print(cknames)
-    # selectValue = request.args.get('label')
-    # print(selectValue)
-    return render_template("home/multifeed.html",User_Models_record=User_Models_record.query.filter_by(username=current_user.username),User_camera_sources=User_camera_sources_record.query.filter_by(username=current_user.username))
-
+    return Response(gen_det_obj_multifeed2(Objdetection_multifeed2(url)), mimetype='multipart/x-mixed-replace; boundary=frame')
 
 
 #####################################################################################################################################################

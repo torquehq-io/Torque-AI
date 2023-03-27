@@ -77,7 +77,7 @@
                             <input type="text" name="link2" class="form-control" id="exampleFormControlInput2" placeholder="Enter the camera source 2">
                         </div>
 
-                        <div class="form-group">
+                        <!-- <div class="form-group">
                             <label>link3</label>
                             <input name="link3" type="text" class="form-control" id="exampleFormControlInput3" placeholder="Enter the camera source 3">
                           </div>
@@ -85,7 +85,7 @@
                         <div class="form-group">
                             <label>link4</label>
                             <input name="link4" type="text" class="form-control" id="exampleFormControlInput4" placeholder="Enter the camera source 4">
-                          </div>
+                          </div> -->
 
                           <button type="submit" class="btn btn-primary mb-2">Save</button>
                      
@@ -128,19 +128,14 @@
                 <tr><td>{{ row.link2 }}</td>
                     
               </tr>
-                <tr><td>{{ row.link3 }}</td>
+                <!-- <tr><td>{{ row.link3 }}</td>
                     
               </tr>
                 <tr><td>{{ row.link4 }}</td>
                    
-              </tr>
+              </tr> -->
 
-              Choose a City<SELECT name="city">
-                {% for row in User_camera_sources %}
-                  <OPTION value={{row.username}}>{{row.link1}}</option>
-                    <OPTION value={{row.username}}>{{row.link2}}</option>
-                {% endfor %}
-                </SELECT>
+            
             
         <td>
             <a href="/update/{{row.0}}" class="btn btn-warning btn-sm" data-toggle="modal" data-target="#modaledit{{row.0}}">Edit</a>
@@ -175,7 +170,7 @@
                                 <input value="{{row.link2}}" type="text" name="link2" class="form-control" id="exampleFormControlInput1" placeholder="Enter Email">
                             </div>
     
-                            <div class="form-group">
+                            <!-- <div class="form-group">
                                 <label>camera source link 3</label>
                                 <input value="{{row.link3}}" name="link3" type="text" class="form-control" id="exampleFormControlInput1" placeholder="Enter Phone Number">
                               </div>
@@ -183,7 +178,7 @@
                             <div class="form-group">
                                 <label>camera source link 4</label>
                                 <input value="{{row.link4}}" name="link4" type="text" class="form-control" id="exampleFormControlInput1" placeholder="Enter Phone Number">
-                              </div>
+                              </div> -->
     
                               <button type="submit" class="btn btn-success mb-2">Update</button>
                          

@@ -34,7 +34,7 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/js/bootstrap-select.min.js"></script>
 
-
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 </head>
 
 <style>
@@ -220,89 +220,7 @@
 
     <div class="col-lg-12">
         <center>
-            <h4>Screen 1</h4>
-        </center>
-    </div>
-    <div class="container  row" style="padding-left: 35px;">
-
-        <div style="padding: 5px 25px 5px 25px ;"  class="card card11 h-100 pt-3 col-lg-4" style="border-radius: 2.8125rem;">
-								
-            <!-- <label style="width:100%">Select Camera Source:</label>
-            <select style="width: 70%; margin-right: 20px;" name="row.source" data-live-search="true" id="car_brand"
-                class="haloo form-control" title="Select Car Brand">
-                {% for row in User_camera_sources %}
-                <option value="{{row.serial_no}}">{{row.source}}</option>
-                {% endfor %}
-            </select><br/>
-            <p style="margin-left: 25%;"> OR </p>
-    
-            <label style="text-align: start;">Camera Source:</label>
-            <input id="rtmpUrl" style="width: 70%" placeholder="rtmps://host:port/application/streamName/streamkey"
-                type="text" name="rtmpUrl" value="" />
-     -->
-                    <!-- <br/> -->
-                    <!-- <hr/> -->
-                    <br/>
-    
-            <div class="col-md-4" style="margin-left:0; padding-left: 0;">
-                <form method="post" id="multiple_select_form" action="">
-                    <label style="text-align: start;">Select Objects:</label>
-                    <select name="select_model"  id="select_model" class="selectpicker" data-live-search="true" >
-                    
-                        {% for i in User_Models_record%}
-                        
-                        {% if i == default_model_name %}
-                            <option value="{{ default_model_name  }}" selected>{{ default_model_name }}</option>
-                        {% else %}
-                            <option value="{{ i.model_name }}">{{ i.model_name}}</option>
-                        {% endif %}
-                        
-                        {% endfor %}
-    
-    
-    
-                    </select>
-    
-    
-                   
-    
-
-                    <input type="submit" name="submit" class="btn btn-outline-primary hehe1" value="Submit" id="add" />
-                </form>
-    
-                <br />
-            </div>			
-            
-            
-        </div>
-
-      
-        <br>
-
-        <div class="col-sm-12 col-lg-6">
-            
-            <div class="card card11">
-                <div class="">
-                </div>
-                <div class="demo-container">
-                    <img id='videoImage' src="" style="display:visible;" />
-                </div>
-
-            </div>
-            <!-- <button style="margin-left: 15px; margin-bottom:15px;" class="btn btn-outline-primary hehe"
-                id="btnPlay">Play</button>
-            <button style="margin-left: 5px; margin-bottom:15px;" class="btn btn-outline-primary hehe1"
-                id="btnStop">Stop</button> -->
-        </div>
-
-    </div>
-
-    <br/>
-
-
-    <div class="col-lg-12">
-        <center>
-            <h4>Screen 2</h4>
+            <h4>Screen 1 : {{ screen1_model }}</h4>
         </center>
     </div>
     <div class="container row" style="padding-left: 35px;">
@@ -327,9 +245,99 @@
                     <br/>
     
             <div class="col-md-4" style="margin-left:0; padding-left: 0;">
+                <form method="post" id="multiple_select_form" action="/model">
+                    <label style="text-align: start;">Select Objects:</label>
+                    <select name="select_model"  id="dropdown1" class="selectpicker" data-live-search="true" >
+                        
+                        {% for i in User_Models_record%}
+                        
+                        <option value="{{ i.model_name }}" >{{ i.model_name }}</option>
+                       
+                        {% endfor %}
+    
+    
+    
+                    </select>
+    
+                  
+                    <input type="submit" name="submit" class="btn btn-outline-primary hehe1" value="Submit" id="dropdown1" />
+                
+                </form>
+                 <form method="post" id="multiple_select_form" action="/model2">
+                    <label style="text-align: start;">Select Objects:</label>
+                    <select name="select_model2"  id="dropdown2" class="selectpicker" data-live-search="true" >
+                        
+                        {% for i in User_Models_record%}
+                        
+                        <option value="{{ i.model_name }}" >{{ i.model_name }}</option>
+                       
+                        {% endfor %}
+    
+    
+    
+                    </select>
+    
+
+                    <input type="submit" name="submit" class="btn btn-outline-primary hehe1" value="Submit" id="submit_button" />
+                
+                
+                </form> 
+
+
+    
+                <br />
+            </div>			
+            
+            
+        </div>
+        <div class="col-sm-12 col-lg-6">
+            
+            <div class="card card11">
+                <div class="">
+                </div>
+                <div class="demo-container">
+                    <img id='videoImage' src="" style="display:visible;" />
+                </div>
+
+            </div>
+           
+        </div>
+
+      
+
+    <br/>
+
+
+    <div class="col-lg-12">
+        <center>
+            <h4>Screen 2 : {{ screen2_model }}</h4>
+        </center>
+    </div>
+    <!-- <div class="container row" style="padding-left: 35px;">
+
+        <div style="padding: 5px 25px 5px 25px ;"  class="card card11 h-100 pt-3 col-lg-4" style="border-radius: 2.8125rem;">
+								 -->
+            <!-- <label style="width:100%">Select Camera Source:</label>
+            <select style="width: 70%; margin-right: 20px;" name="row.source" data-live-search="true" id="car_brand"
+                class="haloo form-control" title="Select Car Brand">
+                {% for row in User_camera_sources %}
+                <option value="{{row.serial_no}}">{{row.source}}</option>
+                {% endfor %}
+            </select><br/>
+            <p style="margin-left: 25%;"> OR </p>
+    
+            <label style="text-align: start;">Camera Source:</label>
+            <input id="rtmpUrl" style="width: 70%" placeholder="rtmps://host:port/application/streamName/streamkey"
+                type="text" name="rtmpUrl" value="" />
+     -->
+                    <!-- <br/> -->
+                    <!-- <hr/> -->
+                    <br/>
+    
+            <!-- <div class="col-md-4" style="margin-left:0; padding-left: 0;">
                 <form method="post" id="multiple_select_form" action="">
                     <label style="text-align: start;">Select Objects:</label>
-                    <select name="select_model2"  id="select_model" class="selectpicker" data-live-search="true">
+                    <select name="select_model2"  id="select_model2" class="selectpicker" data-live-search="true" >
                         
                         {% for i in User_Models_record%}
                         
@@ -349,7 +357,7 @@
             </div>			
             
             
-        </div>
+        </div> -->
 
       
         <br>
@@ -395,13 +403,22 @@
           $("#videoImage").attr("src", "/");
 
       });
-    document.getElementById('select_model').onchange = function() {
-    localStorage.setItem('selectedtem', document.getElementById('select_model').value);};
 
-    if (localStorage.getItem('selectedtem')) {
-    document.getElementById('select_model').options[localStorage.getItem('selectedtem')].selected = true;}
-    
+
+   $('#dropdown1 option[value="yolov5s"]').attr("selected", "selected");
+      $('#dropdown2 option[value="yolov5s"]').attr("selected", "selected");
       
+//     $(document).ready(function() {
+//         $("#dropdown1").change(function() {
+//         $("#dropdown2").prop("disabled", true);
+//         });
+//         $("#submit_button").click(function() {
+//         $("#dropdown2").prop("disabled", false);
+//         });
+//   });
+   
+
+    
 
 </script>
     <script async src="static/assets/js/annotation/opencv3.4.16.js" type="text/javascript"></script>

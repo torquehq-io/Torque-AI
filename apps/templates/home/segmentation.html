@@ -1,0 +1,333 @@
+
+{% extends "layouts/base.html" %}
+
+{% block title %} Typography {% endblock %}
+
+<!-- Specific CSS goes HERE -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+<!-- Custom styles -->
+<link rel="stylesheet" href="{{ url_for('static', filename='assets/css/segmentation.css') }}" />
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css"></link>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/js/bootstrap-select.min.js"></script>
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/css/bootstrap-select.css" />
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+
+
+<!-- header title and describe -->
+<header id=header>
+  <center><h2>PERSON COUNTER</h2></center>
+  <!-- <h1 class="entry-title" style="text-align: center;">
+    <img src="/static/icons/object.png" alt="" width="64" height="64" />&nbsp;&nbsp;
+    <img style="font-size: 14px; font-family: -webkit-standard;" src="/static/icons/detect.png" alt="" width="56" height="56" />&nbsp;&nbsp;
+    <img src="/static/icons/segmentation.png" alt="" width="64" height="64" />
+  </h1> -->
+</header>
+
+<aside id="aside">
+  <!-- <h1 class="aside">Target List</h1> -->
+  <div class="aside-container col-sm-12 col-lg-8 selectpicker" style="margin:15px 0px 0px 15px">
+    <!-- <form method="post" id="multiple_select_form">
+        -->
+
+          {% for key, value in TARGETLIST.items() %}
+              <tr>
+                  <input id="{{ key }}" type="checkbox" name="target" value="{{ key }}" checked>
+                  <label  for="{{ key }}" >{{ value }}</label>
+              </tr>
+          {% endfor %}
+
+
+
+
+      
+      <!-- <h2 class="done" aria-hidden="true"><b>Display</b></h2>
+      <h2 class="undone" aria-hidden="true"><b>Hidden</b></h2> -->
+    </div>
+  </div>
+</aside>
+
+<!-- context -->
+<section id="section">
+
+  <!-- flask settings -->
+  <!-- <div class="modelMenu col-sm-12 col-lg-8">
+    <button class="modelView">
+      <div class="chevron-right"></div>
+    </button>
+
+    <div class="title">Cam Information</div>
+    <div class="list">
+      <ul class="optionTitle">
+        <p>Cam IP</p>
+        <p>Cam Height</p>
+        <p>Cam Width</p>
+      </ul>
+      <ul class="optionList">
+        <p>{{CAM_CONFIG["cam_id"]}}</p>
+        <p>{{CAM_CONFIG["height"]}}</p>
+        <p>{{CAM_CONFIG["width"]}}</p>
+      </ul>
+    </div>
+
+    <div class="title">Model Information</div>
+    <div class="list">
+      <ul class="optionTitle">
+        <p>Model Path</p>
+        <p>Class Path</p>
+        <p>Detect Score</p>
+        <p>Detect NMS</p> 
+        <p>Box Ratio</p> 
+        <p>Box Stretch</p> 
+      </ul>
+      <ul class="optionList">
+        <p>{{MODEL_CONFIG["model_path"]}}</p>
+        <p>{{MODEL_CONFIG["classes_path"]}}</p>
+        <p>{{MODEL_CONFIG["box_score"]}}</p>
+        <p>{{MODEL_CONFIG["box_nms_iou"]}}</p>
+        <p>{{MODEL_CONFIG["box_aspect_ratio"]}}</p>
+        <p>{{MODEL_CONFIG["box_stretch"]}}</p>
+      </ul>
+    </div> 
+
+  </div> -->
+<!--   
+  <h2 class="entry-title" style="margin:15px 0px 0px 15px"><u> o</u></h2> -->
+  <!-- <h4 style="text-align: center; font-family: Trebuchet MS ; color: rgb(108, 107, 107);"> After obtaining images through the camera, it is possible to separate the target and background in the scene, and composite the target with a URL video background. </h4> -->
+
+  <div class="ring" id="spinner" style="display: none;" >
+    Loading
+    <span ></span>
+  </div>
+
+  <div id="capture" align=center>
+    <img id="videoElement" src="{{ url_for('video_feed') }}" />
+  </div>
+
+  <div id="container" align=center>
+    <!-- main btn -->
+    <table style="margin-top:10px; width: 800px;">
+        <tr>
+
+          <td>
+            <em> Open Cam : </em>
+            <label class="switch">
+              <input  type="checkbox" id="cam-preview" checked>
+              <span class="btnCyanSlider round"></span>
+            </label>
+          </td>
+
+          <td>
+            <em> Change BackGround : </em>
+            <label class="custom-search">
+              <input id="video-url" type="text" class="custom-search-input" placeholder="Enter Url or Video/Image Local Path">
+              <button id="upload" class="custom-search-botton" type="submit">Submit</button>  
+            </label>
+
+          </td>
+          
+          <td>
+            <label class="switch-icon">
+              <input type="checkbox" id="background-preview">
+              <span class="btnIconSlider"></span>
+            </label>
+            <button class="download" onclick="blockCapture()"></button>
+          </td>
+        </tr>
+    </table>
+
+    <div>
+      <br>
+    </div>
+   <!-- <p>
+    <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+      Button with data-target
+    </button>
+   </p> -->
+
+ 
+    <label class="select-container">
+      <label class="select-box"> 
+        <label class="options-container" >
+          <form id="control">
+          <div class="option" name="display-mode" >
+            <input type="radio" class="radio" id="none" name="display-mode"/>
+            <label for="none">None</label>
+          </div>
+  
+          <div class="option" name="display-mode">
+            <input type="radio" class="radio" id="basic"  name="display-mode"/>
+            <label for="basic">Basic Mode</label>
+          </div>
+  
+          <div class="option" name="display-mode">
+            <input type="radio" class="radio" id="detect"  name="display-mode"/>
+            <label for="detect">Detect Mode</label>
+          </div>
+
+          <div class="option" name="display-mode">
+            <input type="radio" class="radio" id="semantic" name="display-mode"/>
+            <label for="semantic">Semantic Mode</label>
+          </div>
+        </form>
+        </label>
+
+      </label>
+    </label>
+
+
+    
+     
+    
+    <!-- zoom setting btn -->
+    <p>
+      <a  class="btn btn-primary" data-toggle="collapse"
+          style="background-color : #0eebff ; border:4px #04c9d7 double; font-size: 15px; border-radius: 10px; width:20%;"
+          href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">
+        Options
+      </a>
+    
+    </p>
+
+    <div class="collapse" id="collapseExample">
+      <div class="card card-body">
+        <form id="control">
+          <em> Flip Horizontal : </em>  
+            <label class="switch">
+              <input  type="checkbox" id="flip-horizontal" >
+              <span class="btnDarkGraySlider round"></span>
+            </label>
+          
+          <em> Display Mode : </em>
+            <label class="select-container">
+              <label class="select-box">
+                <label class="options-container" name="display-mode">
+                  
+                  <div class="option" name="display-mode">
+                    <input type="radio" class="radio" id="none" />
+                    <label for="none">None</label>
+                  </div>
+          
+                  <div class="option" name="display-mode">
+                    <input type="radio" class="radio" id="basic" />
+                    <label for="basic">Basic Mode</label>
+                  </div>
+          
+                  <div class="option" name="display-mode">
+                    <input type="radio" class="radio" id="detect" />
+                    <label for="detect">Detect Mode</label>
+                  </div>
+
+                  <div class="option" name="display-mode">
+                    <input type="radio" class="radio" id="semantic" />
+                    <label for="semantic">Semantic Mode</label>
+                  </div>
+                </label>
+          
+                <label class="selected" name="display-mode"> Semantic Mode </label>
+              </label>
+            </label>
+            
+          <br />
+          
+          <h4 class="entry-title"><u> ForeGround  </u></h4>
+          <br />
+
+          <em> Display Style : </em>
+            <label class="select-container">
+              <label class="select-box" style="width: 350px; ">
+                <label class="options-container" name="display-style">
+
+                  {% for key, value in STYLELIST.items() %}
+                  <div class="option" name="display-style">
+                    <input type="radio" class="radio" id="{{ key }}" />
+                    <label for="{{ key }}">{{ key }}</label>
+                  </div>
+                  {% endfor %}
+
+                </label>
+          
+                <label class="selected" name="display-style"> None </label>
+              </label>
+            </label>
+
+          <br />
+
+          <em> Exposure : </em>  
+            <label class="slider">
+              <input id="exposure" type="range" min="-13" max="0" value="{{ CAM_CONFIG['exposure'] }}" oninput="exposure_value.value=value"/>
+              <output id="exposure_value">{{ CAM_CONFIG['exposure'] }}</output>
+            </label>
+
+          <br />
+          <br />
+
+          <em> Contrast : </em>  
+            <label class="slider">
+              <input id="contrast" type="range" min="0" max="100" value="{{ CAM_CONFIG['contrast'] }}" oninput="contrast_value.value=value"/>
+              <output id="contrast_value">{{ CAM_CONFIG['contrast'] }}</output>
+            </label>
+
+          <br />
+          <br />
+
+          <h4 class="entry-title"><u> BackGround  </u></h4>
+          <br />
+
+          <em> BlurRate : </em>  
+          <label class="slider">
+            <input id="blur" type="range" min="0" max="100" value="{{ CAM_CONFIG['blur'] }}" oninput="blur_value.value=value"/>
+            <output id="blur_value">{{ CAM_CONFIG['blur'] }}</output>
+          </label>
+          
+          <br />
+          <br />
+
+          <a id="reset-cam">
+            <button class="btn btn-danger" style="background-color : #d48b7e ; border:4px #d67968 double; font-size: 15px; border-radius: 10px; width:20%;">
+              Reset camera
+            </button>
+          </a>
+          
+        </form>
+      </div>
+    </div>
+
+    <div>
+      <br>
+    </div>
+
+  </div>
+
+</section>
+
+<!-- footer  -->
+<!-- <footer id="footer">
+  <figure>
+    <p style="text-align: center; display: inline-block;">© Taiwan 2023, built with </p>
+    <img src="/static/icons/github.png" alt="© Taiwan 2023, built with" width="26" height="26" >&nbsp;
+    <a href="https://github.com/jason-li-831202">https://github.com/jason-li-831202</a>
+  </figure>
+</footer> -->
+
+
+
+<!-- Imports -->
+<script src="//ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+
+<!-- Scripts -->
+<script
+  type="text/javascript"
+  src="{{ url_for('static', filename='assets/js/segmentation/script.js') }}"
+>
+</script>
+
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->

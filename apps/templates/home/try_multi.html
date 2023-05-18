@@ -44,7 +44,7 @@
 
     <div class="container">
 
-        <label>Select Camera Source:</label>
+        <!-- <label>Select Camera Source:</label>
         <select style="width: 70%; margin-right: 20px;" name="row.source" data-live-search="true" id="car_brand"
             class="form-control" title="Select Car Brand">
             {% for row in User_camera_sources %}
@@ -55,7 +55,7 @@
 
         <label style="text-align: start;">Camera Source:</label><br />
         <input id="rtmpUrl" style="width: 70%" placeholder="rtmps://host:port/application/streamName/streamkey"
-            type="text" name="rtmpUrl" value="" />
+            type="text" name="rtmpUrl" value="" /> -->
 
 
         <div class="col-md-4" style="margin-left:200px;">
@@ -96,8 +96,8 @@
                 </div>
 
             </div>
-            <button style="margin-left: 15px; margin-bottom:15px;" class="btn btn-outline-primary hehe"
-                id="btnPlay">Play</button>
+            <!-- <button style="margin-left: 15px; margin-bottom:15px;" class="btn btn-outline-primary hehe"
+                id="btnPlay">Play</button> -->
             <button style="margin-left: 5px; margin-bottom:15px;" class="btn btn-outline-primary hehe1"
                 id="btnStop">Stop</button>
         </div>
@@ -105,33 +105,38 @@
     </div>
 
     <script>
-        $("#btnPlay").on("click", function (event) {
-            event.preventDefault();
+        $("#videoImage").attr("src", "/video_feed_det_try_4multi?url=");
 
-            console.log("Playing stream ...");
-            var spinner = '<div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div>'
-            var rtmpUrl = $("#rtmpUrl").val();
-            var e = document.getElementById("car_brand");
-            var value = e.value;
-            var text = e.options[e.selectedIndex].text;
-            console.log(value, text);
-            $("#btnPlay").html(spinner);
-            // play in image
-            if (rtmpUrl != "") {
-                // play in image
-                $("#videoImage").attr("src", "/video_feed_det_try_4multi?url=" + rtmpUrl);
+        // function initCanvas() {
+        //     event.preventDefault();
 
-            }
-            else {
-                // play in image
-                $("#videoImage").attr("src", "/video_feed_det_try_4multi?url=" + text);
-            }
+        //     console.log("Playing stream ...");
+        //     var spinner = '<div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div>'
+        //     var rtmpUrl = $("#rtmpUrl").val();
+        //     var e = document.getElementById("car_brand");
+        //     var value = e.value;
+        //     var text = e.options[e.selectedIndex].text;
+        //     console.log(value, text);
+        //     $("#btnPlay").html(spinner);
+        //     // play in image
+        //     if (rtmpUrl != "") {
+        //         // play in image
+        //         $("#videoImage").attr("src", "/video_feed_det_try_4multi?url=" + rtmpUrl);
+
+        //     }
+        //     else {
+        //         // play in image
+        //         $("#videoImage").attr("src", "/video_feed_det_try_4multi?url=" + text);
+        //     }
 
 
-            gDrawing = true;
-            setTimeout(drawImge, 300);
-            initCanvas();
-        });
+        //     gDrawing = true;
+        //     setTimeout(drawImge, 300);
+      
+           
+
+
+        // };
         $("#btnStop").on("click", function (event) {
             event.preventDefault();
             console.log("Stop Stream ...");
@@ -142,12 +147,14 @@
 
         $('#add').bind('click', function () {
             $.ajax({
-                url: "/try",
+                url: "/try'",
                 type: "POST",
                 data: $('[name=skills]').serialize(),
 
 
             });
+           
+            initCanvas() 
 
 
         })

@@ -410,7 +410,7 @@ def training():
     data1 = dataset_path + "/data/" + 'data.yaml'
     # subprocess.run(['python3','yolov5/train.py','--data', data1, '--name', gLabel])
     subprocess.run(['python3', '-m', 'torch.distributed.run', '--nproc_per_node',
-                   '2', 'yolov5/train.py', '--data', data1, '--name', gLabel, '--device', '0,1'])
+                   '2', 'yolov5/train.py', '--data', data1, '--name', gLabel, '--device', '0'])
     rename_modelfile()
 
     return "None"
@@ -1617,7 +1617,7 @@ def stream_view():
     global Row
     rows = []
     cknames = request.form.getlist('skills')
-    print(cknames)
+    print("TTTTTTTTTTTTTTTTTtry",cknames)
     for i in range(10):
         rows.append(str(i))
         print("you are in try {}".format(i))
@@ -1657,7 +1657,12 @@ class Objdetection_4multi():
     def __init__(self, url):
 
         print("in detect...................................")
-        self.video = cv2.VideoCapture(url)
+        current_loggin_user = current_user.username
+        fetch_url = User_camera_sources.query.filter_by(
+        username=current_loggin_user).first()
+        print("screen1 URL:", fetch_url.link1)
+        self.video = cv2.VideoCapture(fetch_url.link1)
+        
         self.url = url
         self.error_count = 0
         self.model = torch.hub.load(
@@ -1749,7 +1754,7 @@ def stream_view_4multi():
 
 class Objdetection_multifeed():
 
-    print("AAAAAAAAaaaaaaaaaaaaa", pre_selected_model)
+   
 
     def __init__(self, url):
 
@@ -2006,8 +2011,174 @@ def det_video_feed_multifeed2():
 
 
 #####################################################################################################################################################
+###############    Segementation anything   ################################################################
+import os
+from flask import Flask, render_template, request, Response, redirect, url_for, jsonify
+from flask_bootstrap import Bootstrap
+from gevent import monkey
+from gevent.pywsgi import WSGIServer
+monkey.patch_all()
 
+from segmentation.src.VideoStream import *
+
+
+
+
+model_config = {
+    "model_path": 'segmentation/models/yolov8n-seg.onnx', # model path
+    "classes_path" : 'segmentation/models/coco_label.txt', # classes path
+    "box_score" : 0.4,
+    "box_nms_iou" : 0.45,
+    "box_aspect_ratio" : None,
+    "box_stretch" : None,
+}
+
+cam_config = {
+    "cam_id" : "rtmp://media5.ambicam.com:1938/live/1efa24f9-0cd0-47c5-b604-c7e3ee118302",
+    'exposure': -2, # init cam exposure
+    'contrast': 50 # init cam contrast
+}
+
+
+VIDEO = VideoStreaming(cam_config=cam_config, model_config=model_config)
+
+@app.route('/segmentation/')
+def segmentation():
+    TITLE = 'Object Segmentation App'
+    CAM_CONFIG = cam_config.copy()
+    CAM_CONFIG["height"] = int(VIDEO.H)
+    CAM_CONFIG["width"] = int(VIDEO.W)
+
+    MODLE_CONFIG = model_config.copy()
+    for key, value in model_config.items():
+        if type(value) == str:
+            MODLE_CONFIG[key] = os.path.basename(value)
+
+    CLASSES_CONFIG = VIDEO.MODEL.colors_dict.copy()
+    STYLE_CONFIG = VIDEO.style_dict.copy()
+    return render_template('home/segmentation.html', TITLE=TITLE, 
+                                        CAM_CONFIG = CAM_CONFIG, 
+                                        MODEL_CONFIG = MODLE_CONFIG, 
+                                        TARGETLIST =  object_list,
+                                        STYLELIST = STYLE_CONFIG)
+ 
+@app.route('/video_feed')
+def video_feed():
+    '''
+    Video streaming route.
+    '''
+    return Response(
+        VIDEO.show(),
+             mimetype='multipart/x-mixed-replace; boundary=frame'
+    )
+
+
+
+@app.route('/request_target_display')
+def request_target_display():
+    targets_list  = request.args.get('targetList')
+    print('*'*10)
+    print("display targets :", targets_list)
+    print('*'*10)
+    VIDEO.setViewTarget(targets_list) 
+
+    return "nothing"   
+# Button requests called from ajax
+@app.route('/request_preview_switch')
+def request_preview_switch():
+    active  = request.args.get('active')
+    VIDEO.preview = active
+    print('*'*10)
+    print("display preview :", VIDEO.preview)
+    print('*'*10)
+    return "nothing"
+
+@app.route('/request_background_video')
+def request_background_video():
+    # url = "https://youtu.be/LtrtLL_8mLM" # testing url
+    url  = request.args.get('url')
+    print('*'*10)
+    print("video url or path :", url)
+    print('*'*10)
+    VIDEO.setBackGround(url)
+    return "nothing"
+
+@app.route('/request_background_switch')
+def request_background_switch():
+    active  = request.args.get('active')
+    VIDEO.background = active
+    print('*'*10, VIDEO.background)
+    return "nothing"
+
+@app.route('/request_flipH_switch')
+def request_flipH_switch():
+    active  = request.args.get('active')
+    VIDEO.flipH = active
+    print('*'*10)
+    print("display flip :",  VIDEO.flipH)
+    print('*'*10)
+    return "nothing"
+
+@app.route('/request_model_switch')
+def request_model_switch():
+    type  = request.args.get('type')
+    VIDEO.detect = type
+    print('*'*10)
+    print("display type :",  type)
+    print('*'*10)
+    return "nothing"
+
+@app.route('/request_style_switch')
+def request_style_switch():
+    type  = request.args.get('type')
+    VIDEO.setViewStyle(type)
+    print('*'*10)
+    print("display style :",  type)
+    print('*'*10)
+    return "nothing"
+
+@app.route('/request_exposure')
+def request_exposure():
+    value  = request.args.get('value')
+    VIDEO.exposure = int(value)
+    print('*'*10)
+    print("display exposure :", VIDEO.exposure)
+    print('*'*10)
+    return "nothing"
+
+
+@app.route('/request_contrast')
+def request_contrast():
+    value  = request.args.get('value')
+    VIDEO.contrast = int(value)
+    print('*'*10)
+    print("display contrast :",VIDEO.contrast)
+    print('*'*10)
+    return "nothing"
+
+@app.route('/request_blur')
+def request_blur():
+    value  = request.args.get('value')
+    VIDEO.blur = int(value)
+    print('*'*10)
+    print("display blur (kernel):",VIDEO.blur)
+    print('*'*10)
+    return "nothing"
+
+@app.route('/reset_camera')
+def reset_camera():
+    STATUS =VIDEO.InitCamSettings()
+    active  = request.args.get('active')
+    VIDEO.flipH = active
+    type  = request.args.get('type')
+    VIDEO.detect = type
+    print('*'*10)
+    print("reset :",STATUS)
+    print('*'*10)
+    return "nothing"
+
+
+###################################################################################
 
 if __name__ == "__main__":
-
-    app.run()
+   app.run()

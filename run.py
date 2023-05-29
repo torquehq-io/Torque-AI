@@ -1997,9 +1997,7 @@ def video_feed_multifeed2():
 import os
 from flask import Flask, render_template, request, Response, redirect, url_for, jsonify
 # from flask_bootstrap import Bootstrap
-from gevent import monkey
-from gevent.pywsgi import WSGIServer
-monkey.patch_all()
+
 
 from segmentation.src.VideoStream import *
 

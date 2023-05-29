@@ -2022,8 +2022,8 @@ cam_config = {
 
 VIDEO = VideoStreaming(cam_config=cam_config, model_config=model_config)
 
-@app.route('/segmentation/',methods=["GET","POST"])
-def home():
+@app.route('/segmentation',methods=["GET","POST"])
+def seg():
     TITLE = 'Object Segmentation App'
     CAM_CONFIG = cam_config.copy()
     CAM_CONFIG["height"] = int(VIDEO.H)

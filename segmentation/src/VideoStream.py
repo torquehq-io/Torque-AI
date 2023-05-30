@@ -7,7 +7,12 @@ from enum import Enum
 
 from segmentation.src.ObjectDetector import ObjectOnnxDetector
 from segmentation.src.AnimeGAN import AnimeGAN
-
+from flask_login import (
+    current_user,
+    login_user,
+    logout_user
+)
+from run import User_camera_sources
 class DisplayType(Enum):
 	NONE = "None"
 	BASIC_MODE = "Basic Mode"
@@ -51,7 +56,7 @@ class VideoStreaming(object):
 
         if (model_config == None) :
             raise Exception("model_config setting is %s." % model_config)
-        
+     
         self.CAM = cv2.VideoCapture(self.cam_config['cam_id'])
         if (not self.CAM.isOpened()) :
             raise Exception("video root [%s] is error. please check it." % self.cam_config['cam_id'])

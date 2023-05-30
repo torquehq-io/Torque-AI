@@ -1322,17 +1322,17 @@ def new():
 
 ###############################################################
 
-# @app.route('/storeRtmpLink')
-# def Test():
-#     current_loggin_user = current_user.username
-#     user = Users.query.filter_by(username=current_loggin_user).first()
-#     user=str(user)[21:-1]
-#     if user:
-#         db.session.execute("SELECT * FROM User_camera_sources")
+@app.route('/storeRtmpLink')
+def Test():
+    current_loggin_user = current_user.username
+    user = Users.query.filter_by(username=current_loggin_user).first()
+    user=str(user)[21:-1]
+    if user:
+        db.session.execute("SELECT * FROM User_camera_sources")
         
-#         db.session.close()
+        db.session.close()
 
-#     return render_template('home/autoLabel.html',User_camera_sources=User_camera_sources.query.filter_by(username=current_user.username),data=current_user.username,table=User_camera_sources)
+    return render_template('home/camera_source_db.html',User_camera_sources=User_camera_sources.query.filter_by(username=current_user.username),data=current_user.username,table=User_camera_sources)
 
 
 @app.route('/insert', methods = ['POST'])
@@ -2005,7 +2005,7 @@ from segmentation.src.VideoStream import *
 
 
 model_config = {
-    "model_path": 'segmentation/models/yolov8x-seg.onnx', # model path
+    "model_path": 'segmentation/models/yolov8n-seg.onnx', # model path
     "classes_path" : 'segmentation/models/coco_label.txt', # classes path
     "box_score" : 0.4,
     "box_nms_iou" : 0.45,
@@ -2013,18 +2013,23 @@ model_config = {
     "box_stretch" : None,
 }
 
-cam_config = {
-    "cam_id" : "rtmp://media5.ambicam.com:1938/live/1efa24f9-0cd0-47c5-b604-c7e3ee118302",
-    'exposure': -2, # init cam exposure
-    'contrast': 50 # init cam contrast
-}
 
 
-VIDEO = VideoStreaming(cam_config=cam_config, model_config=model_config)
 
 @app.route('/segmentation',methods=["GET","POST"])
 def seg():
+    global VIDEO 
     TITLE = 'Object Segmentation App'
+    current_loggin_user=current_user.username
+    fetch_url =  User_camera_sources.query.filter_by(username=current_loggin_user).first()
+    print(fetch_url.link1)
+  
+    cam_config = {
+        "cam_id" :fetch_url.link1 ,
+        'exposure': -2, # init cam exposure
+        'contrast': 50 # init cam contrast
+    }
+    VIDEO = VideoStreaming(cam_config=cam_config, model_config=model_config)
     CAM_CONFIG = cam_config.copy()
     CAM_CONFIG["height"] = int(VIDEO.H)
     CAM_CONFIG["width"] = int(VIDEO.W)

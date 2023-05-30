@@ -48,7 +48,16 @@ href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/css/bootstr
 
 
 <section class="row">
+  <div class="" style="right: 0px;">
+
+    <form action="/storeRtmpLink">
+     <button class=" btn btn-outline-primary hehe1" style="margin-left: 78%; width: 20%;"
+                       >Add camera Source</button>
+   </form>
+
+</div>
 <div class="col-lg-4">
+
 <aside id="aside" > 
   <div class="dropdown" >
     <button class="dropbtn">Select Options</button>
@@ -67,10 +76,13 @@ href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/css/bootstr
           
 
 
-</div>
-  
+        </div>
+        
+      </div>
+      <br>
+      <br>
+     
     </div>
-  </div>
 </aside> 
 
 
@@ -86,6 +98,7 @@ href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/css/bootstr
         </div>
       <div id="capture" align=center >
         <img id="videoElement" src="{{ url_for('video_feed') }}" />
+       
       </div>
     </div>
   </div>
@@ -395,6 +408,27 @@ options.forEach(function (option) {
 options.forEach(function (option) {
   option.checked = true;
 });
+
+
+
+$("#btnPlay").on("click", function (event) {
+        event.preventDefault();
+        var spinner = '<div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div>'
+        console.log("Playing stream ...");
+
+        var rtmpUrl = $("#rtmpUrl").val();
+        $("#btnPlay").html(spinner);
+        // play in image
+        $("#videoElement").attr("src", "/video_feed?url=" + rtmpUrl);
+        
+        initCanvas();
+    }).done((response) => { $("#btnPlay").text("DONE").attr('disabled', true); })
+    $("#btnStop").on("click", function (event) {
+        event.preventDefault();
+        console.log("Stop Stream ...");
+        $("#videoElement").attr("src", "/");
+
+    });
 
 </script>
 

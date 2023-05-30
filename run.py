@@ -2005,7 +2005,7 @@ from segmentation.src.VideoStream import *
 
 
 model_config = {
-    "model_path": 'segmentation/models/yolov8n-seg.onnx', # model path
+    "model_path": 'segmentation/models/yolov8x-seg.onnx', # model path
     "classes_path" : 'segmentation/models/coco_label.txt', # classes path
     "box_score" : 0.4,
     "box_nms_iou" : 0.45,

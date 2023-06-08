@@ -12,7 +12,7 @@ from flask_login import (
     login_user,
     logout_user
 )
-from run import User_camera_sources
+
 class DisplayType(Enum):
 	NONE = "None"
 	BASIC_MODE = "Basic Mode"

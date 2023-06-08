@@ -429,7 +429,7 @@ from io import BytesIO
 
 class Objdetection():
     def __init__(self, url):
-        self.video = cv2.VideoCapture("rtmp://media5.ambicam.com:1938/live/3eb6f300-bb4a-4f66-af0c-15290833e3de")
+        self.video = cv2.VideoCapture(url)
         self.url = url
         self.error_count = 0
 
@@ -1217,7 +1217,7 @@ class Fire_detection1():
         self.url1 = url1
         self.error_count = 0
        
-        self.model = torch.hub.load('yolov5', 'custom', path='Fire_detection/fire.pt', source='local', force_reload=True)
+        self.model = torch.hub.load('yolov5', 'custom', path='/home/torqueai/github/main/Torque-AI/yolov5s.pt', source='local', force_reload=True)
 
        
 
@@ -2012,6 +2012,7 @@ model_config = {
     "box_aspect_ratio" : None,
     "box_stretch" : None,
 }
+
 
 
 

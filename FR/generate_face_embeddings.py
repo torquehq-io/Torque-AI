@@ -1,5 +1,5 @@
 
-from FR import face_model
+from FR.insightface.deploy import face_model
 from imutils import paths
 import numpy as np
 import pickle
@@ -21,7 +21,7 @@ class GenerateFaceEmbedding:
         self.det = 0
 
     def genFaceEmbedding(self, path):
-        # Grab the paths to the input images in our dataset
+        # Grab the paths to the input images in our datase
         print("[INFO] quantifying faces...")
         imagePaths = list(paths.list_images(path))
         print(imagePaths)

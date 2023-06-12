@@ -396,8 +396,8 @@ def training():
 
     dataset_path = str(os.getcwd())+"/Users_slab/"+current_loggin_user+"/"+gLabel
     data1 = dataset_path + "/data/" +'data.yaml'
-    #subprocess.run(['python3','yolov5/train.py','--data', data1, '--name', gLabel])
-    subprocess.run(['python3','-m','torch.distributed.run','--nproc_per_node','2','yolov5/train.py','--data', data1, '--name', gLabel,'--device','0,1'])
+    subprocess.run(['python3','yolov5/train.py','--data', data1, '--name', gLabel])
+    #subprocess.run(['python3','-m','torch.distributed.run','--nproc_per_node','2','yolov5/train.py','--data', data1, '--name', gLabel,'--device','0,1'])
     rename_modelfile()
        
     return "None"  
@@ -491,9 +491,85 @@ def det_video_feed():
     return Response(gen_det(Objdetection(url)), mimetype='multipart/x-mixed-replace; boundary=frame')
 
 
+#######################################################################################################################
+############################### load model ############################################################################
+@app.route("/load_model")
+def load_model():
+   
+    return render_template("home/loadmodel.html", User_camera_sources=User_camera_sources_record.query.filter_by(username=current_user.username),User_Models_record=User_Models_record.query.filter_by(username=current_user.username))
+class Objdetection_with_load_model():
+    def __init__(self, url,model):
+        self.video = cv2.VideoCapture(url)
+        self.url = url
+        self.modelnme = model
+        print("MMMMMMMMM",self.modelnme)
+        self.error_count = 0
+        current_loggin_user = current_user.username
+        # self.model = torch.hub.load('yolov5', 'custom', path=loadModel + "/yolov5/runs/" + "/" + "train" + "/" + gLabel + "/" + "weights" + "/" + gLabel+".pt", source='local', force_reload=True)
+        self.model = torch.hub.load('yolov5', 'custom', path=loadModel +'/Users_slab/' +current_loggin_user+'/Models/'+self.modelnme+'.pt', source='local', force_reload=True, device='cpu')
+
+    def __del__(self):
+        self.video.release()
+
+    def get_frame(self):
+        global Row
+
+        # model = torch.hub.load("ultralytics/yolov5", "custom", path = "/home/torque/Desktop/Torque-AI/Rampage/Intact-core/Rampage_AI/yolov5/runs/train/2/weights/best.pt",force_reload=True)
+
+        # model = torch.hub.load('yolov5', 'custom', path=loadModel + "/yolov5/runs/" + "/" + "train" + "/" + gLabel + "/" + "weights" + "/" + "best.pt", source='local', force_reload=True)
+
+        # model = torch.hub.load('yolov5', 'custom', path='/home/torque/Desktop/Torque-AI/Rampage/Intact-core/Rampage_AI/yolov5/runs/train/a12/weights/a12.pt', source='local', force_reload=True)
+        # Set Model Settings
+        self.model.eval()
+        self.model.conf = 0.6  # confidence threshold (0-1)
+        self.model.iou = 0.45  # NMS IoU threshold (0-1)
+
+        # Capture frame-by-fram ## read the camera frame
+        success, frame = self.video.read()
+        if success == True:
+
+            ret, buffer = cv2.imencode('.jpg', frame)
+            frame = buffer.tobytes()
+
+            # print(type(frame))
+
+            img = Image.open(io.BytesIO(frame))
+            results = self.model(img, size=640)
+
+            results.print()  # print results to screen
+
+            # convert remove single-dimensional entries from the shape of an array
+            img = np.squeeze(results.render())  # RGB
+            # read image as BGR
+            img_BGR = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)  # BGR
+            frame = cv2.imencode('.jpg', img_BGR)[1].tobytes()
+            return frame
 
 
-###################################################################################
+def gen_det_with_load_model(camera):
+    while True:
+        frame = camera.get_frame()
+        yield (b'--frame\r\n'
+               b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
+
+
+@app.route('/video_feed_det_with_loadmodel')
+def det_loadmodel_video_feed():
+    url = request.args.get('url')
+    
+    return Response(gen_det_with_load_model(Objdetection_with_load_model(url,select_model)), mimetype='multipart/x-mixed-replace; boundary=frame')
+
+@app.route('/video_feed_det_with_loadmodel_fetch')
+def det_loadmodel_video_feed_fetch():
+    global select_model
+    select_model=request.args.get('model')
+    print(select_model)
+    return select_model
+
+
+
+
+#################################################################################################################################
 @app.route("/BWphotos")
 def bwPhotos():
     binderList = os.listdir("/home/torquehq/torquehq-io/Github/Torque-AI/Users_slab/test/a1")
@@ -524,7 +600,7 @@ gPath = os.getcwd()
 
 class FR_candidate_addon(object):
     def __init__(self, url):
-        self.video = cv2.VideoCapture(url)
+        self.video = cv2.VideoCapture(0)
         self.url = url
         self.error_count = 0
 
@@ -554,7 +630,7 @@ class FR_candidate_addon(object):
             # haar_cascade = cv2.CascadeClassifier(fn_haar)
             
             frame= cv2.flip(frame, 1, 0)
-            gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+            gray = cv2.cvtColor(frame, cv2.IMREAD_COLOR)
             mini = cv2.resize(gray,(gray.shape[1]//size, gray.shape[0]//size))
             faces = haar_cascade.detectMultiScale(mini)
             faces = sorted(faces, key=lambda x: x[3])
@@ -637,7 +713,7 @@ def frca_modeltrain():
     frmt = TrainFaceRecogModel()
     frmt.trainKerasModelForFaceRecognition()
 
-    return 
+    return 'Train completed'
 
 ################## Face recognition ####################
 from mtcnn import MTCNN
@@ -659,7 +735,7 @@ class FacePredictor():
 
       
 
-        self.video = cv2.VideoCapture(url)
+        self.video = cv2.VideoCapture(0)
         self.url = url
         self.error_count = 0
         
@@ -1120,6 +1196,12 @@ def gen_pc(camera):
         frame= camera.get_frame()
         yield (b'--frame\r\n'
                 b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
+        
+@app.route('/person_counter.html' ,methods=["POST","GET"])
+def person_counter():
+    
+   
+    return render_template('home/person_counter.html', User_camera_sources=User_camera_sources_record.query.filter_by(username=current_user.username))
 
 
 
@@ -2005,7 +2087,7 @@ from segmentation.src.VideoStream import *
 
 
 model_config = {
-    "model_path": 'segmentation/models/yolov8n-seg.onnx', # model path
+    "model_path": 'yolov5/yolov8x-seg.onnx', # model path
     "classes_path" : 'segmentation/models/coco_label.txt', # classes path
     "box_score" : 0.4,
     "box_nms_iou" : 0.45,

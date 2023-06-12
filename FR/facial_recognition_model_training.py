@@ -32,7 +32,7 @@ class TrainFaceRecogModel:
 
         # Initialize Softmax training model arguments
         BATCH_SIZE = 8
-        EPOCHS = 5
+        EPOCHS = 200
         input_shape = embeddings.shape[1]
 
         # Build sofmax classifier

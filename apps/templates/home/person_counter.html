@@ -212,7 +212,12 @@
                                 <form id="urlForm">
                                     <label>RTMP URL:</label>
                                     <input id="rtmpUrl" style="width: 40%" type="text" name="rtmpUrl" value="" />
-                                 
+                                    <p style="margin-left: 25%;"> OR </p>
+                                    <select style="width: 70%; margin-right: 20px;" name="row.source" data-live-search="true" id="car_brand" class="form-control" title="Select Car Brand"> 
+                                        {% for row in User_camera_sources %}
+                                            <option value="{{row.serial_no}}">{{row.source}}</option>
+                                        {% endfor %}
+                                    </select>
                                     
                                     
                                     
@@ -257,10 +262,23 @@
         console.log("Playing stream ...");
 
         var rtmpUrl = $("#rtmpUrl").val();
+
+        var e = document.getElementById("car_brand");
+        var value = e.value;
+        var text = e.options[e.selectedIndex].text;
+
         $("#btnPlay").html(spinner);
         // play in image
-        $("#videoImage").attr("src", "/video_feed_pc?url=" + rtmpUrl);
-        
+        // $("#videoImage").attr("src", "/video_feed_pc?url=" + rtmpUrl);
+        if (rtmpUrl != "") {
+                    // play in image
+                    $("#videoImage").attr("src", "/video_feed_pc?url=" + rtmpUrl);
+
+                }
+                else{
+                    // play in image
+                    $("#videoImage").attr("src", "/video_feed_pc?url=" + text);
+                }
         initCanvas();
     }).done((response) => { $("#btnPlay").text("DONE").attr('disabled', true); })
     $("#btnStop").on("click", function (event) {

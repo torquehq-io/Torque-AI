@@ -502,11 +502,14 @@ class Objdetection_with_load_model():
         self.video = cv2.VideoCapture(url)
         self.url = url
         self.modelnme = model
-        print("MMMMMMMMM",self.modelnme)
+        
         self.error_count = 0
         current_loggin_user = current_user.username
+        if self.modelnme != "yolo5s":
         # self.model = torch.hub.load('yolov5', 'custom', path=loadModel + "/yolov5/runs/" + "/" + "train" + "/" + gLabel + "/" + "weights" + "/" + gLabel+".pt", source='local', force_reload=True)
-        self.model = torch.hub.load('yolov5', 'custom', path=loadModel +'/Users_slab/' +current_loggin_user+'/Models/'+self.modelnme+'.pt', source='local', force_reload=True, device='cpu')
+            self.model = torch.hub.load('yolov5', 'custom', path=loadModel +'/Users_slab/' +current_loggin_user+'/Models/'+self.modelnme+'.pt', source='local', force_reload=True, device='cpu')
+        else :
+            self.model = torch.hub.load('yolov5', 'custom', path=loadModel+"/yolov5/yolov5s.pt" , source='local', force_reload=True, device='cpu')
 
     def __del__(self):
         self.video.release()
@@ -2087,7 +2090,7 @@ from segmentation.src.VideoStream import *
 
 
 model_config = {
-    "model_path": 'yolov5/yolov8x-seg.onnx', # model path
+    "model_path": './segmentation/models/yolov8n-seg.onnx', # model path
     "classes_path" : 'segmentation/models/coco_label.txt', # classes path
     "box_score" : 0.4,
     "box_nms_iou" : 0.45,
@@ -2249,6 +2252,6 @@ def reset_camera():
 
 if __name__ == "__main__":
    
-    app.run()
+    app.run(host="0.0.0.0")
     
     

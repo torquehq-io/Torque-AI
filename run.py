@@ -2256,7 +2256,7 @@ class VideoPeopleDetection():
     def __init__(self,url):
         # Load YOLOv5 model
         #self.model = torch.hub.load('ultralytics/yolov5', 'yolov5s', pretrained=True)
-        self.modelName = "yolov5/crowdhuman_yolov5m.pt"
+        self.modelName = "yolov5/prebuilt_model/crowdhuman_yolov5m.pt"
         self.model = self.load_model(self.modelName)
         self.classes = self.model.names
         self.url=url

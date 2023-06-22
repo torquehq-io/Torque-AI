@@ -2248,7 +2248,105 @@ def reset_camera():
     print('*'*10)
     return "nothing"
 
+########################################
+class VideoPeopleDetection():
+    time_reference = datetime.datetime.now()
+    counter_frame = 0
+    processed_fps = 0
+    def __init__(self,url):
+        # Load YOLOv5 model
+        #self.model = torch.hub.load('ultralytics/yolov5', 'yolov5s', pretrained=True)
+        self.modelName = "yolov5/crowdhuman_yolov5m.pt"
+        self.model = self.load_model(self.modelName)
+        self.classes = self.model.names
+        self.url=url
+        self.video_name = self.url
+        # self.video_name = 'For_Validation6.mp4'
 
+        # Read the video file
+        self.cap = cv2.VideoCapture(self.video_name)
+
+    def __del__(self):
+        self.cap.release()
+
+    def load_model(self, model_name):
+        if model_name:
+            self.model = torch.hub.load('yolov5', 'custom', path=self.modelName, source='local',_verbose=False, force_reload=True)
+            
+
+
+        return self.model
+    def class_to_label(self, x):
+        return self.classes[int(x)]
+    def get_frame(self):
+        ret, frame = self.cap.read()
+
+        # comparison =
+        if not ret:
+            self.cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
+            _, frame = self.cap.read()
+
+        # Convert frame to RGB and perform object detection with YOLOv5
+        #frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        #frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        results = self.model(frame, size=640)
+
+        # Loop through each detected object and count the people
+        num_people = 0
+        bgr = (0, 255, 0)
+
+        #To get the processed FPS
+        #VideoPeopleDetection.time_reference = datetime.datetime.now()
+
+        time_now = datetime.datetime.now()
+        time_diff = (time_now - VideoPeopleDetection.time_reference).seconds
+
+        if time_diff >= 1:
+            VideoPeopleDetection.time_reference = datetime.datetime.now()
+            VideoPeopleDetection.processed_fps = VideoPeopleDetection.counter_frame
+            VideoPeopleDetection.counter_frame = 0
+        else:
+            VideoPeopleDetection.counter_frame += 1
+
+        for obj in results.xyxy[0]:
+            if obj[-1] == 0:  # 0 is the class ID for 'person'
+
+                # Draw bounding boxes around people
+                xmin, ymin, xmax, ymax = map(int, obj[:4])
+                accuracy = obj[4]
+                if (accuracy > 0.5):
+                    num_people += 1
+                    cv2.rectangle(frame, (xmin, ymin), (xmax, ymax), (0, 0, 255), 2)
+                    cv2.putText(frame, f" {round(float(accuracy), 2)}", (xmin, ymin),
+                                cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 0, 255), 2)
+
+
+        # Draw the number of people on the frame and display it
+        cv2.putText(frame, f'FPS: {int(self.cap.get(cv2.CAP_PROP_FPS))}', (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+        cv2.putText(frame, f'People: {num_people}', (10, 80), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+        cv2.putText(frame, f'Processed FPS: {VideoPeopleDetection.processed_fps}', (10, 110), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+        ret, jpeg = cv2.imencode(".jpg", frame)
+
+        return jpeg.tobytes()
+def gen_crowd_counting(camera):
+    while True:
+        frame = camera.get_frame()
+        yield (b'--frame\r\n'
+               b'Content-Type: image/jpeg\r\n\r\n' + frame
+               + b'\r\n\r\n')
+
+@app.route("/video_feed_for_crowd_counting")
+def video_feed_for_crowd_counting():
+    url = request.args.get('url')
+    return Response(gen_crowd_counting(VideoPeopleDetection(url)),
+                    mimetype="multipart/x-mixed-replace; boundary=frame")
+
+
+@app.route('/crowd_counting.html' ,methods=["POST","GET"])
+def crowd_counting():
+    
+   
+    return render_template('home/crowd_counting.html', User_camera_sources=User_camera_sources_record.query.filter_by(username=current_user.username))
 
 if __name__ == "__main__":
    

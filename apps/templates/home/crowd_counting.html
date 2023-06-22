@@ -25,6 +25,16 @@
         border-radius: 10px;
     }
 
+    .form-control {
+        width: 100px;
+        /* margin: 8px; */
+        padding: 5px;
+        border:none !important;
+        background-color: rgba(102, 179, 255, 0.19);
+        margin:5px 0 5px 0;
+        border-radius: 10px;
+    }
+
     button {
         appearance: none;
         background-color: transparent;
@@ -52,6 +62,10 @@
         -webkit-user-select: none;
         touch-action: manipulation;
         will-change: transform;
+    }
+
+    .mb-4{
+        margin-bottom: 24px !important;
     }
 
     button:disabled {
@@ -163,6 +177,9 @@
     input::placeholder {
         opacity: 0.5;
     }
+    select::placeholder {
+        opacity: 0.5;
+    }
 </style>
 
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -199,20 +216,30 @@
             </div>
             <div class="pcoded-content"> -->
                 <!-- [ Main Content ] start -->
-        
+                <div>
+                <section>
+                <h1 style="text-align: center; margin-bottom: 30px; font-size: 35px; color: #1d4fa5; font-weight: 500;">Crowd Counting</h1>
+            
+                   
                 <div class="row">
                     <!-- [ Typography ] start -->
+
+                    <!-- <center><h2>Crowd Counting</h2></center> -->
                     <div class="col-sm-12 col-lg-5">
-                        <center><h2>Crowd Counting</h2></center>
-                        <div class="card card11" style="margin-left: 15px; padding-left: 10px; ">
+                        <!-- <center><h2>Crowd Counting</h2></center> -->
+                        <div class="card card11" style="margin-left: 20px; padding-left: 10px; ">
                             <div class="">
         
                             </div>
                             <div class="card-body" >
-                                <form id="urlForm">
-                                    <label>RTMP URL:</label>
-                                    <input id="rtmpUrl" style="width: 40%" type="text" name="rtmpUrl" value="" />
+                                <form id="urlForm" style="margin-top: 5%;">
+                                    <label>Select Camera Source:</label><br/>
+
+                                    <input id="rtmpUrl" style="width: 70%" type="text" name="rtmpUrl" placeholder="Enter Camera Source" value="" />
+
                                     <p style="margin-left: 25%;"> OR </p>
+                                    <label style="margin-bottom: 0.5rem;">Camera Source:</label><br/>
+
                                     <select style="width: 70%; margin-right: 20px;" name="row.source" data-live-search="true" id="car_brand" class="form-control" title="Select Car Brand"> 
                                         {% for row in User_camera_sources %}
                                             <option value="{{row.serial_no}}">{{row.source}}</option>
@@ -230,13 +257,13 @@
                         </div>
                     </div>
                     <!-- <div class="col-lg-6"></div> -->
-                    <div class="col-sm-12 col-lg-6" style="margin:15px 0px 0px 15px">
-                        <center><h2>VIDEO STREAMING</h2></center>
-                        <div class="card card11">
+                    <div class="col-sm-12 col-lg-4" style="">   <!-- margin:15px 0px 0px 15px -->
+                        <!-- <center><h2>VIDEO STREAMING</h2></center> -->
+                        <div class="">
                             <div class="">
                                 <!-- <h5>Video Streaming </h5> -->
                             </div>
-                            <div class="demo-container">
+                            <div class="demo-container" style="width:100%">
                                 <img id='videoImage' src="" style="display:visible;" />
                             </div>
                            
@@ -250,6 +277,9 @@
             </div>
         </div> 
         <!-- [ Main Content ] end -->
+
+    </section>
+</div>
         
 
 <script>

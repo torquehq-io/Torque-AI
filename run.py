@@ -2328,12 +2328,15 @@ class VideoPeopleDetection():
         ret, jpeg = cv2.imencode(".jpg", frame)
 
         return jpeg.tobytes()
+    
 def gen_crowd_counting(camera):
     while True:
         frame = camera.get_frame()
         yield (b'--frame\r\n'
                b'Content-Type: image/jpeg\r\n\r\n' + frame
                + b'\r\n\r\n')
+        
+
 
 @app.route("/video_feed_for_crowd_counting")
 def video_feed_for_crowd_counting():

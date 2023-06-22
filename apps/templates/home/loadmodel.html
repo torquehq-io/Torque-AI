@@ -45,6 +45,26 @@
         border-radius: 10px;
     }
 
+    .form-control {
+        width: 100px;
+        /* margin: 8px; */
+        padding: 5px;
+        border:none !important;
+        background-color: rgba(102, 179, 255, 0.19);
+        margin:5px 0 5px 0;
+        border-radius: 10px;
+    }
+
+    .dropdown-toggle {
+        width: 100px;
+        /* margin: 8px; */
+        padding: 5px;
+        border:none !important;
+        background-color: rgba(102, 179, 255, 0.19) !important;
+        margin:5px 0 5px 0;
+        border-radius: 10px;
+    }
+
     button {
         appearance: none;
         background-color: transparent;
@@ -206,25 +226,30 @@
             .bootstrap-select:not(.input-group-btn), .bootstrap-select[class*="col-"]{
                 display: flex;
             }
+            .mb-4{
+                margin-bottom: 24px;
+            }
         </style>
 
 
 		<section>
-            <h1 style="text-align: center; margin-bottom: 30px; font-size: 35px; color: #1d4fa5;">Custom Load AI-Model</h1>
+            <h1 style="text-align: center; margin-bottom: 30px; font-size: 35px; color: #1d4fa5; font-weight: 600;">Custom Load AI-Model</h1>
 			<div class="row mt-4">
 				<div class="col-lg-7 mb-lg-0 mb-4">
-					<div class="card">
+					<div class="">
 					</div>
 				</div>
 				<div class="row">
 					<div class="col-lg-5">
 						 <div class="card card11" style="margin-left: 25px; padding-left: 10px; ">
                             <div class="card-body" >
-							<form id="urlForm"   style="margin-top: 10%;">
+							<form id="urlForm"   style="margin-top: 5%;">
                                 <div style="padding-right: 10%;"> 
-								<label style="margin-left: 0 !important;">RTMP URL:</label>
-                                <input id="rtmpUrl" style="width: 70%" type="text" name="rtmpUrl" value="" />
+                                    <label>Select Camera Source:</label><br/>
+
+                                <input id="rtmpUrl" style="width: 70%" type="text" name="rtmpUrl" placeholder="Enter Camera Source" value="" />
                                 <p style="margin-left: 25%;"> OR </p>
+                                <label>Camera Source:</label><br/>
                                 <select style="width: 70%; margin-right: 20px;" name="row.source" data-live-search="true" id="car_brand" class="form-control" title="Select Car Brand"> 
                                     {% for row in User_camera_sources %}
                                         <option value="{{row.serial_no}}">{{row.source}}</option>
@@ -234,8 +259,10 @@
                                 
 
 								</div>
-                                <br>
-                                <select name="skills" id="skills" class="selectpicker">
+                                  
+                                    <br>
+                                    <label>Select Model:</label><br/>
+                                <select name="skills" id="skills" class="selectpicker" style="margin-left:0 !important">
                                     <option value="yolo5s" selected>yolo5s</option>
                                     {%for model in User_Models_record%}
                                         <option value="{{ model.model_name }}">{{ model.model_name }}</option>
@@ -244,11 +271,11 @@
         
         
                                 </select>
-                                <br>
-                                <br>
+                                <!-- <br>
+                                <br> -->
 
 							
-								<button style="margin-left: 15px; margin-bottom:15px;" class="btn btn-outline-primary hehe" id="btnPlay">Play</button>
+								<button style=" margin-bottom:15px;" class="btn btn-outline-primary hehe" id="btnPlay">Play</button>
 								<button style="margin-left: 5px; margin-bottom:15px;" class="btn btn-outline-primary hehe1"  id="btnStop">Stop</button>
 								
                             </form>
@@ -259,7 +286,7 @@
                         
 
 
-                        <br /><br />
+                        <!-- <br /><br /> -->
                        
                           
                          
@@ -270,7 +297,7 @@
 
                     <div class="col-sm-12 col-lg-4" style="margin:15px 0px 0px 15px">
                         <!-- <center><h2>VIDEO STREAMING</h2></center> -->
-                        <div class="card card11">
+                        <div class="">
                             <div class="">
                                 <!-- <h5>Video Streaming </h5> -->
                             </div>

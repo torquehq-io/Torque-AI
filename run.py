@@ -2261,6 +2261,10 @@ class VideoPeopleDetection():
         self.classes = self.model.names
         self.url=url
         self.video_name = self.url
+        self.people_count_history = []
+        self.last_capture_time = datetime.datetime.now()
+        self.csv_file = "people_count_history.csv"  # CSV file to store the history
+        self.last_capture_time = datetime.datetime.now()  # Initialize the last capture time
         # self.video_name = 'For_Validation6.mp4'
 
         # Read the video file
@@ -2272,12 +2276,23 @@ class VideoPeopleDetection():
     def load_model(self, model_name):
         if model_name:
             self.model = torch.hub.load('yolov5', 'custom', path=self.modelName, source='local',_verbose=False, force_reload=True)
-            
-
-
-        return self.model
+            return self.model
     def class_to_label(self, x):
         return self.classes[int(x)]
+    
+    def initialize_csv_file(self):
+        # Create or overwrite the CSV file with header
+        with open(self.csv_file, mode='w', newline='') as file:
+            writer = csv.writer(file)
+            writer.writerow(['Timestamp', 'Count', 'Image Path'])
+
+    def save_data_to_csv(self, timestamp, count, image_path):
+        # Append the data (timestamp, count, image path) to the CSV file
+        with open(self.csv_file, mode='a', newline='') as file:
+            writer = csv.writer(file)
+            writer.writerow([timestamp, count, image_path])
+
+    
     def get_frame(self):
         ret, frame = self.cap.read()
 
@@ -2316,6 +2331,14 @@ class VideoPeopleDetection():
                 accuracy = obj[4]
                 if (accuracy > 0.5):
                     num_people += 1
+                    # Append people count to history
+                       # Append people count and timestamp to history
+                    timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                    self.people_count_history.append({
+                        'timestamp': timestamp,
+                        'count': num_people
+    })
+                    
                     cv2.rectangle(frame, (xmin, ymin), (xmax, ymax), (0, 0, 255), 2)
                     cv2.putText(frame, f" {round(float(accuracy), 2)}", (xmin, ymin),
                                 cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 0, 255), 2)
@@ -2325,32 +2348,54 @@ class VideoPeopleDetection():
         cv2.putText(frame, f'FPS: {int(self.cap.get(cv2.CAP_PROP_FPS))}', (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
         cv2.putText(frame, f'People: {num_people}', (10, 80), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
         cv2.putText(frame, f'Processed FPS: {VideoPeopleDetection.processed_fps}', (10, 110), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+        current_time = datetime.datetime.now()
+        time_diff = (current_time -   self.last_capture_time ).total_seconds()
+        timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        if time_diff >= 30:  # Capture an image every 5 minutes (300 seconds)
+            image_name = current_time.strftime("%Y%m%d%H%M%S") + ".jpg"
+            image_path = os.path.join("crowd_counting/backup", image_name)  # Replace "folder_path" with the desired folder path
+            cv2.imwrite(image_path, frame)
+            # Save data (timestamp, count, image path) to CSV
+            self.save_data_to_csv(timestamp, num_people, image_path)
+
+
+            self.last_capture_time = current_time
         ret, jpeg = cv2.imencode(".jpg", frame)
 
         return jpeg.tobytes()
-    
 def gen_crowd_counting(camera):
     while True:
         frame = camera.get_frame()
         yield (b'--frame\r\n'
                b'Content-Type: image/jpeg\r\n\r\n' + frame
                + b'\r\n\r\n')
-        
 
-
+    
 @app.route("/video_feed_for_crowd_counting")
 def video_feed_for_crowd_counting():
     url = request.args.get('url')
-    return Response(gen_crowd_counting(VideoPeopleDetection(url)),
+    video_detector = VideoPeopleDetection(url)
+    return Response(gen_crowd_counting(video_detector),
                     mimetype="multipart/x-mixed-replace; boundary=frame")
-
 
 @app.route('/crowd_counting.html' ,methods=["POST","GET"])
 def crowd_counting():
-    
-   
+  
     return render_template('home/crowd_counting.html', User_camera_sources=User_camera_sources_record.query.filter_by(username=current_user.username))
+import pandas as pd
+@app.route('/peaple_count_data')
+def get_data():
+    # Read the CSV file into a pandas DataFrame
+    df = pd.read_csv('people_count_history.csv')
 
+    # Prepare the data for plotting
+    data = {
+        'timestamp': df['Timestamp'].tolist(),
+        'count': df['Count'].tolist()
+    }
+
+    # Return the data as JSON
+    return jsonify(data)
 if __name__ == "__main__":
    
     app.run(host="0.0.0.0")

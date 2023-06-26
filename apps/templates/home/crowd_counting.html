@@ -24,7 +24,6 @@
         margin:5px 0 5px 0;
         border-radius: 10px;
     }
-
     .form-control {
         width: 100px;
         /* margin: 8px; */
@@ -34,7 +33,6 @@
         margin:5px 0 5px 0;
         border-radius: 10px;
     }
-
     button {
         appearance: none;
         background-color: transparent;
@@ -63,11 +61,9 @@
         touch-action: manipulation;
         will-change: transform;
     }
-
     .mb-4{
         margin-bottom: 24px !important;
     }
-
     button:disabled {
         pointer-events: none;
         background-color: rgb(112, 108, 108);
@@ -164,7 +160,7 @@
     .hehe1:hover {
         color: #fff;
         border-color: #66b3ff;
-        background: -webkit-linear-gradient(180deg,#66b3ff 0%,#3371d9 );				
+        background: -webkit-linear-gradient(180deg,#66b3ff 0%,#3371d9 );                
     }
 
     .hehe:hover {
@@ -185,13 +181,16 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <title>Person Counter</title>
 
 
 
 <script src="static/assets/js/annotation/less.js"></script>
 
-		<script src="static/assets/js/annotation/jquery-3.5.1.min.js"></script>
+        <script src="static/assets/js/annotation/jquery-3.5.1.min.js"></script>
 
 
 
@@ -216,30 +215,20 @@
             </div>
             <div class="pcoded-content"> -->
                 <!-- [ Main Content ] start -->
-                <div>
-                <section>
-                <h1 style="text-align: center; margin-bottom: 30px; font-size: 35px; color: #1d4fa5; font-weight: 500;">Crowd Counting</h1>
-            
-                   
+        
                 <div class="row">
                     <!-- [ Typography ] start -->
-
-                    <!-- <center><h2>Crowd Counting</h2></center> -->
                     <div class="col-sm-12 col-lg-5">
-                        <!-- <center><h2>Crowd Counting</h2></center> -->
-                        <div class="card card11" style="margin-left: 20px; padding-left: 10px; ">
+                        <center><h2>Crowd Counting</h2></center>
+                        <div class="card card11" style="margin-left: 15px; padding-left: 10px; ">
                             <div class="">
         
                             </div>
                             <div class="card-body" >
-                                <form id="urlForm" style="margin-top: 5%;">
-                                    <label>Select Camera Source:</label><br/>
-
-                                    <input id="rtmpUrl" style="width: 70%" type="text" name="rtmpUrl" placeholder="Enter Camera Source" value="" />
-
+                                <form id="urlForm">
+                                    <label>RTMP URL:</label>
+                                    <input id="rtmpUrl" style="width: 40%" type="text" name="rtmpUrl" value="" />
                                     <p style="margin-left: 25%;"> OR </p>
-                                    <label style="margin-bottom: 0.5rem;">Camera Source:</label><br/>
-
                                     <select style="width: 70%; margin-right: 20px;" name="row.source" data-live-search="true" id="car_brand" class="form-control" title="Select Car Brand"> 
                                         {% for row in User_camera_sources %}
                                             <option value="{{row.serial_no}}">{{row.source}}</option>
@@ -257,7 +246,7 @@
                         </div>
                     </div>
                     <!-- <div class="col-lg-6"></div> -->
-                    <div class="col-sm-12 col-lg-4" style="">   <!-- margin:15px 0px 0px 15px -->
+                    <div class="col-sm-12 col-lg-4">
                         <!-- <center><h2>VIDEO STREAMING</h2></center> -->
                         <div class="">
                             <div class="">
@@ -269,21 +258,19 @@
                            
                         </div>
                     </div>
-        
-                    <!-- [ Typography ] end -->
+                    
+                    
                 </div>
                 <!-- [ Main Content ] end -->
-        
+                
             </div>
         </div> 
-        <!-- [ Main Content ] end -->
-
-    </section>
-</div>
+        <div style="width:50%; height: 1000%;">
+            <canvas id="graph"></canvas>
+        </div>
         
-
-<script>
-
+        <script>
+            
    
 
     $("#btnPlay").on("click", function (event) {
@@ -317,8 +304,62 @@
         $("#videoImage").attr("src", "/");
 
     });
-    
-    
+    function updateGraph() {
+            $.ajax({
+                url: '/peaple_count_data',
+                success: function(data) {
+                    var labels = data.timestamp;
+                    var countData = data.count;
+
+                    var ctx = document.getElementById('graph').getContext('2d');
+                    var chart = new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: labels,
+                            datasets: [{
+                                label: 'People Count',
+                                data: countData,
+                                backgroundColor: 'rgba(0, 123, 255, 0.2)',
+                                borderColor: 'rgba(0, 123, 255, 1)',
+                                borderWidth: 1,
+                                fill: 'start'
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            title: {
+                                display: true,
+                                text: 'People Count Over Time'
+                            },
+                            scales: {
+                                x: {
+                                    title: {
+                                        display: true,
+                                        text: 'Timestamp'
+                                    },
+                                    ticks: {
+                                        autoSkip: true,
+                                        maxTicksLimit: 10
+                                    }
+                                },
+                                y: {
+                                    title: {
+                                        display: true,
+                                        text: 'People Count'
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }
+            });
+        }
+
+        // Update the graph initially
+        updateGraph();
+
+        // Set an interval to update the graph every 5 seconds
+        setInterval(updateGraph, 5000);
 
 </script>
 <script async src="static/assets/js/annotation/opencv3.4.16.js" type="text/javascript"></script>

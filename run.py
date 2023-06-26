@@ -2367,7 +2367,7 @@ class VideoPeopleDetection():
         current_time = datetime.datetime.now()
         time_diff = (current_time -   self.last_capture_time ).total_seconds()
         timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        if time_diff >= 30:  # Capture an image every 5 minutes (300 seconds)
+        if time_diff >= 10:  # Capture an image every 5 minutes (300 seconds)
             image_name = current_time.strftime("%Y%m%d%H%M%S") + ".jpg"
             image_path = os.path.join("crowd_counting/backup", image_name)  # Replace "folder_path" with the desired folder path
             cv2.imwrite(image_path, frame)

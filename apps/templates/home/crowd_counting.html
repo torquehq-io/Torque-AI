@@ -261,6 +261,9 @@
                     
                     
                 </div>
+                <div class="row" style="height:50%; width: 50%; margin-left: 20%;">
+                    <canvas id="liveChart"></canvas>
+                </div>
                 <!-- [ Main Content ] end -->
                 
             </div>
@@ -268,7 +271,7 @@
         <!-- <div style="width:50%; height: 1000%;">
             <canvas id="graph"></canvas>
         </div> -->
-        <canvas id="liveChart"></canvas>
+       
         
         <script>
             
@@ -427,7 +430,7 @@
     }
 
     // Update the chart every 5 seconds
-    setInterval(updateChart, 5000);
+    setInterval(updateChart, 10000);
 </script>
 
 <script async src="static/assets/js/annotation/opencv3.4.16.js" type="text/javascript"></script>

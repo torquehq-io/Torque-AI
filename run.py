@@ -2249,6 +2249,8 @@ def reset_camera():
     return "nothing"
 
 ########################################
+import matplotlib.pyplot as plt
+import pandas as pd
 class VideoPeopleDetection():
     time_reference = datetime.datetime.now()
     counter_frame = 0
@@ -2287,10 +2289,24 @@ class VideoPeopleDetection():
             writer.writerow(['Timestamp', 'Count', 'Image Path'])
 
     def save_data_to_csv(self, timestamp, count, image_path):
-        # Append the data (timestamp, count, image path) to the CSV file
-        with open(self.csv_file, mode='a', newline='') as file:
-            writer = csv.writer(file)
-            writer.writerow([timestamp, count, image_path])
+        data = {
+            'timestamp': timestamp,
+            'count': count,
+            'image_path': image_path
+        }
+
+        # Check if the file exists
+        file_exists = os.path.isfile(self.csv_file)
+
+        with open(self.csv_file, 'a', newline='') as csv_file:
+            fieldnames = ['timestamp', 'count', 'image_path']
+            writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
+
+            # Write the header row if the file is newly created
+            if not file_exists:
+                writer.writeheader()
+
+            writer.writerow(data)
 
     
     def get_frame(self):
@@ -2370,6 +2386,8 @@ def gen_crowd_counting(camera):
                b'Content-Type: image/jpeg\r\n\r\n' + frame
                + b'\r\n\r\n')
 
+
+
     
 @app.route("/video_feed_for_crowd_counting")
 def video_feed_for_crowd_counting():
@@ -2383,19 +2401,61 @@ def crowd_counting():
   
     return render_template('home/crowd_counting.html', User_camera_sources=User_camera_sources_record.query.filter_by(username=current_user.username))
 import pandas as pd
-@app.route('/peaple_count_data')
+
+
+
+# @app.route('/peaple_count_data')
+# def get_data():
+#     # Read the CSV file into a pandas DataFrame
+#     df = pd.read_csv('people_count_history.csv')
+
+#     # Update the following lines with the correct column names
+#     timestamp_column = 'timestamp'
+#     count_column = 'count'
+
+#     # Prepare the data for plotting
+#     data = {
+#         'timestamp': df[timestamp_column].tolist(),
+#         'count': df[count_column].tolist()
+#     }
+#     print(data)
+#     # Return the data as JSON
+#     return data
+
+from flask import Response
+import time
+
+@app.route('/people_count_data')
 def get_data():
     # Read the CSV file into a pandas DataFrame
     df = pd.read_csv('people_count_history.csv')
 
+    # Update the following lines with the correct column names
+    timestamp_column = 'timestamp'
+    count_column = 'count'
+
     # Prepare the data for plotting
     data = {
-        'timestamp': df['Timestamp'].tolist(),
-        'count': df['Count'].tolist()
+        'timestamp': df[timestamp_column].tolist(),
+        'count': df[count_column].tolist()
     }
 
-    # Return the data as JSON
-    return jsonify(data)
+    # Convert the data to JSON
+    json_data = json.dumps(data)
+
+    # Set the cache-control header to disable caching
+    headers = {
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0',
+        'Content-Type': 'application/json'
+    }
+
+    # Return the data as a JSON response with the cache-control headers
+    return Response(json_data, headers=headers)
+
+
+
 if __name__ == "__main__":
    
     app.run(host="0.0.0.0")

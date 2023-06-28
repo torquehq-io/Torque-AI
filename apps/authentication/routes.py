@@ -68,6 +68,7 @@ def register():
         
         os.mkdir(user_folder)
         os.makedirs(user_folder+"/Models")
+        os.makedirs(user_folder+"/crowd_counting_history/images")
         if user:
             return render_template('accounts/register.html',
                                    msg='Username already registered',

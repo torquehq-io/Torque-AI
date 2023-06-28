@@ -2268,7 +2268,7 @@ class VideoPeopleDetection():
         self.current_loggin_user=current_user.username
 
         self.last_capture_time = datetime.datetime.now()
-        self.csv_file = os.getcwd()+"/Users_slab/"+self.current_loggin_user+"/people_count_history.csv"  # CSV file to store the history
+        self.csv_file = os.getcwd()+"/Users_slab/"+self.current_loggin_user+"/crowd_counting_history/people_count_history.csv"  # CSV file to store the history
         self.initialize_csv_file()
         self.last_capture_time = datetime.datetime.now()  # Initialize the last capture time
         # self.video_name = 'For_Validation6.mp4'
@@ -2373,7 +2373,7 @@ class VideoPeopleDetection():
         timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         if time_diff >= 10                                                                    :  # Capture an image every 5 minutes (300 seconds)
             image_name = current_time.strftime("%Y%m%d%H%M%S") + ".jpg"
-            image_path = os.path.join("crowd_counting/backup", image_name)  # Replace "folder_path" with the desired folder path
+            image_path = os.path.join(os.getcwd()+"/Users_slab/"+self.current_loggin_user+"/crowd_counting_history/images/" , image_name)  # Replace "folder_path" with the desired folder path
             cv2.imwrite(image_path, frame)
             # Save data (timestamp, count, image path) to CSV
             self.save_data_to_csv(timestamp, num_people, image_path)
@@ -2408,23 +2408,6 @@ import pandas as pd
 
 
 
-# @app.route('/peaple_count_data')
-# def get_data():
-#     # Read the CSV file into a pandas DataFrame
-#     df = pd.read_csv('people_count_history.csv')
-
-#     # Update the following lines with the correct column names
-#     timestamp_column = 'timestamp'
-#     count_column = 'count'
-
-#     # Prepare the data for plotting
-#     data = {
-#         'timestamp': df[timestamp_column].tolist(),
-#         'count': df[count_column].tolist()
-#     }
-#     print(data)
-#     # Return the data as JSON
-#     return data
 
 from flask import Response
 import time
@@ -2433,7 +2416,7 @@ import time
 def get_data():
     current_loggin_user=current_user.username
     # Read the CSV file into a pandas DataFrame
-    df = pd.read_csv(os.getcwd()+"/Users_slab/"+current_loggin_user+"/people_count_history.csv")
+    df = pd.read_csv(os.getcwd()+"/Users_slab/"+current_loggin_user+"/crowd_counting_history/people_count_history.csv")
 
     # Update the following lines with the correct column names
     timestamp_column = 'Timestamp'

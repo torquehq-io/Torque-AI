@@ -2255,6 +2255,7 @@ class VideoPeopleDetection():
     time_reference = datetime.datetime.now()
     counter_frame = 0
     processed_fps = 0
+   
     def __init__(self,url):
         # Load YOLOv5 model
         #self.model = torch.hub.load('ultralytics/yolov5', 'yolov5s', pretrained=True)
@@ -2264,8 +2265,11 @@ class VideoPeopleDetection():
         self.url=url
         self.video_name = self.url
         self.people_count_history = []
+        self.current_loggin_user=current_user.username
+
         self.last_capture_time = datetime.datetime.now()
-        self.csv_file = "people_count_history.csv"  # CSV file to store the history
+        self.csv_file = os.getcwd()+"/Users_slab/"+self.current_loggin_user+"/people_count_history.csv"  # CSV file to store the history
+        self.initialize_csv_file()
         self.last_capture_time = datetime.datetime.now()  # Initialize the last capture time
         # self.video_name = 'For_Validation6.mp4'
 
@@ -2367,7 +2371,7 @@ class VideoPeopleDetection():
         current_time = datetime.datetime.now()
         time_diff = (current_time -   self.last_capture_time ).total_seconds()
         timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        if time_diff >= 10:  # Capture an image every 5 minutes (300 seconds)
+        if time_diff >= 10                                                                    :  # Capture an image every 5 minutes (300 seconds)
             image_name = current_time.strftime("%Y%m%d%H%M%S") + ".jpg"
             image_path = os.path.join("crowd_counting/backup", image_name)  # Replace "folder_path" with the desired folder path
             cv2.imwrite(image_path, frame)
@@ -2427,12 +2431,13 @@ import time
 
 @app.route('/people_count_data')
 def get_data():
+    current_loggin_user=current_user.username
     # Read the CSV file into a pandas DataFrame
-    df = pd.read_csv('people_count_history.csv')
+    df = pd.read_csv(os.getcwd()+"/Users_slab/"+current_loggin_user+"/people_count_history.csv")
 
     # Update the following lines with the correct column names
-    timestamp_column = 'timestamp'
-    count_column = 'count'
+    timestamp_column = 'Timestamp'
+    count_column = 'Count'
 
     # Prepare the data for plotting
     data = {

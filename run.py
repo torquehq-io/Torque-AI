@@ -44,7 +44,7 @@ if DEBUG:
 ################################################################################
 ############# Auto Annotation tool ##################
 
-from flask import Flask, render_template, request, json, session, Response, url_for, send_file, redirect,stream_with_context,escape
+from flask import Flask, render_template, request, json, session, Response, url_for, send_file, redirect,stream_with_context,escape,flash
 import os, base64, random
 from datetime import timedelta, datetime
 from os.path import join, dirname, realpath
@@ -2443,6 +2443,322 @@ def get_data():
     return Response(json_data, headers=headers)
 
 
+
+#################################### People counting booth demo ####################################################################
+import pygame
+class VideoPeopleDetection1():
+    time_reference = datetime.datetime.now()
+    counter_frame = 0
+    processed_fps = 0
+   
+    def __init__(self,url):
+        # Load YOLOv5 model
+        #self.model = torch.hub.load('ultralytics/yolov5', 'yolov5s', pretrained=True)
+        self.modelName = "yolov5/prebuilt_model/crowdhuman_yolov5m.pt"
+        self.model = self.load_model(self.modelName)
+        self.classes = self.model.names
+        self.url=url
+        self.video_name = self.url
+        self.people_count_history = []
+        self.current_loggin_user=current_user.username
+        self.roi_model=torch.hub.load('yolov5', 'custom', path="/home/torqueai/github/main/Torque-AI/yolov5/yolov5s.pt", source='local',_verbose=False, force_reload=True)
+        self.last_capture_time = datetime.datetime.now()
+        self.csv_file = os.getcwd()+"/Users_slab/"+self.current_loggin_user+"/crowd_counting_history/people_count_history.csv"  # CSV file to store the history
+        self.initialize_csv_file()
+        self.last_capture_time = datetime.datetime.now()  # Initialize the last capture time
+        # self.video_name = 'For_Validation6.mp4'
+
+        # Read the video file
+        self.cap = cv2.VideoCapture(self.video_name)
+
+    def __del__(self):
+        self.cap.release()
+
+    def load_model(self, model_name):
+        if model_name:
+            self.model = torch.hub.load('yolov5', 'custom', path=self.modelName, source='local',_verbose=False, force_reload=True)
+            return self.model
+    def class_to_label(self, x):
+        return self.classes[int(x)]
+    
+    def initialize_csv_file(self):
+        # Create or overwrite the CSV file with header
+        with open(self.csv_file, mode='w', newline='') as file:
+            writer = csv.writer(file)
+            writer.writerow(['Timestamp', 'Count', 'Image Path'])
+
+    def save_data_to_csv(self, timestamp, count, image_path):
+        data = {
+            'timestamp': timestamp,
+            'count': count,
+            'image_path': image_path
+        }
+
+        # Check if the file exists
+        file_exists = os.path.isfile(self.csv_file)
+
+        with open(self.csv_file, 'a', newline='') as csv_file:
+            fieldnames = ['timestamp', 'count', 'image_path']
+            writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
+
+            # Write the header row if the file is newly created
+            if not file_exists:
+                writer.writeheader()
+
+            writer.writerow(data)
+    def detect_chairs(self, frame):
+        # Perform object detection with YOLOv5
+        results = self.roi_model(frame, size=640)
+
+        # Initialize an empty list to store chair coordinates
+        chair_coordinates = []
+
+        for obj in results.xyxy[0]:
+            if obj[-1] == 56:  # 62 is the class ID for 'chair'
+                # Extract chair coordinates
+                xmin, ymin, xmax, ymax = map(int, obj[:4])
+                chair_coordinates.append((xmin, ymin, xmax, ymax))
+
+                # Draw bounding boxes around chairs
+                cv2.rectangle(frame, (xmin, ymin), (xmax, ymax), (255, 0, 0), 2)
+
+        return frame, chair_coordinates
+
+    
+    def get_frame(self):
+        ret, frame = self.cap.read()
+
+        if not ret:
+            self.cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
+            _, frame = self.cap.read()
+
+        # Detect chairs and get chair coordinates
+        frame, chair_coordinates = self.detect_chairs(frame)
+
+        # Generate ROI rectangle zone based on chair coordinates
+        roi_x = None
+        roi_y = None
+        roi_width = None
+        roi_height = None
+
+        if chair_coordinates:
+            # Calculate the average coordinates of chairs
+            avg_x = sum([x[0] for x in chair_coordinates]) / len(chair_coordinates)
+            avg_y = sum([x[1] for x in chair_coordinates]) / len(chair_coordinates)
+            avg_width = sum([x[2] - x[0] for x in chair_coordinates]) / len(chair_coordinates)
+            avg_height = sum([x[3] - x[1] for x in chair_coordinates]) / len(chair_coordinates)
+
+            # Add a certain distance (1 meter) to the coordinates
+            roi_x = int(avg_x - avg_width / 2 - 100)
+            roi_y = int(avg_y - avg_height / 2 - 100)
+            roi_width = int(avg_width + 200)
+            roi_height = int(avg_height + 200)
+
+            # Draw the ROI rectangle
+            cv2.rectangle(frame, (roi_x, roi_y), (roi_x + roi_width, roi_y + roi_height), (0, 255, 0), 2)
+
+        # Perform people counting within the ROI if it exists
+        if roi_x is not None and roi_y is not None and roi_width is not None and roi_height is not None:
+            num_people = self.count_people_in_roi(frame, roi_x, roi_y, roi_width, roi_height)
+        else:
+            num_people = 0
+
+        # Draw the number of people on the frame and display it
+        cv2.putText(frame, f'FPS: {int(self.cap.get(cv2.CAP_PROP_FPS))}', (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+        cv2.putText(frame, f'People: {num_people}', (10, 80), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+        cv2.putText(frame, f'Processed FPS: {VideoPeopleDetection1.processed_fps}', (10, 110), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+        current_time = datetime.datetime.now()
+        time_diff = (current_time -   self.last_capture_time ).total_seconds()
+        timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        if time_diff >= 10                                                                    :  # Capture an image every 5 minutes (300 seconds)
+            image_name = current_time.strftime("%Y%m%d%H%M%S") + ".jpg"
+            image_path = os.path.join(os.getcwd()+"/Users_slab/"+self.current_loggin_user+"/crowd_counting_history/images/" , image_name)  # Replace "folder_path" with the desired folder path
+            cv2.imwrite(image_path, frame)
+            # Save data (timestamp, count, image path) to CSV
+            self.save_data_to_csv(timestamp, num_people, image_path)
+
+
+            self.last_capture_time = current_time
+        ret, jpeg = cv2.imencode(".jpg", frame)
+
+        return jpeg.tobytes()
+    def count_people_in_roi(self, frame, roi_x, roi_y, roi_width, roi_height):
+    # Crop the frame to the ROI
+        roi_frame = frame[roi_y:roi_y+roi_height, roi_x:roi_x+roi_width]
+
+        # Convert the ROI frame to grayscale
+
+        # Apply a person detection algorithm to count the people in the ROI (e.g., OpenCV's HOG-based person detector)
+        results = self.model(frame, size=640)
+
+        # Loop through each detected object and count the people
+        num_people = 0
+        bgr = (0, 255, 0)
+
+        # To get the processed FPS
+        # VideoPeopleDetection.time_reference = datetime.datetime.now()
+
+        time_now = datetime.datetime.now()
+        time_diff = (time_now - VideoPeopleDetection.time_reference).seconds
+
+        if time_diff >= 1:
+            VideoPeopleDetection.time_reference = datetime.datetime.now()
+            VideoPeopleDetection.processed_fps = VideoPeopleDetection.counter_frame
+            VideoPeopleDetection.counter_frame = 0
+        else:
+            VideoPeopleDetection.counter_frame += 1
+
+        for obj in results.xyxy[0]:
+            if obj[-1] == 0:  # 0 is the class ID for 'person'
+                # Extract person coordinates
+                xmin, ymin, xmax, ymax = map(int, obj[:4])
+                accuracy = obj[4]
+
+                # Check if the person coordinates intersect with the ROI rectangle
+                if roi_x <= xmin <= roi_x + roi_width and roi_y <= ymin <= roi_y + roi_height and \
+                roi_x <= xmax <= roi_x + roi_width and roi_y <= ymax <= roi_y + roi_height:
+                    if accuracy > 0.5:
+                        num_people += 1
+                        # Append people count and timestamp to history
+                        timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                        self.people_count_history.append({
+                            'timestamp': timestamp,
+                            'count': num_people
+                        })
+
+                        cv2.rectangle(frame, (xmin, ymin), (xmax, ymax), (0, 0, 255), 2)
+                        cv2.putText(frame, f" {round(float(accuracy), 2)}", (xmin, ymin),
+                                    cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 0, 255), 2)
+
+        # Draw the number of people on the frame and display it
+
+        # Return the number of people detected in the ROI
+        return num_people
+
+    # def count_people_in_roi(self, frame, roi_x, roi_y, roi_width, roi_height):
+    #     # Crop the frame to the ROI
+    #     roi_frame = frame[roi_y:roi_y+roi_height, roi_x:roi_x+roi_width]
+
+    #     # Convert the ROI frame to grayscale
+
+    #     # Apply a person detection algorithm to count the people in the ROI (e.g., OpenCV's HOG-based person detector)
+    #     results = self.model(frame, size=640)
+
+    #     # Loop through each detected object and count the people
+    #     num_people = 0
+    #     bgr = (0, 255, 0)
+
+    #     # To get the processed FPS
+    #     # VideoPeopleDetection.time_reference = datetime.datetime.now()
+
+    #     time_now = datetime.datetime.now()
+    #     time_diff = (time_now - VideoPeopleDetection.time_reference).seconds
+
+    #     if time_diff >= 1:
+    #         VideoPeopleDetection.time_reference = datetime.datetime.now()
+    #         VideoPeopleDetection.processed_fps = VideoPeopleDetection.counter_frame
+    #         VideoPeopleDetection.counter_frame = 0
+    #     else:
+    #         VideoPeopleDetection.counter_frame += 1
+
+    #     for obj in results.xyxy[0]:
+    #         if obj[-1] == 0:  # 0 is the class ID for 'person'
+    #             # Extract person coordinates
+    #             xmin, ymin, xmax, ymax = map(int, obj[:4])
+    #             accuracy = obj[4]
+
+    #             # Check if the person coordinates intersect with the ROI rectangle
+    #             if roi_x <= xmin <= roi_x + roi_width and roi_y <= ymin <= roi_y + roi_height and \
+    #             roi_x <= xmax <= roi_x + roi_width and roi_y <= ymax <= roi_y + roi_height:
+    #                 if accuracy > 0.5:
+    #                     num_people += 1
+    #                     # Append people count and timestamp to history
+    #                     timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    #                     self.people_count_history.append({
+    #                         'timestamp': timestamp,
+    #                         'count': num_people
+    #                     })
+
+    #                     cv2.rectangle(frame, (xmin, ymin), (xmax, ymax), (0, 0, 255), 2)
+    #                     cv2.putText(frame, f" {round(float(accuracy), 2)}", (xmin, ymin),
+    #                                 cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 0, 255), 2)
+
+    #     # Draw the number of people on the frame and display it
+    #     cv2.putText(frame, f'People: {num_people}', (10, 80), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+
+    #     # Check if the number of people exceeds the limit
+    #     if num_people > 1:
+    #         flash("Alert: Too many people detected!",'Alert')
+    #         # Generate an alert by playing a sound
+    #         # pygame.mixer.init()
+    #         # alert_sound = pygame.mixer.Sound('alert_sound.wav')
+    #         # alert_sound.play()
+
+    #     # Return the number of people detected in the ROI
+    #     return num_people
+def gen_crowd_counting1(camera):
+    while True:
+        frame = camera.get_frame()
+        yield (b'--frame\r\n'
+               b'Content-Type: image/jpeg\r\n\r\n' + frame
+               + b'\r\n\r\n')
+
+
+
+    
+@app.route("/video_feed_for_crowd_counting1")
+def video_feed_for_crowd_counting1():
+    url = request.args.get('url')
+    video_detector = VideoPeopleDetection1(url)
+
+   
+    return Response(gen_crowd_counting1(video_detector),
+                    mimetype="multipart/x-mixed-replace; boundary=frame")
+
+@app.route('/crowd_counting1.html' ,methods=["POST","GET"])
+def crowd_counting1():
+  
+    return render_template('home/crowd_counting1.html', User_camera_sources=User_camera_sources_record.query.filter_by(username=current_user.username))
+import pandas as pd
+
+
+
+
+from flask import Response
+import time
+
+@app.route('/people_count_data1')
+def get_data1():
+    current_loggin_user=current_user.username
+    # Read the CSV file into a pandas DataFrame
+    df = pd.read_csv(os.getcwd()+"/Users_slab/"+current_loggin_user+"/crowd_counting_history/people_count_history.csv")
+
+    # Update the following lines with the correct column names
+    timestamp_column = 'Timestamp'
+    count_column = 'Count'
+
+    # Prepare the data for plotting
+    data = {
+        'timestamp': df[timestamp_column].tolist(),
+        'count': df[count_column].tolist()
+    }
+
+    # Convert the data to JSON
+    json_data = json.dumps(data)
+
+    # Set the cache-control header to disable caching
+    headers = {
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0',
+        'Content-Type': 'application/json'
+    }
+
+    # Return the data as a JSON response with the cache-control headers
+    return Response(json_data, headers=headers)
+
+
+####################################################################################################################################
 
 if __name__ == "__main__":
    

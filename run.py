@@ -69,15 +69,15 @@ import cv2
 import shutil
 import inspect
 
-# subprocess.Popen(['gnome-terminal', '-e', 'python3 ffmpegfeed/feed1.py'])
-# subprocess.Popen(['gnome-terminal', '-e', 'python3 ffmpegfeed/feed2.py'])
+# subprocess.Popen(['gnome-terminal', '-e', 'python3 apitest.py'])
+# subprocess.Popen(['gnome-terminal', '-e', 'python3 boothapi.py'])
 
 # def ffmpegfeedall():
-#     subprocess.Popen(['python3','feed1.py'])
-#     #subprocess.Popen(['gnome-terminal', '-e', 'python3 ffmpegfeed/feed1.py'])
-#     # subprocess.Popen(['gnome-terminal', '-e', 'python3 ffmpegfeed/feed2.py'])
-#     # subprocess.Popen(['gnome-terminal', '-e', 'python3 ffmpegfeed/feed3.py'])
-#     # subprocess.Popen(['gnome-terminal', '-e', 'python3 ffmpegfeed/feed4.py'])
+    # subprocess.Popen(['python3','feed1.py'])
+    #subprocess.Popen(['gnome-terminal', '-e', 'python3 ffmpegfeed/feed1.py'])
+    # subprocess.Popen(['gnome-terminal', '-e', 'python3 ffmpegfeed/feed2.py'])
+    # subprocess.Popen(['gnome-terminal', '-e', 'python3 apitest.py'])
+    # subprocess.Popen(['gnome-terminal', '-e', 'python3 boothapi.py'])
     
 # ffmpegfeedall()
 
@@ -2252,6 +2252,7 @@ def reset_camera():
 import matplotlib.pyplot as plt
 import pandas as pd
 class VideoPeopleDetection():
+    # subprocess.Popen(['gnome-terminal', '-e', 'python3 apitest.py'])
     time_reference = datetime.datetime.now()
     counter_frame = 0
     processed_fps = 0
@@ -2290,27 +2291,53 @@ class VideoPeopleDetection():
         # Create or overwrite the CSV file with header
         with open(self.csv_file, mode='w', newline='') as file:
             writer = csv.writer(file)
-            writer.writerow(['Timestamp', 'Count', 'Image Path'])
+            # writer.writerow(['Timestamp', 'Count', 'Image Path'])
+            writer.writerow(['cameradid', 'sendtime', 'imgurl', 'an_id', 'ImgCount'])
 
-    def save_data_to_csv(self, timestamp, count, image_path):
-        data = {
-            'timestamp': timestamp,
-            'count': count,
-            'image_path': image_path
-        }
+    # def save_data_to_csv(self, timestamp, count, image_path):
+    #     data = {
+    #         'timestamp': timestamp,
+    #         'count': count,
+    #         'image_path': image_path
+    #     }
 
-        # Check if the file exists
-        file_exists = os.path.isfile(self.csv_file)
+    #     # Check if the file exists
+    #     file_exists = os.path.isfile(self.csv_file)
 
-        with open(self.csv_file, 'a', newline='') as csv_file:
-            fieldnames = ['timestamp', 'count', 'image_path']
-            writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
+    #     with open(self.csv_file, 'a', newline='') as csv_file:
+    #         fieldnames = ['timestamp', 'count', 'image_path']
+    #         writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
 
-            # Write the header row if the file is newly created
-            if not file_exists:
-                writer.writeheader()
+    #         # Write the header row if the file is newly created
+    #         if not file_exists:
+    #             writer.writeheader()
 
-            writer.writerow(data)
+    #         writer.writerow(data)
+
+    def save_data_to_csv(self, cameraid, timestamp, image_path, analyticsid, count ):
+        
+        if count >= 1:
+            data = {
+                'cameraid': cameraid,
+                'timestamp': timestamp,
+                'count': count,
+                'image_path': image_path,
+                'analyticsid': analyticsid
+            }
+
+            file_exists = os.path.isfile(self.csv_file)
+
+            with open(self.csv_file, 'a', newline='') as csv_file:
+                # writer.writerow(['Timestamp', 'Count', 'Image Path'])
+                # writer.writerow(['Camera ID', 'Time', 'URL', 'Analytics ID', 'Count'])
+                # fieldnames = ['timestamp', 'count', 'image_path']
+                fieldnames = ['cameraid', 'timestamp', 'image_path', 'analyticsid', 'count']
+                writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
+
+                if not file_exists:
+                    writer.writeheader()
+
+                writer.writerow(data)
 
     
     def get_frame(self):
@@ -2327,6 +2354,7 @@ class VideoPeopleDetection():
         results = self.model(frame, size=640)
 
         # Loop through each detected object and count the people
+        analyticsid = 1
         num_people = 0
         bgr = (0, 255, 0)
 
@@ -2354,30 +2382,48 @@ class VideoPeopleDetection():
                     # Append people count to history
                        # Append people count and timestamp to history
                     timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                    # fieldnames = ['cameraid', 'timestamp', 'image_path', 'analyticsid', 'count']
                     self.people_count_history.append({
                         'timestamp': timestamp,
                         'count': num_people
     })
                     
-                    cv2.rectangle(frame, (xmin, ymin), (xmax, ymax), (0, 0, 255), 2)
-                    cv2.putText(frame, f" {round(float(accuracy), 2)}", (xmin, ymin),
-                                cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 0, 255), 2)
+                    cv2.rectangle(frame, (xmin, ymin), (xmax, ymax), (0, 255, 0), 2)
+                    # cv2.putText(frame, f" {round(float(accuracy), 2)}", (xmin, ymin),cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 0, 255), 2)
 
 
         # Draw the number of people on the frame and display it
-        cv2.putText(frame, f'FPS: {int(self.cap.get(cv2.CAP_PROP_FPS))}', (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+        # cv2.putText(frame, f'FPS: {int(self.cap.get(cv2.CAP_PROP_FPS))}', (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
         cv2.putText(frame, f'People: {num_people}', (10, 80), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
-        cv2.putText(frame, f'Processed FPS: {VideoPeopleDetection.processed_fps}', (10, 110), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+        # cv2.putText(frame, f'Processed FPS: {VideoPeopleDetection.processed_fps}', (10, 110), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
         current_time = datetime.datetime.now()
         time_diff = (current_time -   self.last_capture_time ).total_seconds()
         timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        if time_diff >= 10                                                                    :  # Capture an image every 5 minutes (300 seconds)
-            image_name = current_time.strftime("%Y%m%d%H%M%S") + ".jpg"
-            image_path = os.path.join(os.getcwd()+"/Users_slab/"+self.current_loggin_user+"/crowd_counting_history/images/" , image_name)  # Replace "folder_path" with the desired folder path
+        # if time_diff >= 1                                                                    :  # Capture an image every 5 minutes (300 seconds)
+            # image_name = current_time.strftime("%Y%m%d%H%M%S") + ".jpg"
+            # image_path = os.path.join(os.getcwd()+"/Users_slab/"+self.current_loggin_user+"/crowd_counting_history/images/" , image_name)  # Replace "folder_path" with the desired folder path
+            # cv2.imwrite(image_path, frame)
+            # # Save data (timestamp, count, image path) to CSV
+            # self.save_data_to_csv(timestamp, num_people, image_path)
+        if num_people >= 1:
+            # fieldnames = ['cameraid', 'timestamp', 'image_path', 'analyticsid', 'count']
+            current_time = datetime.datetime.now()
+            image_name = current_time.strftime("%Y-%m-%d_%H-%M-%S") + ".jpg"
+            # image_path = os.path.join(os.getcwd() + "/Users_slab/" + self.current_loggin_user + "/crowd_counting_history/images/", image_name)
+            # writer.writerow(['Camera ID', 'Time', 'URL', 'Analytics ID', 'Count'])
+            blobdrive_image_path = "/home/torqueai/blobdrive"
+            image_path = os.path.join(blobdrive_image_path, image_name)
             cv2.imwrite(image_path, frame)
-            # Save data (timestamp, count, image path) to CSV
-            self.save_data_to_csv(timestamp, num_people, image_path)
+            imgurl = "https://inferenceimage.blob.core.windows.net/inferenceimages/" + image_name
+            sendtime = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            cameraid = self.video_name
+            split_string = cameraid.split('/')
+            cameradid = split_string[-1]
+            an_id = 1
+            ImgCount = num_people
+            self.save_data_to_csv(cameradid, sendtime, imgurl, an_id, ImgCount)
 
+            self.last_capture_time = current_time
 
             self.last_capture_time = current_time
         ret, jpeg = cv2.imencode(".jpg", frame)
@@ -2410,23 +2456,60 @@ import pandas as pd
 
 
 from flask import Response
+import requests
 import time
-
+API_ENDPOINT='https://analytics.vmukti.com/api/analytics'
 @app.route('/people_count_data')
 def get_data():
-    current_loggin_user=current_user.username
-    # Read the CSV file into a pandas DataFrame
-    df = pd.read_csv(os.getcwd()+"/Users_slab/"+current_loggin_user+"/crowd_counting_history/people_count_history.csv")
+    current_loggin_user = current_user.username
+    csv_file = os.path.join(os.getcwd(), 'Users_slab', current_loggin_user, 'crowd_counting_history', 'people_count_history.csv')
+    
+    try:
+        with open(csv_file, 'r') as file:
+            reader = csv.DictReader(file)
+            for row in reader:
+                # Populate the data_api dictionary with values from each row
+                data_api = {
+                    "cameradid": row.get('cameradid', ''),
+                    "sendtime": row.get('sendtime', ''),
+                    "imgurl": row.get('imgurl', ''),
+                    "an_id": int(row.get('an_id', 0)),  # Convert to int if necessary
+                    "ImgCount": int(row.get('ImgCount', 0))  # Convert to int if necessary
+                }
 
-    # Update the following lines with the correct column names
-    timestamp_column = 'Timestamp'
-    count_column = 'Count'
+                try:
+                    # Send a POST request with the data_api dictionary
+                    headers = {
+                        'Content-Type': 'application/json'
+                    }
+                    response = requests.post(url=API_ENDPOINT, json=data_api, headers=headers)
 
-    # Prepare the data for plotting
+                    # Check if the request was successful
+                    if response.status_code == 200:
+                        pastebin_url = response.text
+                        print("The pastebin URL is: %s" % pastebin_url)
+                    else:
+                        print("Error:", response.text)
+
+                except requests.exceptions.RequestException as e:
+                    print("Error:", str(e))
+
+    except FileNotFoundError:
+        print(f"CSV file '{csv_file}' not found.")
+
+    # Prepare the data for plotting (using the same data structure as before)
     data = {
-        'timestamp': df[timestamp_column].tolist(),
-        'count': df[count_column].tolist()
+        'timestamp': [],
+        'count': []
     }
+    
+    # Read data from the CSV file again to populate 'data' for plotting
+    with open(csv_file, 'r') as file:
+        reader = csv.DictReader(file)
+        for row in reader:
+            # Append data from each row to the respective lists
+            data['timestamp'].append(row.get('sendtime', ''))
+            data['count'].append(int(row.get('ImgCount', 0)))
 
     # Convert the data to JSON
     json_data = json.dumps(data)
@@ -2441,6 +2524,7 @@ def get_data():
 
     # Return the data as a JSON response with the cache-control headers
     return Response(json_data, headers=headers)
+
 
 
 
@@ -2463,7 +2547,7 @@ class VideoPeopleDetection1():
         self.current_loggin_user=current_user.username
         self.roi_model=torch.hub.load('yolov5', 'custom', path="/home/torqueai/github/main/Torque-AI/yolov5/yolov5s.pt", source='local',_verbose=False, force_reload=True)
         self.last_capture_time = datetime.datetime.now()
-        self.csv_file = os.getcwd()+"/Users_slab/"+self.current_loggin_user+"/crowd_counting_history/people_count_history.csv"  # CSV file to store the history
+        self.csv_file = os.getcwd()+"/Users_slab/"+self.current_loggin_user+"/crowd_counting_history/booth.csv"  # CSV file to store the history
         self.initialize_csv_file()
         self.last_capture_time = datetime.datetime.now()  # Initialize the last capture time
         # self.video_name = 'For_Validation6.mp4'
@@ -2485,44 +2569,48 @@ class VideoPeopleDetection1():
         # Create or overwrite the CSV file with header
         with open(self.csv_file, mode='w', newline='') as file:
             writer = csv.writer(file)
-            writer.writerow(['Timestamp', 'Count', 'Image Path'])
+            writer.writerow(['cameradid', 'sendtime', 'imgurl', 'an_id', 'ImgCount'])
 
-    def save_data_to_csv(self, timestamp, count, image_path):
-        data = {
-            'timestamp': timestamp,
-            'count': count,
-            'image_path': image_path
-        }
+    def save_data_to_csv(self, cameraid, timestamp, image_path, analyticsid, count):
+        if count > 1:
+            data = {
+                'cameraid': cameraid,
+                'timestamp': timestamp,
+                'count': count,
+                'image_path': image_path,
+                'analyticsid': analyticsid
+            }
 
-        # Check if the file exists
-        file_exists = os.path.isfile(self.csv_file)
+            file_exists = os.path.isfile(self.csv_file)
 
-        with open(self.csv_file, 'a', newline='') as csv_file:
-            fieldnames = ['timestamp', 'count', 'image_path']
-            writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
+            with open(self.csv_file, 'a', newline='') as csv_file:
+                # writer.writerow(['Timestamp', 'Count', 'Image Path'])
+                # writer.writerow(['Camera ID', 'Time', 'URL', 'Analytics ID', 'Count'])
+                # fieldnames = ['timestamp', 'count', 'image_path']
+                fieldnames = ['cameraid', 'timestamp', 'image_path', 'analyticsid', 'count']
+                writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
 
-            # Write the header row if the file is newly created
-            if not file_exists:
-                writer.writeheader()
+                if not file_exists:
+                    writer.writeheader()
 
-            writer.writerow(data)
-    def detect_chairs(self, frame):
-        # Perform object detection with YOLOv5
-        results = self.roi_model(frame, size=640)
+                writer.writerow(data)
+    # def detect_chairs(self, frame):
+    #     # Perform object detection with YOLOv5
+    #     results = self.roi_model(frame, size=640)
 
-        # Initialize an empty list to store chair coordinates
-        chair_coordinates = []
+    #     # Initialize an empty list to store chair coordinates
+    #     chair_coordinates = []
 
-        for obj in results.xyxy[0]:
-            if obj[-1] == 56:  # 62 is the class ID for 'chair'
-                # Extract chair coordinates
-                xmin, ymin, xmax, ymax = map(int, obj[:4])
-                chair_coordinates.append((xmin, ymin, xmax, ymax))
+    #     for obj in results.xyxy[0]:
+    #         if obj[-1] == 56:  # 62 is the class ID for 'chair'
+    #             # Extract chair coordinates
+    #             xmin, ymin, xmax, ymax = map(int, obj[:4])
+    #             chair_coordinates.append((xmin, ymin, xmax, ymax))
 
-                # Draw bounding boxes around chairs
-                cv2.rectangle(frame, (xmin, ymin), (xmax, ymax), (255, 0, 0), 2)
+    #             # Draw bounding boxes around chairs
+    #             cv2.rectangle(frame, (xmin, ymin), (xmax, ymax), (255, 0, 0), 2)
 
-        return frame, chair_coordinates
+    #     return frame, chair_coordinates
 
     
     def get_frame(self):
@@ -2533,107 +2621,154 @@ class VideoPeopleDetection1():
             _, frame = self.cap.read()
 
         # Detect chairs and get chair coordinates
-        frame, chair_coordinates = self.detect_chairs(frame)
+        # frame, chair_coordinates = self.detect_chairs(frame)
 
         # Generate ROI rectangle zone based on chair coordinates
-        roi_x = None
-        roi_y = None
-        roi_width = None
-        roi_height = None
+        roi_x = 238
+        roi_y = 148
+        roi_width = 235
+        roi_height = 159
+############this for generating custome roi zone based on object position
+        # if chair_coordinates:
+        #     # Calculate the average coordinates of chairs
+        #     avg_x = sum([x[0] for x in chair_coordinates]) / len(chair_coordinates)
+        #     avg_y = sum([x[1] for x in chair_coordinates]) / len(chair_coordinates)
+        #     avg_width = sum([x[2] - x[0] for x in chair_coordinates]) / len(chair_coordinates)
+        #     avg_height = sum([x[3] - x[1] for x in chair_coordinates]) / len(chair_coordinates)
 
-        if chair_coordinates:
-            # Calculate the average coordinates of chairs
-            avg_x = sum([x[0] for x in chair_coordinates]) / len(chair_coordinates)
-            avg_y = sum([x[1] for x in chair_coordinates]) / len(chair_coordinates)
-            avg_width = sum([x[2] - x[0] for x in chair_coordinates]) / len(chair_coordinates)
-            avg_height = sum([x[3] - x[1] for x in chair_coordinates]) / len(chair_coordinates)
-
-            # Add a certain distance (1 meter) to the coordinates
-            roi_x = int(avg_x - avg_width / 2 - 100)
-            roi_y = int(avg_y - avg_height / 2 - 100)
-            roi_width = int(avg_width + 200)
-            roi_height = int(avg_height + 200)
+        #     # Add a certain distance (1 meter) to the coordinates
+        #     roi_x = int(avg_x - avg_width / 2 - 100)
+        #     roi_y = int(avg_y - avg_height / 2 - 100)
+        #     roi_width = int(avg_width + 200)
+        #     roi_height = int(avg_height + 200)
 
             # Draw the ROI rectangle
-            cv2.rectangle(frame, (roi_x, roi_y), (roi_x + roi_width, roi_y + roi_height), (0, 255, 0), 2)
+        
 
-        # Perform people counting within the ROI if it exists
-        if roi_x is not None and roi_y is not None and roi_width is not None and roi_height is not None:
-            num_people = self.count_people_in_roi(frame, roi_x, roi_y, roi_width, roi_height)
-        else:
-            num_people = 0
+        num_people, alert_message = self.count_people_in_roi(frame, roi_x, roi_y, roi_width, roi_height)
 
-        # Draw the number of people on the frame and display it
-        cv2.putText(frame, f'FPS: {int(self.cap.get(cv2.CAP_PROP_FPS))}', (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+        # Draw the ROI rectangle
+        cv2.rectangle(frame, (roi_x, roi_y), (roi_x + roi_width, roi_y + roi_height), (0, 255, 0), 2)
+
+        # Draw the number of people and alert message on the frame
+        cv2.putText(frame, f'FPS: {int(self.cap.get(cv2.CAP_PROP_FPS))}', (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 1,
+                    (0, 255, 0), 2)
         cv2.putText(frame, f'People: {num_people}', (10, 80), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
-        cv2.putText(frame, f'Processed FPS: {VideoPeopleDetection1.processed_fps}', (10, 110), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
-        current_time = datetime.datetime.now()
-        time_diff = (current_time -   self.last_capture_time ).total_seconds()
-        timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        if time_diff >= 10                                                                    :  # Capture an image every 5 minutes (300 seconds)
-            image_name = current_time.strftime("%Y%m%d%H%M%S") + ".jpg"
-            image_path = os.path.join(os.getcwd()+"/Users_slab/"+self.current_loggin_user+"/crowd_counting_history/images/" , image_name)  # Replace "folder_path" with the desired folder path
-            cv2.imwrite(image_path, frame)
-            # Save data (timestamp, count, image path) to CSV
-            self.save_data_to_csv(timestamp, num_people, image_path)
+        cv2.putText(frame, f'Processed FPS: {VideoPeopleDetection1.processed_fps}', (10, 110),
+                    cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+        cv2.putText(frame, alert_message, (10, 140), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
 
+        current_time = datetime.datetime.now()
+        time_diff = (current_time - self.last_capture_time).total_seconds()
+        timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+        # Capture an image every 10 seconds
+        if num_people > 1:
+            # fieldnames = ['cameraid', 'timestamp', 'image_path', 'analyticsid', 'count']
+            current_time = datetime.datetime.now()
+            image_name = current_time.strftime("%Y-%m-%d_%H-%M-%S") + ".jpg"
+            # image_path = os.path.join(os.getcwd() + "/Users_slab/" + self.current_loggin_user + "/crowd_counting_history/images/", image_name)
+            # writer.writerow(['Camera ID', 'Time', 'URL', 'Analytics ID', 'Count'])
+            blobdrive_image_path = "/home/torqueai/blobdrive"
+            image_path = os.path.join(blobdrive_image_path, image_name)
+            cv2.imwrite(image_path, frame)
+            imgurl = "https://inferenceimage.blob.core.windows.net/inferenceimages/" + image_name
+            sendtime = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            cameraid = self.video_name
+            split_string = cameraid.split('/')
+            cameradid = split_string[-1]
+            an_id = 2
+            ImgCount = num_people
+            self.save_data_to_csv(cameradid, sendtime, imgurl, an_id, ImgCount)
 
             self.last_capture_time = current_time
-        ret, jpeg = cv2.imencode(".jpg", frame)
 
+            
+
+        ret, jpeg = cv2.imencode(".jpg", frame)
         return jpeg.tobytes()
     def count_people_in_roi(self, frame, roi_x, roi_y, roi_width, roi_height):
-    # Crop the frame to the ROI
-        roi_frame = frame[roi_y:roi_y+roi_height, roi_x:roi_x+roi_width]
+        # Crop the frame to the ROI
+        roi_frame = frame[roi_y:roi_y + roi_height, roi_x:roi_x + roi_width]
 
-        # Convert the ROI frame to grayscale
-
-        # Apply a person detection algorithm to count the people in the ROI (e.g., OpenCV's HOG-based person detector)
-        results = self.model(frame, size=640)
-
-        # Loop through each detected object and count the people
+        # Apply a person detection algorithm to detect people in the ROI (e.g., OpenCV's HOG-based person detector)
+        results = self.model(roi_frame, size=640)
+        
+        # Initialize variables
         num_people = 0
-        bgr = (0, 255, 0)
+        alert_message = ""
 
-        # To get the processed FPS
-        # VideoPeopleDetection.time_reference = datetime.datetime.now()
-
-        time_now = datetime.datetime.now()
-        time_diff = (time_now - VideoPeopleDetection.time_reference).seconds
-
-        if time_diff >= 1:
-            VideoPeopleDetection.time_reference = datetime.datetime.now()
-            VideoPeopleDetection.processed_fps = VideoPeopleDetection.counter_frame
-            VideoPeopleDetection.counter_frame = 0
-        else:
-            VideoPeopleDetection.counter_frame += 1
-
+        # Loop through each detected object and count the people within the ROI
         for obj in results.xyxy[0]:
             if obj[-1] == 0:  # 0 is the class ID for 'person'
-                # Extract person coordinates
+                # Extract person coordinates within the ROI
                 xmin, ymin, xmax, ymax = map(int, obj[:4])
-                accuracy = obj[4]
 
-                # Check if the person coordinates intersect with the ROI rectangle
-                if roi_x <= xmin <= roi_x + roi_width and roi_y <= ymin <= roi_y + roi_height and \
-                roi_x <= xmax <= roi_x + roi_width and roi_y <= ymax <= roi_y + roi_height:
-                    if accuracy > 0.5:
-                        num_people += 1
-                        # Append people count and timestamp to history
-                        timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                        self.people_count_history.append({
-                            'timestamp': timestamp,
-                            'count': num_people
-                        })
+                num_people += 1
 
-                        cv2.rectangle(frame, (xmin, ymin), (xmax, ymax), (0, 0, 255), 2)
-                        cv2.putText(frame, f" {round(float(accuracy), 2)}", (xmin, ymin),
-                                    cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 0, 255), 2)
+                # Draw a bounding box around the person within the ROI
+                cv2.rectangle(frame, (roi_x + xmin, roi_y + ymin), (roi_x + xmax, roi_y + ymax), (0, 0, 255), 2)
+                cv2.putText(frame, f"Person", (roi_x + xmin, roi_y + ymin), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 0, 255), 2)
 
-        # Draw the number of people on the frame and display it
+        # Check if the number of people exceeds the limit
+        if num_people > 1:  # Adjust the limit as per your requirement
+            alert_message = "Alert: Exceeded maximum limit of people!"
 
-        # Return the number of people detected in the ROI
-        return num_people
+        # Return the number of people and the alert message
+        return num_people, alert_message
+
+    # def count_people_in_roi(self, frame, roi_x, roi_y, roi_width, roi_height):
+    # # Crop the frame to the ROI
+    #     roi_frame = frame[roi_y:roi_y+roi_height, roi_x:roi_x+roi_width]
+
+    #     # Convert the ROI frame to grayscale
+
+    #     # Apply a person detection algorithm to count the people in the ROI (e.g., OpenCV's HOG-based person detector)
+    #     results = self.model(roi_frame, size=640)
+
+    #     # Loop through each detected object and count the people
+    #     num_people = 0
+    #     bgr = (0, 255, 0)
+
+    #     # To get the processed FPS
+    #     # VideoPeopleDetection.time_reference = datetime.datetime.now()
+
+    #     time_now = datetime.datetime.now()
+    #     time_diff = (time_now - VideoPeopleDetection.time_reference).seconds
+
+    #     if time_diff >= 1:
+    #         VideoPeopleDetection.time_reference = datetime.datetime.now()
+    #         VideoPeopleDetection.processed_fps = VideoPeopleDetection.counter_frame
+    #         VideoPeopleDetection.counter_frame = 0
+    #     else:
+    #         VideoPeopleDetection.counter_frame += 1
+
+    #     for obj in results.xyxy[0]:
+    #         if obj[-1] == 0:  # 0 is the class ID for 'person'
+    #             # Extract person coordinates
+    #             xmin, ymin, xmax, ymax = map(int, obj[:4])
+    #             accuracy = obj[4]
+
+    #             # Check if the person coordinates intersect with the ROI rectangle
+    #             if roi_x <= xmin <= roi_x + roi_width and roi_y <= ymin <= roi_y + roi_height and \
+    #             roi_x <= xmax <= roi_x + roi_width and roi_y <= ymax <= roi_y + roi_height:
+    #                 if accuracy > 0.5:
+    #                     num_people += 1
+    #                     # Append people count and timestamp to history
+    #                     timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    #                     self.people_count_history.append({
+    #                         'timestamp': timestamp,
+    #                         'count': num_people
+    #                     })
+
+    #                     cv2.rectangle(frame, (xmin, ymin), (xmax, ymax), (0, 0, 255), 2)
+    #                     cv2.putText(frame, f" {round(float(accuracy), 2)}", (xmin, ymin),
+    #                                 cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 0, 255), 2)
+
+    #     # Draw the number of people on the frame and display it
+
+    #     # Return the number of people detected in the ROI
+    #     return num_people
 
     # def count_people_in_roi(self, frame, roi_x, roi_y, roi_width, roi_height):
     #     # Crop the frame to the ROI
@@ -2726,22 +2861,72 @@ import pandas as pd
 
 from flask import Response
 import time
-
+# API_ENDPOINT='https://analyticsapi.vmukti.com/api/Analytics'
 @app.route('/people_count_data1')
 def get_data1():
     current_loggin_user=current_user.username
     # Read the CSV file into a pandas DataFrame
-    df = pd.read_csv(os.getcwd()+"/Users_slab/"+current_loggin_user+"/crowd_counting_history/people_count_history.csv")
-
+    df = pd.read_csv(os.getcwd()+"/Users_slab/"+current_loggin_user+"/crowd_counting_history/booth.csv")
+    csv_file = os.path.join(os.getcwd(), 'Users_slab', current_loggin_user, 'crowd_counting_history', 'booth.csv')
     # Update the following lines with the correct column names
-    timestamp_column = 'Timestamp'
-    count_column = 'Count'
+    # timestamp_column = 'sendtime'
+    # count_column = 'ImgCount'
 
-    # Prepare the data for plotting
+    # # Prepare the data for plotting
+    # data = {
+    #     'timestamp': df[timestamp_column].tolist(),
+    #     'count': df[count_column].tolist()
+    # }
+
+    # # Convert the data to JSON
+    # json_data = json.dumps(data)
+
+    try:
+        with open(csv_file, 'r') as file:
+            reader = csv.DictReader(file)
+            for row in reader:
+                # Populate the data_api dictionary with values from each row
+                data_api = {
+                    "cameradid": row.get('cameradid', ''),
+                    "sendtime": row.get('sendtime', ''),
+                    "imgurl": row.get('imgurl', ''),
+                    "an_id": int(row.get('an_id', 0)),  # Convert to int if necessary
+                    "ImgCount": int(row.get('ImgCount', 0))  # Convert to int if necessary
+                }
+
+                try:
+                    # Send a POST request with the data_api dictionary
+                    headers = {
+                        'Content-Type': 'application/json'
+                    }
+                    response = requests.post(url=API_ENDPOINT, json=data_api, headers=headers)
+
+                    # Check if the request was successful
+                    if response.status_code == 200:
+                        pastebin_url = response.text
+                        print("The pastebin booth URL is: %s" % pastebin_url)
+                    else:
+                        print("Error:", response.text)
+
+                except requests.exceptions.RequestException as e:
+                    print("Error:", str(e))
+
+    except FileNotFoundError:
+        print(f"CSV file '{csv_file}' not found.")
+
+    # Set the cache-control header to disable caching
     data = {
-        'timestamp': df[timestamp_column].tolist(),
-        'count': df[count_column].tolist()
+        'timestamp': [],
+        'count': []
     }
+    
+    # Read data from the CSV file again to populate 'data' for plotting
+    with open(csv_file, 'r') as file:
+        reader = csv.DictReader(file)
+        for row in reader:
+            # Append data from each row to the respective lists
+            data['timestamp'].append(row.get('sendtime', ''))
+            data['count'].append(int(row.get('ImgCount', 0)))
 
     # Convert the data to JSON
     json_data = json.dumps(data)

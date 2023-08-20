@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+
+    <head>
+        <title>HLS Player</title>
+        <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    </head>
+
+    <body>
+		<div style="display: flex; margin-left: 6.2%";>
+        <video class="col-lg-6" id="video" style=" margin: 5px -10px;"  controls></video>
+        <br>
+        <video class="col-lg-6"  id="video1"  style=" margin: 10px 20px;" controls></video>
+		</div>
+        
+
+        <script>
+            var video = document.getElementById('video');
+            var hls = new Hls();
+            hls.loadSource('');
+
+            // hls.loadSource('https://media.torqueai.io/live/nmstest12/nmstest12.m3u8');
+
+            hls.attachMedia(video);
+            hls.on(Hls.Events.MANIFEST_PARSED, function () {
+                video.play();
+            });
+
+            var video1 = document.getElementById('video1');
+            var hls = new Hls();
+            // hls.loadSource('https://media.torqueai.io/live/nmstest11/nmstest11.m3u8');
+
+            hls.loadSource('https://t1.arcischain.io:8443/live/5/index.m3u8');
+
+            hls.attachMedia(video1);
+            hls.on(Hls.Events.MANIFEST_PARSED, function () {
+                video.play();
+            });
+
+            function seek() {
+                var startTime = document.getElementById('startTime').value;
+                var endTime = document.getElementById('endTime').value;}
+        </script>
+    </body>
+</html>

@@ -1,2 +1,5 @@
 Users_slab/test/Models/yolov5s.pt
 Users_slab/test/Models/yolov5x6.pt
+*.pt
+*.mp4
+*.flv

@@ -1,0 +1,58 @@
+
+{% extends "layouts/base.html" %}
+
+{% block title %} Typography {% endblock %}
+
+<!-- Specific CSS goes HERE -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Object Detection and OCR</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        function updateTable() {
+            $.ajax({
+                url: '/get_data_ANPR',
+                type: 'GET',
+                success: function(response) {
+                    $('#data-table').html(response);
+                }
+            });
+        }
+
+        $(document).ready(function() {
+            setInterval(updateTable, 1000); // Update every 1 second
+        });
+    </script>
+</head>
+
+<body>
+    <div style="margin-left: 3%; ">
+
+   
+    <h1>ANPR</h1>
+    <div class="col-lg-12" style="display: flex;">
+
+  
+    <center class="col-lg-5 col-md-10 col-sm-10">
+    <img width="100%" src="{{ url_for('video_feed_ANPR') }}">
+    </center>
+    <div class="col-lg-1 col-sm-0"></div>
+    <div class="col-lg-5 col-md-10 col-sm-10" style="height: 50vh; overflow: auto; ">
+        <table id="data-table">
+            <tr>
+                <th>Plate Number</th>
+                <th>OCR Text</th>
+                <th>Image</th>
+            </tr>
+        </table>
+    </div>
+</div>
+  
+</div>
+</body>
+</html>
+{% endblock content %}

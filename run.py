@@ -480,122 +480,6 @@ def output():
 
 
 
-#########################################################################
-########## multi object detection list ###################3
-
-
-
-class Objdetection_4multi():
-   
-  
-    def __init__(self, url):
-      
-        print("in detect...................................")
-        self.video = cv2.VideoCapture(url)
-        self.url = url
-        self.error_count = 0
-        self.model = torch.hub.load('yolov5', 'custom', path='/home/torque/Desktop/main/torqueai/yolov5s.pt', source='local', force_reload=True)
-        self.cknames = cknames
-        
-    def __del__(self):
-        self.video.release()
-    
-    def get_frame(self):
-        global Row
-        
-        
-        
-        
-        # Set Model Settings
-        self.model.eval()
-        self.model.conf = 0.6  # confidence threshold (0-1)
-        self.model.iou = 0.45  # NMS IoU threshold (0-1) 
-      
-    
-        
-        # Capture frame-by-fram ## read the camera frame
-        success, frame = self.video.read()
-        if success == True:
-
-           
-            print("OOObject detection multi")
-           
-            names = self.model.module.names if hasattr(self.model, 'module') else self.model.names
-            # print(names)
-            
-            
-            keys =[]
-            for v in cknames:
-                value = [i for i in names if names[i]==v]
-                keys.extend(value)
-                
-              
-            # keys=keys.index(cknames)
-           
-            
-            print(keys) 
-            values = list( map(names.get, keys) )
-            
-            pred = self.model(frame, augment='store_true')
-           
-            
-            # object.print()  # print results to screen
-            objects = pred.xyxy[0]
-            labels =  self.model.module.names if hasattr(self.model, 'module') else self.model.names
-            for i in range(len(objects)):
-                obj = objects[i]
-                print(obj[5])
-                if obj[5] in keys:
-                    print("ooooo",obj)
-                    label =labels[int(obj[5])]
-                    print(label)
-                    cv2.rectangle(frame, (int(obj[0]), int(obj[1])), (int(obj[2]), int(obj[3])), (0, 255, 0), 2)
-                    cv2.putText(frame, label, (int(obj[0]), int(obj[1]) - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
-         
-            # read image as BGR
-            img_BGR = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR) #BGR
-            frame = cv2.imencode('.jpg', img_BGR )[1].tobytes()
-            return frame
-           
-
-def gen_det_obj_4multi(camera):
-    while True:
-        frame = camera.get_frame()
-        yield (b'--frame\r\n'
-                b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
-
-
-@app.route('/video_feed_det_try_4multi')
-def det_video_feed_try_4multi():
-    url = request.args.get('url')
-    return Response(gen_det_obj_4multi(Objdetection_4multi(url)), mimetype='multipart/x-mixed-replace; boundary=frame')
-    
-
-
-
-
-
-
-
-@app.route('/try_4multi', methods = ['POST', 'GET'])
-def stream_view_4multi():
-    global Row1,cknames
-    rows = []
-    cknames = request.form.getlist('skills')
-    print(cknames)
- 
-    return render_template("home/try_multi.html",data=object_list,len = len(object_list),User_camera_sources=User_camera_sources_record.query.filter_by(username=current_user.username))
-
-
-
-
-
-#####################################################################################################################################################
-                        # Multi feed 
-#####################################################################################################################################################
-
-
-
 #####################################################################################################################################################
 ###############    Segementation anything   ################################################################
 import os
@@ -770,17 +654,17 @@ def reset_camera():
 ########################################
 import matplotlib.pyplot as plt
 import pandas as pd
+from ultralytics import YOLO
+import cvzone
 class VideoPeopleDetection():
-    # subprocess.Popen(['gnome-terminal', '-e', 'python3 apitest.py'])
     time_reference = datetime.datetime.now()
     counter_frame = 0
     processed_fps = 0
    
     def __init__(self,url):
-        # Load YOLOv5 model
-        #self.model = torch.hub.load('ultralytics/yolov5', 'yolov5s', pretrained=True)
-        self.modelName = "yolov5/prebuilt_model/crowdhuman_yolov5m.pt"
-        self.model = self.load_model(self.modelName)
+
+       
+        self.model = YOLO('yolov8s.pt')
         self.classes = self.model.names
         self.url=url
         self.video_name = self.url
@@ -791,9 +675,7 @@ class VideoPeopleDetection():
         self.csv_file = os.getcwd()+"/Users_slab/"+self.current_loggin_user+"/crowd_counting_history/people_count_history.csv"  # CSV file to store the history
         self.initialize_csv_file()
         self.last_capture_time = datetime.datetime.now()  # Initialize the last capture time
-        # self.video_name = 'For_Validation6.mp4'
-
-        # Read the video file
+        self.prev_people_count=-1
         self.cap = cv2.VideoCapture(self.video_name)
 
     def __del__(self):
@@ -813,26 +695,6 @@ class VideoPeopleDetection():
             # writer.writerow(['Timestamp', 'Count', 'Image Path'])
             writer.writerow(['cameradid', 'sendtime', 'imgurl', 'an_id', 'ImgCount'])
 
-    # def save_data_to_csv(self, timestamp, count, image_path):
-    #     data = {
-    #         'timestamp': timestamp,
-    #         'count': count,
-    #         'image_path': image_path
-    #     }
-
-    #     # Check if the file exists
-    #     file_exists = os.path.isfile(self.csv_file)
-
-    #     with open(self.csv_file, 'a', newline='') as csv_file:
-    #         fieldnames = ['timestamp', 'count', 'image_path']
-    #         writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
-
-    #         # Write the header row if the file is newly created
-    #         if not file_exists:
-    #             writer.writeheader()
-
-    #         writer.writerow(data)
-
     def save_data_to_csv(self, cameraid, timestamp, image_path, analyticsid, count ):
         
         if count >= 1:
@@ -847,9 +709,7 @@ class VideoPeopleDetection():
             file_exists = os.path.isfile(self.csv_file)
 
             with open(self.csv_file, 'a', newline='') as csv_file:
-                # writer.writerow(['Timestamp', 'Count', 'Image Path'])
-                # writer.writerow(['Camera ID', 'Time', 'URL', 'Analytics ID', 'Count'])
-                # fieldnames = ['timestamp', 'count', 'image_path']
+               
                 fieldnames = ['cameraid', 'timestamp', 'image_path', 'analyticsid', 'count']
                 writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
 
@@ -861,90 +721,65 @@ class VideoPeopleDetection():
     
     def get_frame(self):
         ret, frame = self.cap.read()
-
-        # comparison =
+        my_file = open("crowd_counting/coco.txt", "r")
+        data = my_file.read()
+        class_list = data.split("\n")
+        count = 0
+        # Clear the CSV file if it exists
+       
         if not ret:
             self.cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
             _, frame = self.cap.read()
 
-        # Convert frame to RGB and perform object detection with YOLOv5
-        #frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        #frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-        results = self.model(frame, size=640)
+        count += 1
+        
+        frame = cv2.resize(frame, (1020, 500))
 
-        # Loop through each detected object and count the people
-        analyticsid = 1
-        num_people = 0
-        bgr = (0, 255, 0)
+        results = self.model.predict(frame)
+        a = results[0].boxes.boxes
+        a = a.cpu()  # Convert CUDA tensor to CPU tensor
+        px = pd.DataFrame(a).astype("float")
+        people_count = 0  # Reset people count for each frame
+        for index, row in px.iterrows():
+            x1 = int(a[index][0])
+            y1 = int(a[index][1])
+            x2 = int(a[index][2])
+            y2 = int(a[index][3])
+            d = int(a[index][5])
+            c = class_list[d]
+            if 'person' in c:
+                cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 0, 255), 1)
+                cv2.putText(frame, str(c), (x1, y1), cv2.FONT_HERSHEY_COMPLEX, 0.5, (255, 255, 255), 1)
+                people_count += 1  # Increment people count for each person detected
 
-        #To get the processed FPS
-        #VideoPeopleDetection.time_reference = datetime.datetime.now()
+        cv2.putText(frame, f"People Count: {people_count}", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (255, 0, 0), 2)
+        if people_count >= 1:
+            if people_count != self.prev_people_count:
+                # Capture and save the image
+                camera_id = "PQRS-230651-ABCDE"
+                image_name = datetime.datetime.now().strftime("%Y-%m-%d-%H:%M:%S") + camera_id +".jpg"
+                image_path = "/home/torqueai/blobdrive/" + image_name 
+                #image_name = "/home/torqueai/blobdrive" + image_name + ".jpg"
+                cv2.imwrite(image_path, frame)
+                print(f"Image captured: {image_name}")
 
-        time_now = datetime.datetime.now()
-        time_diff = (time_now - VideoPeopleDetection.time_reference).seconds
+                # Prepare data for CSV
+                camera_id = "PQRS-230651-ABCDE"
+                send_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                img_url = "https://inferenceimage.blob.core.windows.net/inferenceimages/" + image_name
+                an_id = 1
+                img_count = people_count
 
-        if time_diff >= 1:
-            VideoPeopleDetection.time_reference = datetime.datetime.now()
-            VideoPeopleDetection.processed_fps = VideoPeopleDetection.counter_frame
-            VideoPeopleDetection.counter_frame = 0
-        else:
-            VideoPeopleDetection.counter_frame += 1
+                # Save data to CSV
+                data = {'cameradid': camera_id, 'sendtime': send_time, 'imgurl': img_url,
+                        'an_id': an_id, 'ImgCount': img_count}
+                self.save_data_to_csv(camera_id, send_time, img_url, an_id, img_count)
+            self.prev_people_count = people_count
+            # df = pd.DataFrame(data)
+            # df.to_csv('people_count.csv', mode='a', header=not os.path.exists('people_count.csv'), index=False)
 
-        for obj in results.xyxy[0]:
-            if obj[-1] == 0:  # 0 is the class ID for 'person'
-
-                # Draw bounding boxes around people
-                xmin, ymin, xmax, ymax = map(int, obj[:4])
-                accuracy = obj[4]
-                if (accuracy > 0.5):
-                    num_people += 1
-                    # Append people count to history
-                       # Append people count and timestamp to history
-                    timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                    # fieldnames = ['cameraid', 'timestamp', 'image_path', 'analyticsid', 'count']
-                    self.people_count_history.append({
-                        'timestamp': timestamp,
-                        'count': num_people
-    })
-                    
-                    cv2.rectangle(frame, (xmin, ymin), (xmax, ymax), (0, 255, 0), 2)
-                    # cv2.putText(frame, f" {round(float(accuracy), 2)}", (xmin, ymin),cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 0, 255), 2)
-
-
-        # Draw the number of people on the frame and display it
-        # cv2.putText(frame, f'FPS: {int(self.cap.get(cv2.CAP_PROP_FPS))}', (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
-        cv2.putText(frame, f'People: {num_people}', (10, 80), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
-        # cv2.putText(frame, f'Processed FPS: {VideoPeopleDetection.processed_fps}', (10, 110), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
-        current_time = datetime.datetime.now()
-        time_diff = (current_time -   self.last_capture_time ).total_seconds()
-        timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        # if time_diff >= 1                                                                    :  # Capture an image every 5 minutes (300 seconds)
-            # image_name = current_time.strftime("%Y%m%d%H%M%S") + ".jpg"
-            # image_path = os.path.join(os.getcwd()+"/Users_slab/"+self.current_loggin_user+"/crowd_counting_history/images/" , image_name)  # Replace "folder_path" with the desired folder path
-            # cv2.imwrite(image_path, frame)
-            # # Save data (timestamp, count, image path) to CSV
-            # self.save_data_to_csv(timestamp, num_people, image_path)
-        if num_people >= 1:
-            # fieldnames = ['cameraid', 'timestamp', 'image_path', 'analyticsid', 'count']
-            current_time = datetime.datetime.now()
-            image_name = current_time.strftime("%Y-%m-%d_%H-%M-%S") + ".jpg"
-            # image_path = os.path.join(os.getcwd() + "/Users_slab/" + self.current_loggin_user + "/crowd_counting_history/images/", image_name)
-            # writer.writerow(['Camera ID', 'Time', 'URL', 'Analytics ID', 'Count'])
-            blobdrive_image_path = "/home/torqueai/blobdrive"
-            image_path = os.path.join(blobdrive_image_path, image_name)
-            cv2.imwrite(image_path, frame)
-            imgurl = "https://inferenceimage.blob.core.windows.net/inferenceimages/" + image_name
-            sendtime = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            cameraid = self.video_name
-            split_string = cameraid.split('/')
-            cameradid = split_string[-1]
-            an_id = 1
-            ImgCount = num_people
-            self.save_data_to_csv(cameradid, sendtime, imgurl, an_id, ImgCount)
-
-            self.last_capture_time = current_time
-
-            self.last_capture_time = current_time
+            # Send data to URL
+          
         ret, jpeg = cv2.imencode(".jpg", frame)
 
         return jpeg.tobytes()
@@ -1025,7 +860,7 @@ class VideoPeopleDetection1():
     def __init__(self,url):
         # Load YOLOv5 model
         #self.model = torch.hub.load('ultralytics/yolov5', 'yolov5s', pretrained=True)
-        self.modelName = "yolov5/prebuilt_model/crowdhuman_yolov5m.pt"
+        self.modelName = "crowdhuman_yolov5m.pt"
         self.model = self.load_model(self.modelName)
         self.classes = self.model.names
         self.url=url
@@ -1400,10 +1235,214 @@ def get_data1():
 ##########################################################################################
 
 ##############beep counting####################
-import ffmpeg
-import librosa
+# import ffmpeg
+# import librosa
+# import numpy as np
+# from scipy.io.wavfile import write
+# import os
+
+# import numpy as np
+# from sklearn.model_selection import train_test_split
+# from tensorflow.keras.utils import to_categorical
+# from tensorflow.keras.models import Sequential
+# from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense, Dropout
+# from skimage.transform import resize
+# class Hls_Link_extractor():
+#     def __init__(self):
+#         self.input_url="https://vm4inj5.vmukti.com:443/live-record/SSAE-425389-AFFDA.m3u8"
+#         self.out_audio = "/home/torque/github/main/Torque-AI/beep_counter/out_audio.aac"
+#     def audio_stream_to_new_file(self):
+#         try:
+#             # Copy audio stream to a new file
+#             (
+#                 ffmpeg
+#                 .input(self.input_url)
+#                 .output(self.out_audio , acodec='aac', ab='16k')  # convert audio stream to AAC with a lower bit rate
+#                 .run(capture_stdout=True, capture_stderr=True)
+#             )
+
+#         except ffmpeg.Error as e:
+#             print('stdout:', e.stdout.decode('utf8'))
+#             print('stderr:', e.stderr.decode('utf8'))
+#             raise e
+
+# class Segmentor():
+#     def segment_audio(audio_path, timestamps, output_dir):
+#         y, sr = librosa.load(audio_path, sr=22050)
+
+#         for i, (start, end, label) in enumerate(timestamps):
+#             start_sample = int(start * sr)
+#             end_sample = int(end * sr)
+
+#             segment = y[start_sample:end_sample]
+#             output_path = f"{output_dir}/segment_{i}_{label}.wav"
+#             write(output_path, sr, segment.astype(np.float32))
+
+#     def convert_to_spectrogram(audio_path, n_fft=2048):
+#         y, sr = librosa.load(audio_path, sr=22050)
+        
+#         # If the audio is shorter than n_fft, pad it with zeros
+#         if len(y) < n_fft:
+#             y = np.pad(y, (0, n_fft - len(y)), constant_values=(0, 0))
+        
+#         spectrogram = librosa.feature.melspectrogram(y=y, sr=sr, n_mels=128, fmax=8000)
+#         spectrogram = librosa.power_to_db(spectrogram)
+#         return spectrogram
+
+
+#     def segmen():
+#         audio_path = '/home/torque/github/main/Torque-AI/beep_counter/out_audio.aac'
+#         output_dir = '/home/torque/github/main/Torque-AI/beep_counter/data/segments'
+#         timestamps = [
+#             (0, 3, 'beep'),
+#             (5, 39, 'non-beep'),
+#             (40, 43, 'beep'),
+#             (48, 102, 'non-beep'),
+#             (103, 106, 'beep'),
+#             (110, 125, 'non-beep'),
+#             (128, 134, 'beep'),
+#             (138, 158, 'non-beep')
+#         ]
+
+
+
+#         Segmentor.segment_audio(audio_path, timestamps, output_dir)
+
+#         for i, (start, end, label) in enumerate(timestamps):
+#             segment_path = f"{output_dir}/segment_{i}_{label}.wav"
+#             spectrogram = Segmentor.convert_to_spectrogram(segment_path)
+#             # Now `spectrogram` is a 2D array representing the spectrogram of the audio segment.
+
+# class Label():
+#     def convert_to_spectrogram(audio_path, n_fft=2048):
+#         y, sr = librosa.load(audio_path, sr=22050)
+        
+#         # If the audio is shorter than n_fft, pad it with zeros
+#         if len(y) < n_fft:
+#             y = np.pad(y, (0, n_fft - len(y)), constant_values=(0, 0))
+        
+#         spectrogram = librosa.feature.melspectrogram(y=y, sr=sr, n_mels=128, fmax=8000)
+#         spectrogram = librosa.power_to_db(spectrogram)
+#         return spectrogram
+#     def model_prep():
+#         # Prepare data
+#         spectrograms = [Label.convert_to_spectrogram(os.path.join('/home/torque/github/main/Torque-AI/beep_counter/data/segments', f)) for f in os.listdir('/home/torque/github/main/Torque-AI/beep_counter/data/segments')]
+#         spectrograms_resized = [resize(s, (128, 128, 1)) for s in spectrograms]
+#         X = np.array(spectrograms_resized)
+#         y = np.array([0 if 'beep' in f else 1 for f in os.listdir('/home/torque/github/main/Torque-AI/beep_counter/data/segments')])  # Encode labels (0: beep, 1: non-beep)
+
+#         # Split data into training set and test set
+#         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+#         # Convert labels to one-hot encoding
+#         y_train = to_categorical(y_train, num_classes=2)
+#         y_test = to_categorical(y_test, num_classes=2)
+
+#         # Define model
+#         model = Sequential([
+#             Conv2D(32, (3, 3), activation='relu', input_shape=(128, 128, 1)),
+#             MaxPooling2D((2, 2)),
+#             Conv2D(64, (3, 3), activation='relu'),
+#             MaxPooling2D((2, 2)),
+#             Flatten(),
+#             Dense(64, activation='relu'),
+#             Dropout(0.5),
+#             Dense(2, activation='softmax')
+#         ])
+
+#         # Compile model
+#         model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
+
+#         # Train model
+#         model.fit(X_train, y_train, epochs=10, validation_data=(X_test, y_test))
+
+#         # Evaluate model
+#         test_loss, test_acc = model.evaluate(X_test, y_test)
+#         print('Test accuracy:', test_acc)
+
+#         # Save the model
+#         # Save the model in SavedModel format
+#         model.save('/home/torque/github/main/Torque-AI/beep_counter/trained_model')
+# ############
+# @app.route('/beep_counter',methods=['POST','GET'])
+# def beep_counter():
+#     # Create instances of your classes and execute their methods here
+#     hls_extractor = Hls_Link_extractor()
+#     hls_extractor.audio_stream_to_new_file()
+    
+#     segmentor = Segmentor()
+#     segmentor.segment_audio(segmentor.audio_path, segmentor.timestamps, segmentor.output_dir)
+    
+#     label = Label()
+#     label.convert_to_spectrogram(label.audio_path)
+#     return "model generated"
+# @app.route('/beep_count')
+# def beepcnt():
+    
+   
+#     csv_file = os.path.join(os.getcwd(), 'beep_count.csv')
+   
+#     data = {
+#         'timestamp': [],
+#         'count': [],
+#         'total_count':[]
+#     }
+    
+#     # Read data from the CSV file again to populate 'data' for plotting
+#     with open(csv_file, 'r') as file:
+#         reader = csv.DictReader(file)
+#         for row in reader:
+#             # Append data from each row to the respective lists
+#             data['timestamp'].append(row.get('Timestamp', ''))
+#             data['count'].append(int(row.get('BeepCount', 0)))
+#             data['total_count'].append(int(row.get('TotalBeepCount', 0)))
+
+#     # Convert the data to JSON
+#     json_data = json.dumps(data)
+
+#     # Set the cache-control header to disable caching
+#     headers = {
+#         'Cache-Control': 'no-cache, no-store, must-revalidate',
+#         'Pragma': 'no-cache',
+#         'Expires': '0',
+#         'Content-Type': 'application/json'
+#     }
+
+#     # Return the data as a JSON response with the cache-control headers
+#     return Response(json_data, headers=headers)
+# # import m3u8
+# # @app.route('/hls_stream')
+# # def hls_stream():
+# #     # HLS URL
+# #     hls_url = 'https://t1.arcischain.io:8443/live/5/index.m3u8'
+    
+# #     # Parse the HLS manifest
+# #     m3u8_obj = m3u8.load(hls_url)
+    
+# #     # Try to find the playlist URL (modify this based on your HLS structure)
+# #     playlist_url = None
+    
+# #     for playlist in m3u8_obj.playlists:
+# #         if playlist.stream_info and 'BANDWIDTH' in playlist.stream_info:
+# #             playlist_url = playlist.absolute_uri
+# #             break
+
+# #     if playlist_url is None:
+# #         return "No valid playlist found in the HLS manifest."
+
+# #     return render_template('hls_stream.html', playlist_url=playlist_url)
+
+    
+# subprocess.Popen(['gnome-terminal', '-e', 'python3  /home/torque/github/main/Torque-AI/beep_counter/audio_predictor_extractor_live.py'])
+# subprocess.Popen(['gnome-terminal', '-e', 'python3  /home/torque/github/main/Torque-AI/beep_counter/audio_predictor_apel_opt.py'])  
+# ###################################################
+############face recognition######################
+
+from flask import Flask, render_template, request, session, redirect, url_for, Response, jsonify
+import mysql.connector
+import cv2
+from PIL import Image
 import numpy as np
-from scipy.io.wavfile import write
 import os
 
 import numpy as np
@@ -1541,7 +1580,10 @@ def beep_counter():
     label = Label()
     label.convert_to_spectrogram(label.audio_path)
     return "model generated"
-###################################################
+
+
+
+####################################################################################################################################
 ############face recognition######################
 
 from flask import Flask, render_template, request, session, redirect, url_for, Response, jsonify
@@ -1834,14 +1876,228 @@ def loadData():
     data = mycursor.fetchall()
  
     return jsonify(response = data)
+
+############################################################################################
+
+import cv2
+import numpy as np
+import time
+import torch
+from paddleocr import PaddleOCR
+import csv
+import os
+
+csv_filename = 'captured_data.csv'
+image_save_path = 'apps/static/detected_images'
+
+if not os.path.exists(image_save_path):
+    os.makedirs(image_save_path)
+
+with open(csv_filename, mode='w', newline='') as csv_file:
+    csv_writer = csv.writer(csv_file)
+    csv_writer.writerow(['Plate Number', 'OCR Text', 'Image Filename'])
+
+def generate_frames():
+    # ... (previous code)
+    model_path = r"ANPR.pt"
+    cpu_or_cuda = "cpu"
+    device = torch.device(cpu_or_cuda)
+    model = torch.hub.load('ultralytics/yolov5', 'custom', path=model_path, force_reload=True)
+    model = model.to(device)
+    capture = cv2.VideoCapture('1car.flv')
+
+    text_font = cv2.FONT_HERSHEY_PLAIN
+    color = (0, 0, 255)
+    text_font_scale = 1.25
+    prev_frame_time = 0
+    new_frame_time = 0
+
+    ocr = PaddleOCR()
+    while True:
+        
+        ret, image = capture.read()
+        if ret:
+            output = model(image)
+            result = np.array(output.pandas().xyxy[0])
+            for i in result:
+                p1 = (int(i[0]), int(i[1]))
+                p2 = (int(i[2]), int(i[3]))
+                text_origin = (int(i[0]), int(i[1]) - 5)
+                cv2.rectangle(image, p1, p2, color=color, thickness=2)
+                cv2.putText(image, f"{i[-1]} {i[-3]:.2f}", org=text_origin, fontFace=text_font,
+                            fontScale=text_font_scale, color=color, thickness=2)
+
+                plate_image = image[p1[1]:p2[1], p1[0]:p2[0]]
+                ocr_result = ocr.ocr(plate_image)
+                ocr_text = ' '.join([word_info[1][0] for word_info in ocr_result[0]])
+                cv2.putText(image, ocr_text, (p1[0], p2[1] + 20), text_font, text_font_scale,
+                            (255, 0, 0), thickness=2)
+
+                # Generate unique filename for the image
+                image_filename = f"{time.time():.0f}.jpg"
+                image_path = os.path.join(image_save_path, image_filename)
+
+                # Save the detected license plate image
+                cv2.imwrite(image_path, plate_image)
+
+                # Store captured data in the CSV file
+                with open(csv_filename, mode='a', newline='') as csv_file:
+                    csv_writer = csv.writer(csv_file)
+                    csv_writer.writerow([i[-1], ocr_text, image_filename])
+
+                # ... (rest of the code)
+            new_frame_time = time.time()
+            fps = 1 / (new_frame_time - prev_frame_time)
+            prev_frame_time = new_frame_time
+            fps = int(fps)
+            fps = str(fps)
+            cv2.putText(image, fps, (7, 70), text_font, 3, (100, 255, 0), 3, cv2.LINE_AA)
+
+            ret, buffer = cv2.imencode('.jpg', image)
+            frame = buffer.tobytes()
+            yield (b'--frame\r\n'
+                   b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+
+        else:
+            break
+
+    capture.release()
+
+
+
+@app.route('/video_feed_ANPR')
+def video_feed_ANPR():
+
+
+    return Response(generate_frames(),
+                    mimetype='multipart/x-mixed-replace; boundary=frame')
+# ... (remaining code)
+
+@app.route('/get_data_ANPR')
+def get_data_ANPR():
+    generate_data = []
+
+    for i, row in enumerate(csv.reader(open(csv_filename))):
+        if i == 0:
+            continue
+        generate_data.append(row)
+
+    table_html = ''
+    for row in generate_data:
+        table_html += f'<tr><td>{row[0]}</td><td>{row[1]}</td><td><img src="{url_for("static", filename="detected_images/" + row[2])}" width="100"></td></tr>'
+
+    return table_html
+
+
+############################################################################################
+import cv2
+import numpy as np
+import time
+import torch
+from paddleocr import PaddleOCR
+import csv
+import os
+csv_filename = 'captured_data.csv'
+image_save_path = 'apps/static/detected_images'
+
+if not os.path.exists(image_save_path):
+    os.makedirs(image_save_path)
+
+with open(csv_filename, mode='w', newline='') as csv_file:
+    csv_writer = csv.writer(csv_file)
+    csv_writer.writerow(['Plate Number', 'OCR Text', 'Image Filename'])
+
+class AnprDetection():
+    def __init__(self, url):
+        self.capture = cv2.VideoCapture(url)
+        self.url = url
+        self.error_count = 0
+        self.cpu_or_cuda = "cuda"
+        self.device = torch.device(self.cpu_or_cuda)
+        self.ocr = PaddleOCR()
+        self.model = torch.hub.load('ultralytics/yolov5', 'custom', path='ANPR.pt', force_reload=True)
+        
+        # self.model = torch.hub.load('yolov5', 'custom', path=loadModel + '/yolov5/runs/train/'+gLabel+'/weights/'+gLabel+'.pt', source='local', force_reload=True)
+    def __del__(self):
+        self.capture.release()
+    
+    def get_frame_anpr(self):
+        self.text_font = cv2.FONT_HERSHEY_PLAIN
+        self.color = (0, 0, 255)
+        self.text_font_scale = 1.25
+        self.prev_frame_time = 0
+        self.new_frame_time = 0
+        
+        while True:
+        
+            ret, image = self.capture.read()
+            if ret:
+                output = self.model(image)
+                result = np.array(output.pandas().xyxy[0])
+                for i in result:
+                    p1 = (int(i[0]), int(i[1]))
+                    p2 = (int(i[2]), int(i[3]))
+                    text_origin = (int(i[0]), int(i[1]) - 5)
+                    cv2.rectangle(image, p1, p2, color=self.color, thickness=2)
+                    cv2.putText(image, f"{i[-1]} {i[-3]:.2f}", org=text_origin, fontFace=self.text_font,
+                                fontScale=self.text_font_scale, color=self.color, thickness=2)
+
+                    plate_image = image[p1[1]:p2[1], p1[0]:p2[0]]
+                    ocr_result = self.ocr.ocr(plate_image)
+                    ocr_text = ' '.join([word_info[1][0] for word_info in ocr_result[0]])
+                    cv2.putText(image, ocr_text, (p1[0], p2[1] + 20), self.text_font, self.text_font_scale,
+                                (255, 0, 0), thickness=2)
+
+                    # Generate unique filename for the image
+                    image_filename = f"{time.time():.0f}.jpg"
+                    image_path = os.path.join(image_save_path, image_filename)
+
+                    # Save the detected license plate image
+                    cv2.imwrite(image_path, plate_image)
+
+                    # Store captured data in the CSV file
+                    with open(csv_filename, mode='a', newline='') as csv_file:
+                        csv_writer = csv.writer(csv_file)
+                        csv_writer.writerow([i[-1], ocr_text, image_filename])
+
+                    # ... (rest of the code)
+                self.new_frame_time = time.time()
+                fps = 1 / (self.new_frame_time - self.prev_frame_time)
+                self.prev_frame_time = self.new_frame_time
+                fps = int(fps)
+                fps = str(fps)
+                cv2.putText(image, fps, (7, 70), self.text_font, 3, (100, 255, 0), 3, cv2.LINE_AA)
+
+                ret, buffer = cv2.imencode('.jpg', image)
+                frame =  buffer.tobytes()
+                return frame                
+
+
  
 
 
+        
+       
+
+def gen_det_anpr(camera):
+    while True:
+        frame = camera.get_frame_anpr()
+        yield (b'--frame\r\n'
+                b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
 
 
+@app.route('/video_feed_det')
+def det_video_feed():
+    url = request.args.get('url')
+    return Response(gen_det_anpr(AnprDetection(url)), mimetype='multipart/x-mixed-replace; boundary=frame')
 
-####################################################################################################################################
+@app.route('/anprtest.html' ,methods=["POST","GET"])
+def anprtest():
+  
+    return render_template('home/anprtest.html', User_camera_sources=User_camera_sources_record.query.filter_by(username=current_user.username))
 
+
+############################################################################################
 if __name__ == "__main__":
    
     app.run(host="0.0.0.0")

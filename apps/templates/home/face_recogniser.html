@@ -10,10 +10,40 @@
 <body>
 <section class="py-1">
     <div class="row mt-5">
-        <div class="col-lg-8 offset-lg-2">
-            <h3>Personnel Data</h3>
-            <hr>
+        <div class="col-lg-8 offset-lg-1">
+            
+          
             <div class="row">
+    <style>
+        .hehe1 {
+margin-left: 0px;
+/* margin-bottom: 25px; */
+margin-top: 10px;
+background: -webkit-linear-gradient(180deg,#3371d9 0%,#66b3ff );
+color: #ffffff;
+border-color: #66b3ff;
+border-radius: 10px;
+height: auto;
+width: auto; 
+}
+
+.hehe1:hover {
+color: #fff;
+border-color: #66b3ff;
+background: -webkit-linear-gradient(180deg,#66b3ff 0%,#3371d9 );                
+}
+
+.scrollable-table-container {
+            max-height: 400px; /* Adjust the height as needed */
+            overflow: auto;
+        }
+   </style>
+<section class="py-1">
+    <div class="row mt-5">
+        <div class="col-lg-8 " style="margin-left: 3%; margin-bottom: 3%;">
+            <h3>Face Recognition Data</h3>
+            <hr>
+            <!-- <div class="row">
                 <div class="col-lg-4">
                     <a href="/addprsn" type="button" class="btn btn-success btn-lg"><b>Add Personnel</b></a>
                 </div>
@@ -48,6 +78,43 @@
                 </tbody>
 
             </table>
+            </div> -->
+
+            <div class="row col-lg-12">
+                <div class="col-lg-6">
+                    <a style="margin-left: 5px; margin-bottom:15px; text-align: start;" class="btn btn-outline-primary hehe1" href="/addprsn" type="button">Add Personnel</a>
+                </div>
+              <div class="col-lg-6">
+                <a style="margin-left: 5px; margin-bottom:15px;" class="btn btn-outline-primary hehe1" href="/fr_page" type="button">Face Recognition</a>
+              </div>
+               
+            </div>
+
+            <br>
+            <div class="scrollable-table-container">
+                <table class="table" style="width: 100%;">
+                    <thead>
+                        <tr>
+                            <th>Person Id</th>
+                            <th>Name</th>
+                            <th>Skill</th>
+                            <th>Active</th>
+                            <th>Added</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in data %}
+                            <tr>
+                                <td>{{item[0]}}</td>
+                                <td>{{item[1]}}</td>
+                                <td>{{item[2]}}</td>
+                                <td>{{item[3]}}</td>
+                                <td>{{item[4]}}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </section>

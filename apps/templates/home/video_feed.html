@@ -1,0 +1,135 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Typography {% endblock %}
+
+<!-- Specific CSS goes HERE -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+
+    <head>
+        <title>HLS Player</title>
+        <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+        <meta name="apple-mobile-web-app-capable" content="yes">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="static/assets/js/annotation/less.js"></script>
+
+        <script src="static/assets/js/annotation/jquery-3.5.1.min.js"></script>
+    </head>
+
+    <body>
+        <div style="display: flex; margin-left: 6.2%";>
+        <video class="col-lg-6" id="video" style=" margin: 5px -10px;"  controls></video>
+       
+        </div>
+        
+        <div class="row" style="height:50%; width: 50%; margin-left: 20%;">
+            <canvas id="liveChart"></canvas>
+        </div>
+
+        <div style="height: 50%; width: 50%; margin-left: 20%;">
+            <canvas id="liveChart1"></canvas>
+        </div>
+        <script>
+         
+            var video1 = document.getElementById('video');
+            var hls = new Hls();
+            // hls.loadSource('https://media.torqueai.io/live/nmstest11/nmstest11.m3u8');
+
+            hls.loadSource('https://t1.arcischain.io:8443/live/5/index.m3u8');
+
+            hls.attachMedia(video1);
+            hls.on(Hls.Events.MANIFEST_PARSED, function () {
+                video.play();
+            });
+
+            function seek() {
+                var startTime = document.getElementById('startTime').value;
+                var endTime = document.getElementById('endTime').value;}
+            
+        function fetchData() {
+        return $.ajax({
+            url: '/beep_count',
+            method: 'GET',
+            dataType: 'json'
+        });
+    }
+    function fetchhls() {
+        return $.ajax({
+            url: '/audio_extracter',
+            method: 'GET',
+            dataType: 'json'
+        });
+    }
+    // Function to update the line chart with live data
+    function updateChart() {
+        fetchData().done(function (data) {
+            // Get the chart canvas element
+            const chartCanvas = document.getElementById('liveChart').getContext('2d');
+
+            // Create the line chart or update the existing chart
+            if (window.chart) {
+                // Update the chart data
+                window.chart.data.labels = data.timestamp;
+                window.chart.data.datasets[0].data = data.count;
+                window.chart.data.datasets[1].data = data.total_count;
+                window.chart.update();
+            } else {
+                // Create the chart for the first time
+                window.chart = new Chart(chartCanvas, {
+                    type: 'line',
+                    data: {
+                        labels: data.timestamp,
+                        datasets: [{
+                            label: 'People Count',
+                            data: data.count,
+                            borderColor: 'rgb(0, 0, 255)',
+                            borderWidth: 1,
+                            fill: false
+                        },
+                        {
+                                label: 'Total Beep Count',
+                                data: data.total_count,
+                                borderColor: 'rgb(255, 0, 0)', // Red color for total beep count line
+                                borderWidth: 2,
+                                fill: false
+                            }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            x: {
+                                display: true,
+                                title: {
+                                    display: true,
+                                    text: 'Timestamp'
+                                }
+                            },
+                            y: {
+                                display: true,
+                                title: {
+                                    display: true,
+                                    text: 'Count'
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        });
+    }
+
+
+    // Update the chart every 5 seconds
+    setInterval(updateChart, 10000); 
+    </script>
+  
+      
+    </body>
+    {% endblock content %}
+

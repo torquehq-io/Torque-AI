@@ -42,7 +42,28 @@ href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/css/bootstr
   </h1> -->
 </header>
 <style>
+ .hehe1 {
+margin-left: 0px;
+/* margin-bottom: 25px; */
+margin-top: 10px;
+background: -webkit-linear-gradient(180deg,#3371d9 0%,#66b3ff );
+color: #ffffff;
+border-color: #66b3ff;
+border-radius: 10px;
+height: auto;
+width: auto; 
+}
 
+.hehe1:hover {
+color: #fff;
+border-color: #66b3ff;
+background: -webkit-linear-gradient(180deg,#66b3ff 0%,#3371d9 );                
+}
+ @media screen and (max-width:1000px) {
+    .segflex{
+      flex-direction: column;
+    }
+ }
 </style>
 
 
@@ -51,14 +72,17 @@ href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/css/bootstr
   <div class="" style="right: 0px;">
 
     <form action="/storeRtmpLink">
-     <button class=" btn btn-outline-primary hehe1" style="margin-left: 78%; width: 20%;"
+     <button class=" btn btn-outline-primary hehe1" style="margin-left: 78%; width: auto;"
                        >Add camera Source</button>
    </form>
 
 </div>
-<div class="col-lg-4">
 
-<aside id="aside" > 
+
+<div class="col-lg-12 segflex" style="display: flex; margin-left: 3%;">
+<div class="col-lg-3 col-md-10 col-sm-10">
+
+<!-- <aside id="aside" >  -->
   <div class="dropdown" >
     <button class="dropbtn">Select Options</button>
     <div class="dropdown-content">
@@ -83,10 +107,10 @@ href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/css/bootstr
       <br>
      
     </div>
-</aside> 
+<!-- </aside>  -->
 
 
-<div class="col-lg-4">
+<div class="col-lg-6 col-md-10 col-sm-10">
 
   <div class="ring" id="spinner" style="display: none;" >
     Loading
@@ -97,11 +121,12 @@ href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/css/bootstr
         <div class="">
         </div>
       <div id="capture" align=center >
-        <img id="videoElement" src="{{ url_for('video_feed') }}" />
+        <img width="100%" id="videoElement" src="{{ url_for('video_feed') }}" />
        
       </div>
     </div>
   </div>
+</div>
 
 
 </section>
@@ -115,8 +140,8 @@ href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/css/bootstr
 
 
 <section class="row">
-  <div class="col-lg-4"></div>
-  <div class="col-lg-8">
+  <div class="col-lg-3"></div>
+  <div class="col-lg-6">
 
     <label class="select-container">
       <label class="select-box"> 
@@ -357,10 +382,10 @@ href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/css/bootstr
         </form>
       </div>
     </div>
-
+<!-- 
     <div>
       <br>
-    </div>
+    </div> -->
 
   </div>
 

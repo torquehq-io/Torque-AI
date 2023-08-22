@@ -7,9 +7,35 @@
 
 {% block content %}
 
+<<<<<<< HEAD
 <section class="py-1">
     <div class="row mt-5">
         <div class="col-md-3 offset-lg-2">
+=======
+<style>
+    .hehe1 {
+margin-left: 0px;
+/* margin-bottom: 25px; */
+margin-top: 10px;
+background: -webkit-linear-gradient(180deg,#3371d9 0%,#66b3ff );
+color: #ffffff;
+border-color: #66b3ff;
+border-radius: 10px;
+height: auto;
+width: auto; 
+}
+
+.hehe1:hover {
+color: #fff;
+border-color: #66b3ff;
+background: -webkit-linear-gradient(180deg,#66b3ff 0%,#3371d9 );                
+}
+</style>
+
+<section class="py-1">
+    <div class="row mt-5">
+        <div class="col-md-6 offset-lg-1">
+>>>>>>> 5ae81d6 (update fr code)
             <h3>Generate Dataset {{ prs }}</h3>
             <hr>
             <img src="{{ url_for('vidfeed_dataset', nbr=prs) }}" width="100%" class="img-thumbnail">
@@ -18,8 +44,13 @@
 
     <br>
     <div class="row">
+<<<<<<< HEAD
         <div class="col-md-3 offset-lg-2">
             <a class="btn btn-warning btn-lg" href="{{ url_for('train_classifier', nbr=prs) }}"> Training </a>
+=======
+        <div class="col-md-3 offset-lg-1">
+            <a class="btn btn-warning btn-lg hehe1" href="{{ url_for('train_classifier', nbr=prs) }}"> Training </a>
+>>>>>>> 5ae81d6 (update fr code)
         </div>
     </div>
 </section>

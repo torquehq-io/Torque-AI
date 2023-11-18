@@ -2759,9 +2759,99 @@ def get_data1():
 
 
 ####################################################################################################################################
+######################################### Driver detection test ##########################################################
+from driver_behaviour.dms_utils.dms_utils import load_and_preprocess_image, ACTIONS
+from driver_behaviour.net import MobileNet
+from driver_behaviour.facial_tracking.facialTracking import FacialTracker
+import driver_behaviour.facial_tracking.conf as conf
+import tensorflow as tf
+model = MobileNet()
+model.load_weights("driver_behaviour/models/model_split.h5")
 
+yolo_model = torch.hub.load('ultralytics/yolov5', 'yolov5s')
+yolo_model.classes = [0]
+yolo_model.classes = [67]
+facial_tracker = FacialTracker()
+def infer_one_frame(image, model, yolo_model, facial_tracker):
+        eyes_status = ''
+        yawn_status = ''
+        action = ''
+
+        facial_tracker.process_frame(image)
+        if facial_tracker.detected:
+            eyes_status = facial_tracker.eyes_status
+            yawn_status = facial_tracker.yawn_status
+
+        rgb_image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        yolo_result = yolo_model(rgb_image)
+
+        rgb_image = cv2.resize(rgb_image, (224, 224))
+        rgb_image = tf.expand_dims(rgb_image, 0)
+        y = model.predict(rgb_image)
+        result = np.argmax(y, axis=1)
+
+        if result[0] == 0 and yolo_result.xyxy[0].shape[0] > 0:
+            action = list(ACTIONS.keys())[result[0]]
+        if result[0] == 1 and eyes_status == 'eye closed':
+            action = list(ACTIONS.keys())[result[0]]
+
+        cv2.putText(image, f'Driver eyes: {eyes_status}', (30, 40), 0, 1,
+                    conf.LM_COLOR, 2, lineType=cv2.LINE_AA)
+        cv2.putText(image, f'Driver mouth: {yawn_status}', (30, 80), 0, 1,
+                    conf.CT_COLOR, 2, lineType=cv2.LINE_AA)
+        cv2.putText(image, f'Driver action: {action}', (30, 120), 0, 1,
+                    conf.WARN_COLOR, 2, lineType=cv2.LINE_AA)
+        cv2.putText(image, f'Driver Present: {action}', (30, 160), 0, 1,
+                    conf.WARN_COLOR, 2, lineType=cv2.LINE_AA)
+
+        return image
+class DriverBehaviour():
+    def __init__(self,url):
+        self.url=url
+        self.video_name = self.url
+        self.people_count_history = []
+        self.current_loggin_user=current_user.username
+        # self.video_name = 'For_Validation6.mp4'
+        self.cap = cv2.VideoCapture(self.url)
+
+    def __del__(self):
+        self.cap.release()
+
+    def get_frames(self):
+
+        ret, frame = self.cap.read()
+        if not ret:
+            self.cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
+            _, frame = self.cap.read()
+        frame = infer_one_frame(frame, model, yolo_model, facial_tracker)
+
+        ret, buffer = cv2.imencode('.jpg', frame)
+        return buffer.tobytes()
+
+def driver_behaviour_analysis(camera):
+    while True:
+        frame = camera.get_frames()
+        yield (b'--frame\r\n'
+               b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
+        
+
+@app.route('/driver_analysis_video_feed')
+def driver_analysis_video_feed():
+    
+    url = request.args.get('url')
+    driver_behaviour = DriverBehaviour(url)
+    
+
+    return Response(driver_behaviour_analysis(driver_behaviour),
+                    mimetype='multipart/x-mixed-replace; boundary=frame')
+
+@app.route('/driverbehaviour.html' ,methods=["POST","GET"])
+def driverbehaviour():
+  
+    return render_template('home/driverbehaviour.html', User_camera_sources=User_camera_sources_record.query.filter_by(username=current_user.username))
+####################################################################################################################################
 if __name__ == "__main__":
    
-    app.run(host="0.0.0.0")
+    app.run(debug=True,host="0.0.0.0")
     
     

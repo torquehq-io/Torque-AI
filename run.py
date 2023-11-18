@@ -2274,7 +2274,7 @@ class VideoPeopleDetection():
         # self.video_name = 'For_Validation6.mp4'
 
         # Read the video file
-        self.cap = cv2.VideoCapture(self.video_name)
+        self.cap = cv2.VideoCapture(0)
 
     def __del__(self):
         self.cap.release()

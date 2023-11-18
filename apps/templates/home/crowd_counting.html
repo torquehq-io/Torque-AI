@@ -314,61 +314,6 @@
 
 
 
-<!-- <script>
-    // Function to fetch live data from Flask route
-    async function fetchData() {
-        const response = await fetch('/people_count_data?rand=' + Date.now());
-        const data = await response.json();
-        return data;
-    }
-
-    // Function to update the line chart with live data
-    async function updateChart() {
-        const data = await fetchData();
-
-        // Get the chart canvas element
-        const chartCanvas = document.getElementById('liveChart').getContext('2d');
-
-        // Create the line chart
-        const chart = new Chart(chartCanvas, {
-            type: 'line',
-            data: {
-                labels: data.timestamp,
-                datasets: [{
-                    label: 'People Count',
-                    data: data.count,
-                    borderColor: 'rgb(0, 0, 255)',
-                    borderWidth: 1,
-                    fill: false
-                }]
-            },
-            options: {
-                responsive: true,
-                scales: {
-                    x: {
-                        display: true,
-                        title: {
-                            display: true,
-                            text: 'Timestamp'
-                        }
-                    },
-                    y: {
-                        display: true,
-                        title: {
-                            display: true,
-                            text: 'Count'
-                        }
-                    }
-                }
-            }
-        });
-    }
-
-    // Update the chart every second
-    setInterval(updateChart, 1000);
-</script> -->
-
-
 <script>
     // Function to fetch live data from Flask route
     function fetchData() {

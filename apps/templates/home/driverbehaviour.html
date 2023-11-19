@@ -195,7 +195,7 @@
                 <div class="row">
                     <!-- [ Typography ] start -->
                     <div class="col-sm-12 col-lg-5">
-                        <center><h2>Crowd Counting</h2></center>
+                        <center><h2>Vehical Driver Monitoring</h2></center>
                         <div class="card card11" style="margin-left: 15px; padding-left: 10px; ">
                             <div class="">
         
@@ -205,7 +205,7 @@
                                     <label>RTMP URL:</label>
                                     <input id="rtmpUrl" style="width: 40%" type="text" name="rtmpUrl" value="" />
                                     <p style="margin-left: 25%;"> OR </p>
-                                    <select style="width: 70%; margin-right: 20px;" name="row.source" data-live-search="true" id="car_brand" class="form-control" title="Select Car Brand"> 
+                                    <select style="width: 70%; margin-right: 20px;" name="row.source" data-live-search="true" id="car_brand" class="form-control" title="Select Camera Source"> 
                                         {% for row in User_camera_sources %}
                                             <option value="{{row.serial_no}}">{{row.source}}</option>
                                         {% endfor %}
@@ -290,69 +290,6 @@
 
 
 
-<script>
-    // Function to fetch live data from Flask route
-    function fetchData() {
-        return $.ajax({
-            url: '/people_count_data',
-            method: 'GET',
-            dataType: 'json'
-        });
-    }
-
-    // Function to update the line chart with live data
-    function updateChart() {
-        fetchData().done(function(data) {
-            // Get the chart canvas element
-            const chartCanvas = document.getElementById('liveChart').getContext('2d');
-
-            // Create the line chart or update the existing chart
-            if (window.chart) {
-                // Update the chart data
-                window.chart.data.labels = data.timestamp;
-                window.chart.data.datasets[0].data = data.count;
-                window.chart.update();
-            } else {
-                // Create the chart for the first time
-                window.chart = new Chart(chartCanvas, {
-                    type: 'line',
-                    data: {
-                        labels: data.timestamp,
-                        datasets: [{
-                            label: 'People Count',
-                            data: data.count,
-                            borderColor: 'rgb(0, 0, 255)',
-                            borderWidth: 1,
-                            fill: false
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        scales: {
-                            x: {
-                                display: true,
-                                title: {
-                                    display: true,
-                                    text: 'Timestamp'
-                                }
-                            },
-                            y: {
-                                display: true,
-                                title: {
-                                    display: true,
-                                    text: 'Count'
-                                }
-                            }
-                        }
-                    }
-                });
-            }
-        });
-    }
-
-    // Update the chart every 5 seconds
-    setInterval(updateChart, 10000);
-</script>
 
 <script async src="static/assets/js/annotation/opencv3.4.16.js" type="text/javascript"></script>
 {% endblock content %}

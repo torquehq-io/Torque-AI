@@ -235,7 +235,7 @@
                                     <label>RTMP URL:</label>
                                     <input id="rtmpUrl" style="width: 40%" type="text" name="rtmpUrl" value="" />
                                     <p style="margin-left: 25%;"> OR </p>
-                                    <select style="width: 70%; margin-right: 20px;" name="row.source" data-live-search="true" id="car_brand" class="form-control" title="Select Car Brand"> 
+                                    <select style="width: 70%; margin-right: 20px;" name="row.source" data-live-search="true" id="car_brand" class="form-control" title="Select Camera Source"> 
                                         {% for row in User_camera_sources %}
                                             <option value="{{row.serial_no}}">{{row.source}}</option>
                                         {% endfor %}

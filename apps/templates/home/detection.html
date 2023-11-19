@@ -22,7 +22,7 @@
 
 <form id="urlForm" ,action="{{ url_for('video_feed_multifeed1') }}">
       <label>Select Camera Source:</label>
-      <select style="width: 70%; margin-right: 20px;" name="model_name" data-live-search="true" id="car_brand" class="form-control" title="Select Car Brand"> 
+      <select style="width: 70%; margin-right: 20px;" name="model_name" data-live-search="true" id="car_brand" class="form-control" title="Select Camera Source"> 
         {% for row in User_Models_record %}
           <option value="{{row.serial_no}}">{{row.model_name}}</option>
         {% endfor %}

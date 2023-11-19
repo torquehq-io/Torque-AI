@@ -1223,7 +1223,7 @@ class Fire_detection():
         current_loggin_user=current_user.username
         fetch_url =  User_camera_sources.query.filter_by(username=current_loggin_user).first()
         print(fetch_url.link1)
-        self.video = cv2.VideoCapture(fetch_url.link1)
+        self.video = cv2.VideoCapture(0)
 
         self.url = url
         self.error_count = 0
@@ -1297,12 +1297,12 @@ class Fire_detection1():
         current_loggin_user=current_user.username
         fetch_url =  User_camera_sources.query.filter_by(username=current_loggin_user).first()
         print(fetch_url.link2)
-        self.video = cv2.VideoCapture(fetch_url.link2)
+        self.video = cv2.VideoCapture('Fire_detection/input.mp4')
 
         self.url1 = url1
         self.error_count = 0
        
-        self.model = torch.hub.load('yolov5', 'custom', path='/home/torqueai/github/main/Torque-AI/yolov5s.pt', source='local', force_reload=True)
+        self.model = torch.hub.load('yolov5', 'custom', path='Fire_detection/fire.pt', source='local', force_reload=True)
 
        
 
